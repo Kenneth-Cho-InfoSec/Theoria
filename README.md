@@ -8,7 +8,6 @@ photos and videos. It is built with Kotlin, Jetpack Compose, and Android’s mod
 The name comes from the Greek *theōria*: contemplation or beholding. The app is intended to make
 viewing and managing a personal media library feel calm, capable, and local-first.
 
-[![CI](https://github.com/Kenneth-Cho-InfoSec/Theoria/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/Kenneth-Cho-InfoSec/Theoria/actions/workflows/nightly.yml)
 ![License](https://img.shields.io/github/license/Kenneth-Cho-InfoSec/Theoria?color=%23247EE0)
 ![Status](https://img.shields.io/badge/status-beta-orange)
 
@@ -17,8 +16,8 @@ viewing and managing a personal media library feel calm, capable, and local-firs
 Theoria is currently in beta (`0.0.1-beta`). The project is under active development and should be
 treated as a development build rather than a stable production release.
 
-The current local configuration is an offline, no-ML build. Release artifacts are generated locally
-and are not evidence of a published GitHub release.
+The current local configuration is an offline, no-ML build. The latest beta release is available from
+the [GitHub Releases page](https://github.com/Kenneth-Cho-InfoSec/Theoria/releases).
 
 ## Features
 
