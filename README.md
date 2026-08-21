@@ -12,8 +12,6 @@ viewing and managing a personal media library feel calm, capable, and local-firs
 ![License](https://img.shields.io/github/license/Kenneth-Cho-InfoSec/Theoria?color=%23247EE0)
 ![Status](https://img.shields.io/badge/status-beta-orange)
 
-![Theoria preview](./screenshots/preview.png)
-
 ## Current status
 
 Theoria is currently in beta (`0.0.1-beta`). The project is under active development and should be
