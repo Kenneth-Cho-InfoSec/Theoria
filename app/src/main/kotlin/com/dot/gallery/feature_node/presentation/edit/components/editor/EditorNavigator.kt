@@ -21,10 +21,8 @@ import com.dot.gallery.feature_node.domain.model.editor.toEditorDestination
 import com.dot.gallery.feature_node.domain.model.editor.ImageFilter
 import com.dot.gallery.feature_node.domain.model.editor.MarkupItems
 import com.dot.gallery.feature_node.domain.model.editor.PathProperties
-import com.dot.gallery.core.decoder.RawDevelopParams
 import com.dot.gallery.feature_node.presentation.edit.adjustments.varfilter.VariableFilterTypes
 import com.dot.gallery.feature_node.presentation.edit.components.adjustment.AdjustScrubber
-import com.dot.gallery.feature_node.presentation.edit.components.develop.DevelopCategorySection
 import com.dot.gallery.feature_node.presentation.edit.components.colour.ColourSection
 import com.dot.gallery.feature_node.presentation.edit.components.colour.toVariableFilterType
 import com.dot.gallery.feature_node.presentation.edit.components.effects.EffectsSection
@@ -34,10 +32,6 @@ import com.dot.gallery.feature_node.presentation.edit.components.lighting.Lighti
 import com.dot.gallery.feature_node.presentation.edit.components.lighting.toVariableFilterType
 import com.dot.gallery.feature_node.presentation.edit.components.markup.MarkupSelector
 import com.dot.gallery.feature_node.presentation.edit.components.markup.MarkupToolSelector
-import com.dot.gallery.feature_node.presentation.edit.components.cutout.CutoutEditControls
-import com.dot.gallery.feature_node.presentation.edit.components.cutout.SmartSelector
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.CutoutState
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.ZoomablePagerImagePointTool
 import com.dot.gallery.feature_node.domain.model.editor.TextAnnotation
 import kotlin.math.roundToInt
 
@@ -66,16 +60,7 @@ fun EditorNavigator(
     textAnnotations: List<TextAnnotation> = emptyList(),
     onTextAnnotationsChange: (List<TextAnnotation>) -> Unit = {},
     selectedTextIndex: Int = -1,
-    onDetectFaces: () -> Unit = {},
-    faceDetectAvailable: Boolean = false,
-    isDetectingFaces: Boolean = false,
     startDestination: EditorDestination = EditorDestination.Lighting,
-    rawDevelopParams: RawDevelopParams? = null,
-    onRawDevelopChange: (RawDevelopParams) -> Unit = {},
-    rawThumbnailProvider: (suspend (RawDevelopParams) -> Bitmap?)? = null,
-    cutoutState: CutoutState? = null,
-    onCutoutToolChange: (ZoomablePagerImagePointTool) -> Unit = {},
-    onCutoutReset: () -> Unit = {},
 ) {
 
     NavHost(
@@ -91,26 +76,13 @@ fun EditorNavigator(
             if (isSupportingPanel) {
                 EditorSelector(
                     isSupportingPanel = true,
-                    items = EditorItems.visibleItems(isRaw = rawDevelopParams != null),
+                    items = EditorItems.visibleItems(isRaw = false),
                     onItemClick = { editorItem ->
                         navController.navigate(editorItem.toEditorDestination())
                     }
                 )
             }
             // Phone layout: tab bar is outside NavHost, so Editor destination is empty
-        }
-
-        // Develop tabs (RAW only) — one per category, self-contained controls with live thumbnails.
-        composable<EditorDestination.Develop> { entry ->
-            val category = entry.toRoute<EditorDestination.Develop>().category
-            rawDevelopParams?.let { params ->
-                DevelopCategorySection(
-                    category = category,
-                    params = params,
-                    onChange = onRawDevelopChange,
-                    thumbnailProvider = rawThumbnailProvider,
-                )
-            }
         }
 
         // Lighting tab
@@ -159,32 +131,6 @@ fun EditorNavigator(
                     onAdjustItemLongClick(tool.toVariableFilterType())
                 }
             )
-        }
-
-        // Smart category — entry buttons for the two subject tools.
-        composable<EditorDestination.Smart> {
-            SmartSelector(
-                isSupportingPanel = isSupportingPanel,
-                onToolClick = { backgroundRemoval ->
-                    navController.navigate(EditorDestination.CutoutEdit(backgroundRemoval)) {
-                        popUpTo(EditorDestination.Smart) { inclusive = false }
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
-
-        // Interactive cut-out mode — Include/Exclude controls (Copy/Share are in the header, and
-        // Undo/Redo use the editor's top bar; the mask bakes into the pipeline on exit).
-        composable<EditorDestination.CutoutEdit> {
-            cutoutState?.let { state ->
-                CutoutEditControls(
-                    cutoutState = state,
-                    isSupportingPanel = isSupportingPanel,
-                    onToolChange = onCutoutToolChange,
-                    onReset = onCutoutReset,
-                )
-            }
         }
 
         // More tab → directly show external editors
@@ -287,9 +233,6 @@ fun EditorNavigator(
                 textAnnotations = textAnnotations,
                 onTextAnnotationsChange = onTextAnnotationsChange,
                 selectedTextIndex = selectedTextIndex,
-                onDetectFaces = onDetectFaces,
-                faceDetectAvailable = faceDetectAvailable,
-                isDetectingFaces = isDetectingFaces
             )
         }
 

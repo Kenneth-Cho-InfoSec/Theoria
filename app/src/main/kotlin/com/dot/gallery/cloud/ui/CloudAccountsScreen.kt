@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui
@@ -354,9 +354,10 @@ private fun ServerCard(
             }
 
             // Sync progress message
-            AnimatedVisibility(visible = isSyncing && syncProgress?.message?.isNotEmpty() == true) {
+            val progressMessage = syncProgress?.message.orEmpty()
+            AnimatedVisibility(visible = isSyncing && progressMessage.isNotEmpty()) {
                 Text(
-                    text = syncProgress?.message ?: "",
+                    text = progressMessage,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 4.dp)

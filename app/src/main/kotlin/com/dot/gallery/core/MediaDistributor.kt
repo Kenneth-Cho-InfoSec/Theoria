@@ -5,7 +5,6 @@ import com.dot.gallery.feature_node.domain.model.AlbumState
 import com.dot.gallery.feature_node.domain.model.CollectionWithCount
 import com.dot.gallery.feature_node.domain.model.GeoMedia
 import com.dot.gallery.feature_node.domain.model.IgnoredAlbum
-import com.dot.gallery.feature_node.domain.model.ImageEmbedding
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.model.LocationMedia
 import com.dot.gallery.feature_node.domain.util.MediaGroupType
@@ -88,12 +87,6 @@ interface MediaDistributor {
     val collectionAlbumIdsFlow: StateFlow<Set<Long>>
     fun collectionAlbumIdsInCollection(collectionId: Long): Flow<List<Long>>
     fun collectionMediaFlow(collectionId: Long): StateFlow<MediaState<Media.UriMedia>>
-
-    /**
-     * Search
-     */
-    val imageEmbeddingsFlow: StateFlow<List<ImageEmbedding>>
-
 
     fun locationBasedMedia(
         gpsLocationNameCity: String,

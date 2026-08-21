@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.dot.gallery.feature_node.presentation.widget.data
@@ -8,9 +8,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import android.util.Size
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -18,6 +20,7 @@ import java.io.File
 object WidgetBitmapLoader {
 
     private const val CACHE_DIR = "widget_cache"
+    private const val TAG = "WidgetBitmapLoader"
 
     /**
      * Loads a bitmap from [uri] using Glide (with all registered decoders) and
@@ -32,11 +35,17 @@ object WidgetBitmapLoader {
         maxWidth: Int = 1024,
         maxHeight: Int = 1024
     ): Boolean = withContext(Dispatchers.IO) {
+        if (maxWidth <= 0 || maxHeight <= 0) {
+            Log.w(TAG, "Rejected non-positive widget bitmap dimensions")
+            return@withContext false
+        }
         val bitmap = loadBitmap(context, uri, maxWidth, maxHeight)
-        if (bitmap != null) {
+        if (bitmap == null) return@withContext false
+        try {
             saveBitmapToFile(context, bitmap, widgetId, index)
             true
-        } else {
+        } catch (error: Exception) {
+            Log.w(TAG, "Failed to cache widget bitmap (${error::class.simpleName})")
             false
         }
     }
@@ -50,7 +59,8 @@ object WidgetBitmapLoader {
         if (!file.exists()) return null
         return try {
             BitmapFactory.decodeFile(file.absolutePath)
-        } catch (e: Exception) {
+        } catch (error: Exception) {
+            Log.w(TAG, "Failed to decode cached widget bitmap (${error::class.simpleName})")
             null
         }
     }
@@ -79,7 +89,10 @@ object WidgetBitmapLoader {
                 .submit()
                 .get()
             return@withContext bitmap
-        } catch (_: Exception) {
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            Log.w(TAG, "Glide widget thumbnail failed (${error::class.simpleName})")
         }
 
         // Fallback: ContentResolver.loadThumbnail (API 29+)
@@ -88,15 +101,26 @@ object WidgetBitmapLoader {
                 uri, Size(maxWidth, maxHeight), null
             )
             return@withContext bitmap
-        } catch (_: Exception) { }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            Log.w(TAG, "ContentResolver widget thumbnail failed (${error::class.simpleName})")
+        }
 
         null
     }
 
     private fun saveBitmapToFile(context: Context, bitmap: Bitmap, widgetId: Int, index: Int) {
         val file = getBitmapFile(context, widgetId, index)
-        file.parentFile?.mkdirs()
-        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+        val parent = file.parentFile
+        if (parent != null && !parent.exists() && !parent.mkdirs() && !parent.exists()) {
+            error("Unable to create widget bitmap cache directory")
+        }
+        file.outputStream().use { output ->
+            check(bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)) {
+                "Bitmap compression failed"
+            }
+        }
     }
 
     private fun getBitmapFile(context: Context, widgetId: Int, index: Int): File {

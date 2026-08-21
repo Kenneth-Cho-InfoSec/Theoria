@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decoder.glide
 
 import android.content.Context
@@ -49,6 +54,11 @@ data class EncryptedMediaSource(
             r
         }
         return result.bytes.inputStream()
+    }
+
+    /** Release the spill file created for large decrypted media. */
+    fun close() {
+        tempFile?.takeIf { it.isFile }?.delete()
     }
 
     /** Materialize as EncryptedMediaStream (byte array) for decoders that still require bytes. */

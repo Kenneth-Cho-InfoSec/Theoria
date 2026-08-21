@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.data.dao
@@ -38,6 +38,13 @@ interface CloudMediaDao {
 
     @Query("SELECT * FROM cloud_media WHERE remoteId = :remoteId AND providerType = :providerType")
     suspend fun getByRemoteId(remoteId: String, providerType: ProviderType): CloudMediaEntity?
+
+    @Query("SELECT * FROM cloud_media WHERE remoteId = :remoteId AND providerType = :providerType AND serverConfigId = :configId")
+    suspend fun getByRemoteIdForConfig(
+        remoteId: String,
+        providerType: ProviderType,
+        configId: Long
+    ): CloudMediaEntity?
 
     @Query("SELECT * FROM cloud_media WHERE contentHash = :hash LIMIT 1")
     suspend fun getByContentHash(hash: String): CloudMediaEntity?
@@ -105,6 +112,14 @@ interface CloudMediaDao {
     @Query("UPDATE cloud_media SET favorite = :favorite WHERE remoteId = :remoteId AND providerType = :providerType")
     suspend fun updateFavorite(remoteId: String, providerType: ProviderType, favorite: Boolean)
 
+    @Query("UPDATE cloud_media SET favorite = :favorite WHERE remoteId = :remoteId AND providerType = :providerType AND serverConfigId = :configId")
+    suspend fun updateFavoriteForConfig(
+        remoteId: String,
+        providerType: ProviderType,
+        configId: Long,
+        favorite: Boolean
+    )
+
     @Query("UPDATE cloud_media SET trashed = :trashed WHERE remoteId = :remoteId AND providerType = :providerType")
     suspend fun updateTrashed(remoteId: String, providerType: ProviderType, trashed: Boolean)
 
@@ -116,6 +131,9 @@ interface CloudMediaDao {
 
     @Query("DELETE FROM cloud_media WHERE remoteId = :remoteId AND providerType = :providerType")
     suspend fun delete(remoteId: String, providerType: ProviderType)
+
+    @Query("DELETE FROM cloud_media WHERE remoteId = :remoteId AND providerType = :providerType AND serverConfigId = :configId")
+    suspend fun deleteForConfig(remoteId: String, providerType: ProviderType, configId: Long)
 
     @Query("DELETE FROM cloud_media WHERE serverConfigId = :configId")
     suspend fun deleteByServerConfig(configId: Long)

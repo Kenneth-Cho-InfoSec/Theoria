@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.core
@@ -11,9 +11,9 @@ import com.dot.gallery.cloud.core.capabilities.OcrCapableProvider
 import com.dot.gallery.cloud.core.capabilities.PeopleCapableProvider
 import com.dot.gallery.cloud.core.capabilities.RemoteMediaProvider
 import com.dot.gallery.cloud.core.capabilities.ShareLinkCapableProvider
-import com.dot.gallery.cloud.core.capabilities.SmartSearchCapableProvider
 import com.dot.gallery.cloud.core.capabilities.SyncCapableProvider
 import com.dot.gallery.feature_node.presentation.util.printDebug
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,9 +24,10 @@ class ProviderRegistry @Inject constructor() {
     // several accounts of the same provider type (e.g. two Immich servers) can be registered
     // simultaneously, each as its own isolated instance.
     @PublishedApi
-    internal val _providers = mutableMapOf<Long, MediaCapabilityProvider>()
+    internal val _providers = ConcurrentHashMap<Long, MediaCapabilityProvider>()
 
     fun register(configId: Long, provider: MediaCapabilityProvider) {
+        require(configId > 0L) { "Provider account ID must be positive" }
         _providers[configId] = provider
         printDebug("ProviderRegistry: Registered ${provider.providerType.displayName} " +
                 "(account #$configId) with capabilities: ${provider.capabilities}")
@@ -68,7 +69,6 @@ class ProviderRegistry @Inject constructor() {
     fun getRemoteProviders(): List<RemoteMediaProvider> = getByCapability()
     fun getPeopleProviders(): List<PeopleCapableProvider> = getByCapability()
     fun getOcrProviders(): List<OcrCapableProvider> = getByCapability()
-    fun getSmartSearchProviders(): List<SmartSearchCapableProvider> = getByCapability()
     fun getMapProviders(): List<MapCapableProvider> = getByCapability()
     fun getShareLinkProviders(): List<ShareLinkCapableProvider> = getByCapability()
     fun getSyncProviders(): List<SyncCapableProvider> = getByCapability()

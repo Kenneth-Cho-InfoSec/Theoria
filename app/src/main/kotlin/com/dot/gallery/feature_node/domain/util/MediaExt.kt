@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.domain.util
 
 import android.content.Context
@@ -91,6 +96,7 @@ val Media.volume: String
  *   `(VOLUME_EXTERNAL_PRIMARY, "DCIM/Camera/")`
  */
 fun resolveMediaStoreVolume(path: String): Pair<String, String> {
+    if (path.isBlank()) return MediaStore.VOLUME_EXTERNAL_PRIMARY to ""
     val primaryStorage = Environment.getExternalStorageDirectory().absolutePath.trimEnd('/')
 
     return when {

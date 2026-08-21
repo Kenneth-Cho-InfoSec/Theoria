@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.presentation.components
@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -80,15 +82,7 @@ import com.dot.gallery.feature_node.presentation.albums.EditGroupScreen
 import com.dot.gallery.feature_node.presentation.albums.AlbumsScreen
 import com.dot.gallery.feature_node.presentation.albums.AlbumsViewModel
 import com.dot.gallery.feature_node.presentation.albumtimeline.AlbumTimelineScreen
-import com.dot.gallery.feature_node.presentation.classifier.AddCategoryScreen
-import com.dot.gallery.feature_node.presentation.classifier.CategoriesSettingsScreen
-import com.dot.gallery.feature_node.presentation.classifier.CategoryEditorScreen
-import com.dot.gallery.feature_node.presentation.classifier.EditCategoryScreen
-import com.dot.gallery.feature_node.presentation.classifier.CategoriesScreen
-import com.dot.gallery.feature_node.presentation.classifier.CategoriesViewModel
 import com.dot.gallery.feature_node.presentation.location.LocationsScreen
-import com.dot.gallery.feature_node.presentation.classifier.CategoryViewModel
-import com.dot.gallery.feature_node.presentation.classifier.CategoryViewScreen
 import com.dot.gallery.feature_node.presentation.collection.CollectionViewModel
 import com.dot.gallery.feature_node.presentation.collection.CollectionAlbumSelectorScreen
 import com.dot.gallery.feature_node.presentation.collection.CollectionViewScreen
@@ -118,12 +112,11 @@ import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsSe
 import com.dot.gallery.feature_node.presentation.settings.subsettings.SlideshowSettingsScreen
 import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsTimelineAlbumsScreen
 import com.dot.gallery.feature_node.presentation.settings.subsettings.EditBackupsViewerScreen
-import com.dot.gallery.feature_node.presentation.settings.subsettings.AIModelsManagerScreen
+import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsGeneralScreen
 import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsSecurityScreen
 import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsBackupScreen
 import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsBackupExportScreen
 import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsBackupImportScreen
-import com.dot.gallery.feature_node.presentation.settings.subsettings.SettingsSmartFeaturesScreen
 import com.dot.gallery.cloud.core.ProviderType
 import com.dot.gallery.cloud.ui.CloudAccountsScreen
 import com.dot.gallery.cloud.ui.CloudAddServerScreen
@@ -221,6 +214,32 @@ fun NavigationComp(
         mutableStateOf(false)
     }
     val allowBlur by rememberAllowBlur()
+    val lockApp by Settings.Security.rememberLockApp()
+    var appUnlocked by rememberSaveable(lockApp) { mutableStateOf(!lockApp) }
+    val appBiometricState = rememberBiometricState(
+        title = stringResource(R.string.biometric_authentication),
+        subtitle = stringResource(R.string.security_lock_app_subtitle),
+        onSuccess = { appUnlocked = true },
+        onFailed = { appUnlocked = false }
+    )
+
+    // Lock again whenever the activity leaves the foreground. The keyed effect also handles
+    // enabling the preference while the app is already open without exposing a frame of content.
+    LaunchedEffect(lockApp, appUnlocked, appBiometricState.isSupported) {
+        if (!lockApp) {
+            appUnlocked = true
+        } else if (!appBiometricState.isSupported) {
+            // Do not strand users on devices without a configured secure credential.
+            appUnlocked = true
+        } else if (!appUnlocked) {
+            appBiometricState.authenticate()
+        }
+    }
+    OnLifecycleEvent { _, event ->
+        if (event == Lifecycle.Event.ON_STOP && lockApp) {
+            appUnlocked = false
+        }
+    }
 
     LaunchedEffect(navBackStackEntry) {
         navBackStackEntry?.destination?.route?.let {
@@ -262,15 +281,16 @@ fun NavigationComp(
     }
 
     val searchViewModel = hiltViewModel<SearchViewModel>()
-    SharedTransitionLayout {
-        NavHost(
+    if (!lockApp || appUnlocked) {
+        SharedTransitionLayout {
+            NavHost(
             navController = navController,
             startDestination = startDest,
             enterTransition = { navigateInAnimation },
             exitTransition = { navigateUpAnimation },
             popEnterTransition = { navigateInAnimation },
             popExitTransition = { navigateUpAnimation }
-        ) {
+            ) {
             composable(
                 route = Screen.SetupScreen(),
             ) {
@@ -303,14 +323,34 @@ fun NavigationComp(
                 route = Screen.TrashedScreen()
             ) {
                 val trashedMediaState = navViewModel.trashedMediaState.collectAsStateWithLifecycle()
-                TrashedGridScreen(
-                    paddingValues = paddingValues,
-                    mediaState = trashedMediaState,
-                    metadataState = metadataState,
-                    clearSelection = selector::clearSelection,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this
+                val lockTrash by Settings.Security.rememberLockTrash()
+                var trashUnlocked by rememberSaveable { mutableStateOf(!lockTrash) }
+                val trashBiometricState = rememberBiometricState(
+                    title = stringResource(R.string.biometric_authentication),
+                    subtitle = stringResource(R.string.security_lock_trash_subtitle),
+                    onSuccess = { trashUnlocked = true },
+                    onFailed = { navController.navigateUp() }
                 )
+                LaunchedEffect(lockTrash) {
+                    trashUnlocked = !lockTrash
+                    if (lockTrash) {
+                        if (trashBiometricState.isSupported) {
+                            trashBiometricState.authenticate()
+                        } else {
+                            navController.navigateUp()
+                        }
+                    }
+                }
+                if (trashUnlocked) {
+                    TrashedGridScreen(
+                        paddingValues = paddingValues,
+                        mediaState = trashedMediaState,
+                        metadataState = metadataState,
+                        clearSelection = selector::clearSelection,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this
+                    )
+                }
             }
             composable(
                 route = Screen.FavoriteScreen()
@@ -807,7 +847,7 @@ fun NavigationComp(
                     when (target) {
                         TARGET_FAVORITES -> navViewModel.favoriteMediaState
                         TARGET_TRASH -> navViewModel.trashedMediaState
-                        "cloud_archive" -> archiveViewModel!!.mediaState
+                        "cloud_archive" -> archiveViewModel?.mediaState ?: navViewModel.timelineMediaState
                         else -> navViewModel.timelineMediaState
                     }
                 }.collectAsStateWithLifecycle()
@@ -911,30 +951,6 @@ fun NavigationComp(
             }
 
             composable(
-                route = Screen.CategoriesScreen()
-            ) {
-                val categoriesViewModel = hiltViewModel<CategoriesViewModel>()
-                val categoriesWithCount by categoriesViewModel.categoriesWithCount.collectAsStateWithLifecycle()
-                val distributor = LocalMediaDistributor.current
-                val categoryMediaState by distributor.timelineMediaFlow.collectAsStateWithLifecycle(
-                    context = Dispatchers.IO,
-                    initialValue = MediaState()
-                )
-                CategoriesScreen(
-                    categoriesWithCount = categoriesWithCount,
-                    mediaState = categoryMediaState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this
-                )
-            }
-
-            composable(
-                route = Screen.CategoriesSettingsScreen()
-            ) {
-                CategoriesSettingsScreen()
-            }
-
-            composable(
                 route = Screen.LocationsScreen.withMediaId(),
                 arguments = listOf(
                     navArgument("mediaId") {
@@ -946,210 +962,14 @@ fun NavigationComp(
                 val initialMediaId = remember(backStackEntry) {
                     backStackEntry.arguments?.getLong("mediaId", -1L) ?: -1L
                 }
-                val locationsViewModel = hiltViewModel<CategoriesViewModel>()
-                val locations by locationsViewModel.locations.collectAsStateWithLifecycle()
-                val geoMedia by locationsViewModel.geoMedia.collectAsStateWithLifecycle()
+                val distributor = LocalMediaDistributor.current
+                val locations by distributor.locationsMediaFlow.collectAsStateWithLifecycle(initialValue = emptyList())
+                val geoMedia by distributor.geoMediaFlow.collectAsStateWithLifecycle(initialValue = emptyList())
                 LocationsScreen(
                     metadataState = metadataState,
                     locations = locations,
                     geoMedia = geoMedia,
                     initialMediaId = initialMediaId
-                )
-            }
-
-            composable(
-                route = Screen.AddCategoryScreen()
-            ) {
-                AddCategoryScreen(
-                    paddingValues = paddingValues,
-                    isScrolling = isScrolling,
-                    metadataState = metadataState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this,
-                    onNavigateBack = { navController.navigateUp() }
-                )
-            }
-            
-            composable(
-                route = Screen.EditCategoryScreen.route(),
-                arguments = listOf(
-                    navArgument(name = "categoryId") {
-                        type = NavType.LongType
-                        defaultValue = -1
-                    }
-                )
-            ) { backStackEntry ->
-                val categoryId = remember(backStackEntry) {
-                    backStackEntry.arguments?.getLong("categoryId") ?: -1
-                }
-                EditCategoryScreen(
-                    categoryId = categoryId,
-                    paddingValues = paddingValues,
-                    isScrolling = isScrolling,
-                    metadataState = metadataState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this,
-                    onNavigateBack = { navController.navigateUp() }
-                )
-            }
-
-            // Unified Category Editor — Create mode
-            composable(
-                route = Screen.CategoryEditorScreen.create()
-            ) {
-                CategoryEditorScreen(
-                    categoryId = null,
-                    paddingValues = paddingValues,
-                    isScrolling = isScrolling,
-                    metadataState = metadataState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this,
-                    onNavigateBack = { navController.navigateUp() }
-                )
-            }
-
-            // Unified Category Editor — Edit mode
-            composable(
-                route = Screen.CategoryEditorScreen.edit(),
-                arguments = listOf(
-                    navArgument(name = "categoryId") {
-                        type = NavType.LongType
-                        defaultValue = -1
-                    }
-                )
-            ) { backStackEntry ->
-                val categoryId = remember(backStackEntry) {
-                    backStackEntry.arguments?.getLong("categoryId") ?: -1
-                }
-                CategoryEditorScreen(
-                    categoryId = categoryId,
-                    paddingValues = paddingValues,
-                    isScrolling = isScrolling,
-                    metadataState = metadataState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this,
-                    onNavigateBack = { navController.navigateUp() }
-                )
-            }
-
-            composable(
-                route = Screen.CategoryViewScreen.category(),
-                arguments = listOf(
-                    navArgument(name = "category") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                )
-            ) { backStackEntry ->
-                val category: String = remember(backStackEntry) {
-                    backStackEntry.arguments?.getString("category") ?: ""
-                }
-                CategoryViewScreen(
-                    category = category,
-                    metadataState = metadataState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this
-                )
-            }
-
-            // New ID-based category view route
-            composable(
-                route = Screen.CategoryViewScreen.categoryId(),
-                arguments = listOf(
-                    navArgument(name = "categoryId") {
-                        type = NavType.LongType
-                        defaultValue = -1L
-                    }
-                )
-            ) { backStackEntry ->
-                val categoryId: Long = remember(backStackEntry) {
-                    backStackEntry.arguments?.getLong("categoryId") ?: -1L
-                }
-                CategoryViewScreen(
-                    categoryId = categoryId,
-                    metadataState = metadataState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this
-                )
-            }
-
-            composable(
-                route = Screen.MediaViewScreen.idAndCategory(),
-                arguments = listOf(
-                    navArgument(name = "mediaId") {
-                        type = NavType.LongType
-                        defaultValue = -1
-                    },
-                    navArgument(name = "category") {
-                        type = NavType.StringType
-                        defaultValue = "null"
-                    }
-                )
-            ) { backStackEntry ->
-                val mediaId: Long = remember(backStackEntry) {
-                    backStackEntry.arguments?.getLong("mediaId") ?: -1
-                }
-                val category: String = remember(backStackEntry) {
-                    backStackEntry.arguments?.getString("category", "null").toString()
-                }
-
-                val viewModel = hiltViewModel<CategoryViewModel>().apply {
-                    this.category = category
-                }
-                val mediaState = viewModel.mediaByCategory
-                    .collectAsStateWithLifecycle(MediaState())
-
-                MediaViewScreenRoute(
-                    toggleRotate = toggleRotate,
-                    paddingValues = paddingValues,
-                    mediaId = mediaId,
-                    target = "category_$category",
-                    mediaState = mediaState,
-                    metadataState = metadataState,
-                    albumsState = albumsState,
-                    vaultState = vaultState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this
-                )
-            }
-
-            composable(
-                route = Screen.MediaViewScreen.idAndCategoryId(),
-                arguments = listOf(
-                    navArgument(name = "mediaId") {
-                        type = NavType.LongType
-                        defaultValue = -1
-                    },
-                    navArgument(name = "categoryId") {
-                        type = NavType.LongType
-                        defaultValue = -1
-                    }
-                )
-            ) { backStackEntry ->
-                val mediaId: Long = remember(backStackEntry) {
-                    backStackEntry.arguments?.getLong("mediaId") ?: -1
-                }
-                val categoryId: Long = remember(backStackEntry) {
-                    backStackEntry.arguments?.getLong("categoryId") ?: -1
-                }
-
-                val viewModel = hiltViewModel<CategoryViewModel>().apply {
-                    setCategoryId(categoryId)
-                }
-                val mediaState = viewModel.mediaByCategoryId
-                    .collectAsStateWithLifecycle(MediaState())
-
-                MediaViewScreenRoute(
-                    toggleRotate = toggleRotate,
-                    paddingValues = paddingValues,
-                    mediaId = mediaId,
-                    target = "categoryId_$categoryId",
-                    mediaState = mediaState,
-                    metadataState = metadataState,
-                    albumsState = albumsState,
-                    vaultState = vaultState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this
                 )
             }
 
@@ -1235,12 +1055,6 @@ fun NavigationComp(
             }
             composable(Screen.SettingsGeneralScreen()) {
                 SettingsGeneralScreen()
-            }
-            composable(Screen.SettingsSmartFeaturesScreen()) {
-                SettingsSmartFeaturesScreen()
-            }
-            composable(Screen.AIModelsManagerScreen()) {
-                AIModelsManagerScreen()
             }
             composable(Screen.SettingsAppearanceScreen()) {
                 ColorPaletteScreen()
@@ -1721,6 +1535,35 @@ fun NavigationComp(
                 )
             }
 
+            }
+        }
+    } else {
+        AppLockGate(onRetry = { appBiometricState.authenticate() })
+    }
+}
+
+@Composable
+private fun AppLockGate(onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.security_lock_app),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = stringResource(R.string.security_lock_app_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+        )
+        Button(onClick = onRetry) {
+            Text(stringResource(R.string.biometric_authentication))
         }
     }
 }

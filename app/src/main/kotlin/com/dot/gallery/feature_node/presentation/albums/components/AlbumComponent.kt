@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.albums.components
@@ -77,6 +77,7 @@ import com.dot.gallery.R
 import com.dot.gallery.cloud.core.ProviderType
 import com.dot.gallery.cloud.ui.descriptor.ProviderBrandIcon
 import com.dot.gallery.core.LocalMediaHandler
+import com.dot.gallery.core.Settings.Album.rememberAlbumThumbnailPadding
 import com.dot.gallery.core.presentation.components.LocalMediaImageRenderer
 import com.dot.gallery.feature_node.domain.model.Album
 import com.dot.gallery.feature_node.presentation.common.components.OptionItem
@@ -642,6 +643,7 @@ fun AlbumImage(
     onItemClick: (Album) -> Unit,
     onItemLongClick: ((Album) -> Unit)?
 ) {
+    val thumbnailPadding by rememberAlbumThumbnailPadding()
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState()
     val cornerRadius by animateDpAsState(
@@ -701,8 +703,9 @@ fun AlbumImage(
     } else {
         val renderer = LocalMediaImageRenderer.current
         renderer.RenderImage(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
+                .padding(thumbnailPadding.dp)
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),

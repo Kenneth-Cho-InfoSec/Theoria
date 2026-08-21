@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.immich
@@ -28,7 +28,6 @@ import com.dot.gallery.cloud.core.capabilities.MemoriesCapableProvider
 import com.dot.gallery.cloud.core.capabilities.PeopleCapableProvider
 import com.dot.gallery.cloud.core.capabilities.RemoteMediaProvider
 import com.dot.gallery.cloud.core.capabilities.ShareLinkCapableProvider
-import com.dot.gallery.cloud.core.capabilities.SmartSearchCapableProvider
 import com.dot.gallery.cloud.core.capabilities.SyncCapableProvider
 import com.dot.gallery.cloud.data.dao.CloudMediaDao
 import com.dot.gallery.cloud.data.entity.CloudMediaEntity
@@ -39,7 +38,6 @@ import com.dot.gallery.cloud.immich.data.dto.ImmichAssetDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichBulkCheckItemDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichBulkUploadCheckDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichLoginDto
-import com.dot.gallery.cloud.immich.data.dto.ImmichSearchDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichSharedLinkCreateDto
 import com.dot.gallery.core.Resource
 import com.dot.gallery.feature_node.domain.model.Media
@@ -80,7 +78,6 @@ class ImmichProvider @Inject constructor(
 ) : RemoteMediaProvider,
     MapCapableProvider,
     PeopleCapableProvider,
-    SmartSearchCapableProvider,
     ShareLinkCapableProvider,
     SyncCapableProvider,
     MemoriesCapableProvider,
@@ -239,7 +236,8 @@ class ImmichProvider @Inject constructor(
             val tempApi = createIsolatedApiService(tempUrl, apiKey = config.apiKey, token = token)
             val response = tempApi.getServerAbout()
             if (response.isSuccessful) {
-                val about = response.body()!!
+                val about = response.body()
+                    ?: return Result.failure(Exception("Connection returned an empty server response"))
                 val storage = try {
                     tempApi.getServerStorage().body()
                 } catch (_: Exception) { null }
@@ -284,7 +282,8 @@ class ImmichProvider @Inject constructor(
                     ImmichLoginDto(email = config.username, password = config.password)
                 )
                 if (loginResponse.isSuccessful) {
-                    val body = loginResponse.body()!!
+                    val body = loginResponse.body()
+                        ?: return Result.failure(Exception("Login returned an empty response"))
                     authInterceptor.accessToken = body.accessToken
                     _connectionState.value = ConnectionState.CONNECTED
                     Result.success(
@@ -428,7 +427,8 @@ class ImmichProvider @Inject constructor(
             val configId = currentConfig?.id ?: 0L
             val response = requireApi().createAlbum(mapOf("albumName" to name))
             if (response.isSuccessful) {
-                val dto = response.body()!!
+                val dto = response.body()
+                    ?: return Result.failure(Exception("Album creation returned an empty response"))
                 Result.success(
                     CloudAlbum(
                         remoteId = dto.id,
@@ -550,7 +550,12 @@ class ImmichProvider @Inject constructor(
     override suspend fun getServerVersion(): Result<String> = try {
         val response = requireApi().getServerAbout()
         if (response.isSuccessful) {
-            Result.success(response.body()!!.version)
+            val version = response.body()?.version
+            if (version.isNullOrBlank()) {
+                Result.failure(Exception("Server version response was empty"))
+            } else {
+                Result.success(version)
+            }
         } else {
             Result.failure(Exception("Failed to get server version: ${response.code()}"))
         }
@@ -561,7 +566,8 @@ class ImmichProvider @Inject constructor(
     override suspend fun getStorageInfo(): Result<CloudStorageInfo> = try {
         val response = requireApi().getServerStorage()
         if (response.isSuccessful) {
-            val dto = response.body()!!
+            val dto = response.body()
+                ?: return Result.failure(Exception("Storage response was empty"))
             printDebug("ImmichProvider: Storage info: used=${dto.diskUsed}, total=${dto.diskSize}, pct=${dto.diskUsedPercentage}")
             Result.success(
                 CloudStorageInfo(
@@ -673,25 +679,6 @@ class ImmichProvider @Inject constructor(
         }
     }
 
-    // === Smart Search ===
-
-    override suspend fun smartSearch(query: String): Result<List<Media>> {
-        return try {
-            val configId = currentConfig?.id ?: 0L
-            val response = requireApi().smartSearch(ImmichSearchDto(query = query))
-            if (response.isSuccessful) {
-                val media = response.body()?.assets?.items
-                    ?.map { it.toCloudMediaEntity(configId, baseUrl).toUriMedia() }
-                    ?: emptyList()
-                Result.success(media)
-            } else {
-                Result.failure(Exception("Smart search failed: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     // === Share Link ===
 
     override suspend fun createShareLink(assetIds: List<String>, expiresAt: Long?): Result<String> {
@@ -746,7 +733,8 @@ class ImmichProvider @Inject constructor(
                     fileModifiedAt = fileModifiedAt
                 )
                 if (response.isSuccessful) {
-                    val dto = response.body()!!
+                    val dto = response.body()
+                        ?: return Result.failure(Exception("Upload returned an empty response"))
                     val entity = dto.toCloudMediaEntity(configId, baseUrl)
                     cloudMediaDao.insert(entity)
                     Result.success(entity)

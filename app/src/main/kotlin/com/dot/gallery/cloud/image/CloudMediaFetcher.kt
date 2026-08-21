@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.image
 
+import android.net.Uri
 import com.dot.gallery.cloud.core.CloudTrace
 import com.dot.gallery.cloud.core.CloudUri
 import com.dot.gallery.cloud.core.ProviderRegistry
@@ -100,23 +101,23 @@ class CloudMediaFetcher private constructor(
             val response = CloudTrace.time("Sketch.fetch[$providerType] $sizeParam '$remoteId' HTTP") {
                 client.newCall(requestBuilder.build()).execute()
             }
-            if (!response.isSuccessful) {
-                CloudTrace.w("Sketch.fetch[$providerType] $sizeParam '$remoteId' -> HTTP ${response.code}")
-                return@withContext Result.failure(Exception("HTTP ${response.code}: ${response.message}"))
-            }
+            response.use { httpResponse ->
+                if (!httpResponse.isSuccessful) {
+                    CloudTrace.w("Sketch.fetch[$providerType] $sizeParam '$remoteId' -> HTTP ${httpResponse.code}")
+                    return@use Result.failure(Exception("HTTP ${httpResponse.code}: ${httpResponse.message}"))
+                }
 
-            val bytes = response.body?.bytes()
-                ?: return@withContext Result.failure(Exception("Empty response body"))
+                val bytes = httpResponse.body.bytes()
+                val mimeType = httpResponse.header("Content-Type")
+                CloudTrace.d("Sketch.fetch[$providerType] $sizeParam '$remoteId' <- ${CloudTrace.bytes(bytes.size.toLong())} ($mimeType)")
 
-            val mimeType = response.header("Content-Type")
-            CloudTrace.d("Sketch.fetch[$providerType] $sizeParam '$remoteId' <- ${CloudTrace.bytes(bytes.size.toLong())} ($mimeType)")
-
-            Result.success(
-                FetchResult(
-                    dataSource = ByteArrayDataSource(bytes, DataFrom.NETWORK),
-                    mimeType = mimeType
+                Result.success(
+                    FetchResult(
+                        dataSource = ByteArrayDataSource(bytes, DataFrom.NETWORK),
+                        mimeType = mimeType
+                    )
                 )
-            )
+            }
         } catch (e: Exception) {
             CloudTrace.w("Sketch.fetch[$providerType] $sizeParam '$remoteId' failed: ${e.message}")
             Result.failure(e)
@@ -163,20 +164,37 @@ class CloudMediaFetcher private constructor(
                 ThumbnailSize.THUMBNAIL -> "thumbnail"
                 ThumbnailSize.PREVIEW -> "preview"
             }
-            val sb = StringBuilder("$SCHEME://${providerType.name}/$remoteId?size=$sizeStr")
-            if (!fileId.isNullOrBlank()) sb.append("&fileId=$fileId")
-            if (configId > 0L) sb.append("&cfg=$configId")
-            return sb.toString()
+            return Uri.Builder()
+                .scheme(SCHEME)
+                .authority(providerType.name)
+                .appendEncodedPath(Uri.encode(remoteId, "/"))
+                .appendQueryParameter("size", sizeStr)
+                .apply { if (!fileId.isNullOrBlank()) appendQueryParameter("fileId", fileId) }
+                .apply { if (configId > 0L) appendQueryParameter("cfg", configId.toString()) }
+                .build()
+                .toString()
         }
 
         fun buildOriginalUri(providerType: ProviderType, remoteId: String, configId: Long = -1L): String {
-            val base = "$SCHEME://${providerType.name}/$remoteId?size=original"
-            return if (configId > 0L) "$base&cfg=$configId" else base
+            return Uri.Builder()
+                .scheme(SCHEME)
+                .authority(providerType.name)
+                .appendEncodedPath(Uri.encode(remoteId, "/"))
+                .appendQueryParameter("size", "original")
+                .apply { if (configId > 0L) appendQueryParameter("cfg", configId.toString()) }
+                .build()
+                .toString()
         }
 
         fun buildPersonUri(providerType: ProviderType, personId: String, configId: Long = -1L): String {
-            val base = "$SCHEME://${providerType.name}/$personId?type=person"
-            return if (configId > 0L) "$base&cfg=$configId" else base
+            return Uri.Builder()
+                .scheme(SCHEME)
+                .authority(providerType.name)
+                .appendEncodedPath(Uri.encode(personId, "/"))
+                .appendQueryParameter("type", "person")
+                .apply { if (configId > 0L) appendQueryParameter("cfg", configId.toString()) }
+                .build()
+                .toString()
         }
     }
 }

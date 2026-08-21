@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.setup.pages
@@ -88,7 +88,7 @@ fun SetupLooksFeelPage(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    listOf(Settings.Misc.ALIAS_REFRA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
+                    listOf(Settings.Misc.ALIAS_THEORIA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
                         LogoChoice(
                             modifier = Modifier.weight(1f),
                             label = alias,
@@ -106,7 +106,7 @@ fun SetupLooksFeelPage(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    listOf(Settings.Misc.ALIAS_REFRA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
+                    listOf(Settings.Misc.ALIAS_THEORIA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
                         LogoChoice(
                             modifier = Modifier.weight(1f),
                             label = alias,

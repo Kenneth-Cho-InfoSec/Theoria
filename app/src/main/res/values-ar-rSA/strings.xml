@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">المعرض</string>
     <string name="change_app_name">اسم التطبيق</string>
     <string name="change_app_name_summary">غيّر اسم التطبيق الذي يظهر على المُطلق</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">افتح خارجيًا</string>
     <string name="no_map_app">لا يوجد تطبيق متاح لإظهار الموقع</string>
     <string name="app_dev">بواسطة %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">تبرع</string>
     <string name="github">Github</string>
     <string name="donate_button_cd">زر التبرع</string>
     <string name="github_button_cd">زر Github</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">أهمِل اللافتة</string>
     <string name="dismiss_banner_title">انقل الشعار؟</string>
     <string name="dismiss_banner_message">سيتم نقل زري «التبرع» و«GitHub» إلى شريط صغير في أسفل صفحة «الإعدادات».</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">كل البيانات الوصفية</string>
     <string name="no_metadata_found">لم يُعثر على أي بيانات وصفية</string>
     <string name="loading_metadata">يحمّل البيانات الوصفية…</string>
-    <string name="categorise_your_media">صنّف وسائطك</string>
-    <string name="disclaimer_classification">Your media is not uploaded to any server, all classification is done locally on your device by using TensorFlow-Lite with a pre-trained model available in the app\'s assets.</string>
+
     <string name="ai_category">الميزات الذكية</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">لم يتم تثبيت نماذج الذكاء الاصطناعي. نزلها من \"الإعدادات\" &gt; \"الميزات الذكية\".</string>
+
     <string name="ai_models_manager">مدير نماذج الذكاء الاصطناعي</string>
     <string name="ai_models_download">نزّل نماذج الذكاء الاصطناعي</string>
-    <string name="ai_models_download_summary">نزّل نماذج الذكاء الاصطناعي للبحث عن الصور وتصنيفها (~147 م.بايت)</string>
+
     <string name="ai_models_downloading">ينزل نماذج الذكاء الاصطناعي…</string>
-    <string name="ai_models_ready_summary">يتوفر البحث والتصنيف المدعوم بالذكاء الاصطناعي</string>
-    <string name="ai_models_error">خطأ في نموذج الذكاء الاصطناعي</string>
+
     <string name="ai_models_delete">احذف نماذج الذكاء الاصطناعي</string>
     <string name="ai_models_delete_confirm">أمتأكد من رغبتك في حذف نماذج الذكاء الاصطناعي؟ ستحتاج إلى تنزيلها مرة أخرى لاستخدام ميزات الذكاء الاصطناعي.</string>
     <string name="ai_models_size">حجم النموذج: %s</string>
-    <string name="ai_models_unavailable">غير متوفر — يتطلب ميزة «نماذج الذكاء الاصطناعي»</string>
+
     <string name="ai_models_description">AI models enable intelligent image search and automatic media classification. The app uses CLIP (Contrastive Language-Image Pretraining) models in ONNX format to understand the content of your photos.</string>
     <string name="ai_models_privacy_description">تتم جميع عمليات معالجة الذكاء الاصطناعي بالكامل على جهازك. ولا تغادر أي صور أو استعلامات بحث أو بيانات تصنيف هاتفك أبدًا. تعمل النماذج محليًّا باستخدام ONNX Runtime ولا تتطلب اتصالاً بالإنترنت بمجرد تنزيلها. وتظل ملفاتك الوسائطية سرية تمامًا.</string>
     <string name="ai_models_source">المصدر</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">ملفات النماذج</string>
-    <string name="ai_models_feature_search">ابحث حسب الوصف</string>
-    <string name="ai_models_feature_categories">الفئات التلقائية</string>
+
     <!-- New Category System -->
-    <string name="add_category">أضف فئة</string>
-    <string name="edit_category">حرِّر فئة</string>
-    <string name="delete_category_title">احذف الفئة؟</string>
-    <string name="delete_category_confirmation">أمتأكد من رغبتك في حذف هذه الفئة؟ لا يمكن التراجع عن هذا الإجراء.</string>
-    <string name="category_name">اسم الفئة</string>
-    <string name="category_name_hint">على سبيل المثال: الطبيعة، الطعام، السفر</string>
-    <string name="search_terms">مصطلحات البحث</string>
-    <string name="search_terms_hint">Comma-separated keywords to match images</string>
-    <string name="search_terms_example">غروب الشمس، شروق الشمس، الساعة الذهبية، السماء</string>
-    <string name="accuracy_threshold">عتبة الدقة</string>
-    <string name="more_results">المزيد من النتائج</string>
-    <string name="more_accurate">More accurate</string>
+
     <string name="preview">معاينة</string>
-    <string name="matching_photos">الصور المطابقة</string>
-    <string name="best_match">أفضل تطابق</string>
-    <string name="matching_photos_count">%1$d مطابقة</string>
-    <string name="recommended">موصى به</string>
-    <string name="no_matching_photos">لم يُعثر على صور مطابقة</string>
-    <string name="category_helper_text">أدخل اسمًا ومصطلحات بحث واضبط مستوى الدقة لإنشاء فئتك</string>
-    <string name="reset_categories">صفّر الفئات</string>
-    <string name="reset_categories_summary">احذف جميع الفئات وإعادة التهيئة باستخدام الإعدادات الافتراضية</string>
+
     <string name="create">أنشئ</string>
     <string name="save">احفظ</string>
-    <string name="browse_categories">تصفح الفئات</string>
-    <string name="category_media_count">%1$d عناصر</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">فئة جديدة</string>
-    <string name="describe_content">صف ما يجب تضمينه</string>
-    <string name="describe_content_hint">صف الصور التي ينبغي أن تتضمنها هذه الفئة</string>
-    <string name="describe_content_example">على سبيل المثال، صور لقطتي في البيت</string>
-    <string name="quick_start">البدء السريع</string>
-    <string name="quick_start_subtitle">انقر على اقتراح للبدء</string>
-    <string name="matching_preview">معاينة</string>
-    <string name="see_all_matches">اعرض جميع %1$d مطابقة</string>
-    <string name="sensitivity">الحساسية</string>
-    <string name="sensitivity_broad">Broad</string>
-    <string name="sensitivity_broad_desc">تضمين صور ذات صلة غير واضحة</string>
-    <string name="sensitivity_balanced">متوازن</string>
-    <string name="sensitivity_balanced_desc">مزيج جيد من العناصر ذات الصلة</string>
-    <string name="sensitivity_strict">صارم</string>
-    <string name="sensitivity_strict_desc">المطابقات القوية فقط</string>
-    <string name="sensitivity_exact">دقيق</string>
-    <string name="sensitivity_exact_desc">نتائج مطابقة شبه مثالية فقط</string>
-    <string name="fine_tune">Fine-tune</string>
-    <string name="category_created">أُنشئت فئة — يصنّف الصور…</string>
-    <string name="category_updated">حُدثت الفئة — يعيد التصنيف…</string>
-    <string name="category_deleted">حُذفت الفئة</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">الصور المرجعية</string>
-    <string name="reference_images_hint">أضف صورًا للعثور على صور مشابهة لها من الناحية البصرية</string>
-    <string name="add_reference_photos">أضف صور</string>
-    <string name="reference_images_count">%1$d محدّد</string>
+
     <string name="restore">استعِد</string>
     <string name="encrypted">مشفر</string>
     <string name="date_format_settings">تنسيق التاريخ</string>
     <string name="date_header">تنسيقات التاريخ</string>
     <string name="date_header_summary">عيِّن تنسيقات تاريخك المخصصة</string>
     <string name="launch_on_library">الإطلاق في المكتبة</string>
-    <string name="categories">الفئات</string>
-    <string name="classified_media">%1$s classified media</string>
-    <string name="scan_for_new_categories">افحص عن فئات جديدة</string>
-    <string name="ai_models_not_available">AI models are not downloaded. Download them from Settings → Smart Features.</string>
-    <string name="scanning_media">يفحص الوسائط...</string>
+
     <string name="date_header_title">ترويسة التاريخ</string>
     <string name="media_view">عرض الوسائط</string>
     <string name="exif_date">تاريخ Exif</string>
@@ -439,7 +390,7 @@
     <string name="vault_notification_channel_name">عمليات المخزن</string>
     <string name="vault_notification_channel_description">تقدم مهام التشفير / فك التشفير</string>
     <string name="decrypt_vault">فك تشفير الخزنة</string>
-    <string name="restore_vault_summary">The current vault and its content will be decrypted and restored.\nThis action will make your content accessible again in the ReFra.</string>
+    <string name="restore_vault_summary">The current vault and its content will be decrypted and restored.\nThis action will make your content accessible again in the Theoria.</string>
     <string name="restore_vault_title">تأكيد فك التشفير؟</string>
     <string name="yes">نعم</string>
     <string name="vault_deletion_title">تأكيد الحذف؟</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" على %1$s"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">يجمع البيانات الوصفية...</string>
@@ -936,7 +887,7 @@
     <string name="backup_encrypt_header">التعمية</string>
     <string name="backup_restore_header">اختر ما تريد استعادته</string>
     <string name="backup_restore">استعِد</string>
-    <string name="backup_made_with_version">أُنشئ باستخدام ReFra %1$s</string>
+    <string name="backup_made_with_version">أُنشئ باستخدام Theoria %1$s</string>
     <string name="backup_empty">لا تحتوي هذه النُسخة الاحتياطية على أي بيانات قابلة للاستعادة.</string>
     <string name="backup_items_count">%1$d عناصر</string>
     <string name="backup_pick_file_prompt">اختر ملف النُسخة الاحتياطية الذي تريد الاستعادة منه.</string>

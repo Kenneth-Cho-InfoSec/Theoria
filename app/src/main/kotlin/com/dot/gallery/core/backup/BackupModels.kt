@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@ package com.dot.gallery.core.backup
 import kotlinx.serialization.Serializable
 
 /**
- * Top-level manifest describing the contents of a ReFra backup archive.
+ * Top-level manifest describing the contents of a Theoria backup archive.
  *
  * The backup is a ZIP archive containing this manifest (as `manifest.json`) plus,
  * for each vault, the fully decrypted media files under `vaults/<uuid>/<mediaId>`.

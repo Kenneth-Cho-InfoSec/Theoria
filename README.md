@@ -1,53 +1,101 @@
-# ReFra
-> An Android Gallery app built with Jetpack Compose.
-> 
-> The goal of this project is to create and bring the Gallery app everyone wants, with the features everyone needs. FOSS
+# Theoria
 
-![Downloads](https://img.shields.io/github/downloads/IacobIonut01/Gallery/total?color=%23247EE0&label=Downloads)
-[![CI](https://github.com/IacobIonut01/Gallery/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/IacobIonut01/Gallery/actions/workflows/nightly.yml)
-![License](https://img.shields.io/github/license/IacobIonut01/Gallery?color=%23247EE0)
-[![Crowdin](https://badges.crowdin.net/gallery-compose/localized.svg)](https://crowdin.com/project/gallery-compose)
-![GitHub Repo stars](https://img.shields.io/github/stars/IacobIonut01/Gallery?color=%23247EE0)
+![Theoria icon](./fastlane/metadata/android/en-US/images/icon.png)
 
-![](./screenshots/preview.png)
-[![Crowdin](./screenshots/items/support_banner.png)](https://crowdin.com/project/gallery-compose)
-[![Community](./screenshots/items/community_banner.png)](https://t.me/GalleryCompose)
+Theoria is a privacy-focused Android gallery for browsing, organizing, editing, and protecting
+photos and videos. It is built with Kotlin, Jetpack Compose, and Android’s modern media APIs.
 
-## Download
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-    alt="Get it on F-Droid"
-    height="80">](https://f-droid.org/packages/com.dot.gallery)
-[<img 
-    alt='Get it on Google Play'
-    src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'
-    height="80" />](https://play.google.com/store/apps/details?id=com.dot.gallery.gplay&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
-[<img 
-    alt='Get it on GitHub'
-    src='./screenshots/items/get-it-on-github.png'
-    height="80" />](https://github.com/IacobIonut01/Gallery/releases/latest)
+The name comes from the Greek *theōria*: contemplation or beholding. The app is intended to make
+viewing and managing a personal media library feel calm, capable, and local-first.
 
-## Support
-- Translate the project using the link from above
-- Donations:
-    - Use the links on the right side of the repo (Sponsor me)
-    - More options available in-app (Settings -> Donate)
-## Frequent Questions
-- Why 'ReFra'?
-    - Refra is a short form of 'refraction', which is the bending of light when it passes through different mediums. This app aims to refract our perception of media files, making them more accessible and easier to manage.
-- What is the `offline` variant?
-    - The `offline` variant is a version of the app with all online features removed — maps, cloud provider support (Immich, ownCloud, etc.), and any functionality that requires an internet connection, even on a local network. This is useful for users who want a fully self-contained gallery with no network permissions.
-- Why Google Play version is 'Paid'?
-    - It's just another way to support the project while getting back automatic updates via Google Play
-- Why Android 11 is the minimum version required?
-    - Some Media features and APIs require Android 11 as a minimum version [Trash feature, most APIs used in the app]
-- Will you support lower android versions?
-    - While this is not a priority right now, I do have in mind to include support for lower Android versions at a cost of reduced features. If anyone volntueers to do so before me can request a pull request.
-- Can I verify the downloaded APK file?
-    - Checksums of APKs are provided in the release notes. The signing certificate fingerprint is listed below:
-      - SHA-256: `78:46:05:DD:50:75:BE:05:82:78:A5:42:5C:BD:E5:21:31:62:CB:B4:59:1B:44:28:F4:4E:75:E0:8C:C6:43:8A`
-      - SHA-1: `AD:93:69:27:F2:3B:33:99:FC:C0:B2:8A:25:44:C8:1C:AA:42:B0:9A`
-      - MD5: `73:FC:3C:60:14:D3:69:6D:1B:DA:34:F1:BF:5A:33:3C`
-- Will you add [X] feature?
-    - Please open a new feature request under 'Issues' tab and if the feature will be considered useful and possible can be added.
-- Can you remove permission [X]?
-    - Several permissions (e.g. Internet connectivity, location) are for showing a map preview of your current photo location data. If you do not need this feature, you can download an `offline` release from the [Releases page](https://github.com/IacobIonut01/ReFra/releases).
+[![CI](https://github.com/Kenneth-Cho-InfoSec/Theoria/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/Kenneth-Cho-InfoSec/Theoria/actions/workflows/nightly.yml)
+![License](https://img.shields.io/github/license/Kenneth-Cho-InfoSec/Theoria?color=%23247EE0)
+![Status](https://img.shields.io/badge/status-beta-orange)
+
+![Theoria preview](./screenshots/preview.png)
+
+## Current status
+
+Theoria is currently in beta (`0.0.1-beta`). The project is under active development and should be
+treated as a development build rather than a stable production release.
+
+The current local configuration is an offline, no-ML build. Release artifacts are generated locally
+and are not evidence of a published GitHub release.
+
+## Features
+
+- Local photo and video browsing with a Compose-based interface.
+- Editing, albums, favourites, trash, wallpaper, casting, panorama viewing, and motion-photo support.
+- Private/vault storage with encrypted media and backup-related functionality.
+- Metadata inspection and privacy-focused metadata sanitization.
+- Optional cloud and network providers, including Immich, ownCloud, Nextcloud, WebDAV, and SMB.
+- Optional maps and on-device ML features when those build options are enabled.
+- Native support for additional media formats through bundled codec integrations.
+
+## Build variants and configuration
+
+Build behavior is controlled by [`app.properties`](app.properties):
+
+- `OFFLINE=true` removes network-related behavior and permissions from the offline build.
+- `INCLUDE_MAPS` controls map support.
+- `INCLUDE_IMMICH`, `INCLUDE_OWNCLOUD`, `INCLUDE_NEXTCLOUD`, `INCLUDE_WEBDAV`, `INCLUDE_SMB`, and
+  `INCLUDE_NFS` control provider source sets when networking is enabled.
+- `ALL_FILES_ACCESS` controls the optional broad-storage-access behavior.
+
+The app also has `WithML` and `NoML` product flavors, plus ABI flavors for universal, ARM64, and
+other supported Android architectures. The `NoML` flavor omits bundled ML model assets.
+
+## Build locally
+
+Use JDK 17 and the Android SDK/NDK versions declared by the project. Common commands are:
+
+```bash
+# Compile the debug Kotlin sources
+./gradlew :app:compileUniversalNoMLDebugKotlin
+
+# Run the JVM unit tests
+./gradlew :app:testUniversalNoMLDebugUnitTest
+
+# Build the offline, no-ML universal release APK
+./gradlew :app:assembleUniversalNoMLRelease
+```
+
+The release APK is written under:
+
+```text
+app/build/outputs/apk/universalNoML/release/
+```
+
+The release build currently uses the project’s configured debug signing configuration unless the
+release signing configuration and its credentials are explicitly wired into the build. Do not
+present locally generated artifacts as officially signed distribution packages without verifying
+their certificate separately.
+
+## License and provenance
+
+Theoria contains code from multiple provenance categories:
+
+- Project-owned new code and independently authored additions are licensed under the [Mozilla
+  Public License 2.0](LICENSE-MPL) where marked with `SPDX-License-Identifier: MPL-2.0`.
+- Code inherited from [IacobIonut01/ReFra](https://github.com/IacobIonut01/ReFra) remains under the
+  [Apache License 2.0](LICENSE) where marked with `SPDX-License-Identifier: Apache-2.0`.
+- Third-party libraries, vendored codec sources, generated files, model assets, and other bundled
+  material retain their original licenses and notices.
+
+Apache-origin code is not relicensed merely because it has been modified. A replacement may be
+marked MPL 2.0 only after it has been independently implemented and its provenance reviewed.
+See [`LICENSE-EXCLUSIONS.md`](LICENSE-EXCLUSIONS.md) for the detailed boundaries and exclusions.
+
+## Contributing
+
+When adding code, preserve upstream copyright notices and third-party licenses. New independently
+authored files should include an SPDX header, and changes that replace inherited code should keep a
+clear provenance record. Please run the relevant unit tests and a build before submitting changes.
+
+Bug reports and feature requests can be opened in the project’s issue tracker:
+
+<https://github.com/Kenneth-Cho-InfoSec/Theoria/issues>
+
+## Developer
+
+**kennethcho** — <https://github.com/Kenneth-Cho-InfoSec>

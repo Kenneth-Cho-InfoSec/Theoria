@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.sync
@@ -43,7 +43,8 @@ import com.dot.gallery.feature_node.domain.repository.MediaRepository
 import com.dot.gallery.feature_node.presentation.util.printDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.firstOrNull
 import com.dot.gallery.feature_node.domain.util.getUri
 import androidx.work.workDataOf
 import java.security.MessageDigest
@@ -92,7 +93,7 @@ class CloudUploadWorker @AssistedInject constructor(
             // scheduler, so only require it for the periodic worker, not for a manual trigger.
             val isManual = inputData.getBoolean(KEY_MANUAL, false)
             val targetConfigId = inputData.getLong(KEY_CONFIG_ID, -1L)
-            val configs = configDao.getAll().first()
+            val configs = configDao.getAll().firstOrNull().orEmpty()
             val activeConfigs = configs.filter {
                 it.isActive && (isManual || it.syncEnabled) &&
                     (targetConfigId <= 0L || it.id == targetConfigId)
@@ -145,7 +146,8 @@ class CloudUploadWorker @AssistedInject constructor(
                 // already-synced album isn't re-hashed (which took minutes and made progress
                 // read "1 of <whole album>") and can never be re-uploaded if the network
                 // dedup check transiently fails. Mirrors CloudBackupViewModel's scan.
-                val cachedNames: Set<String> = cloudMediaDao.getByServerConfig(config.id).first()
+                val cachedNames: Set<String> = cloudMediaDao.getByServerConfig(config.id)
+                    .firstOrNull().orEmpty()
                     .mapNotNull { it.label.ifBlank { it.remoteId.substringAfterLast('/') }.ifBlank { null } }
                     .toSet()
 
@@ -157,7 +159,7 @@ class CloudUploadWorker @AssistedInject constructor(
                     // back to the provider's default upload folder (null).
                     val albumTarget = pref.albumLabel.trim().ifBlank { null }
                     val allAlbumMedia = repository.getMediaByAlbumId(pref.albumId, skipBatching = true)
-                        .first().data ?: continue
+                        .firstOrNull()?.data ?: continue
                     if (allAlbumMedia.isEmpty()) continue
 
                     // On a metered (cellular) network, drop photos/videos the account opted out of.
@@ -194,11 +196,13 @@ class CloudUploadWorker @AssistedInject constructor(
 
                     val hashes = mediaWithHashes.map { it.second }
                     val alreadyUploaded = try {
-                        syncProvider.bulkUploadCheck(hashes).getOrDefault(emptyMap())
+                        syncProvider.bulkUploadCheck(hashes).getOrNull()
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (e: Exception) {
                         printDebug("CloudUploadWorker: Bulk check failed for $accountLabel: ${e.message}")
-                        emptyMap()
-                    }
+                        null
+                    } ?: continue
 
                     mediaWithHashes.forEachIndexed { idx, (media, _) ->
                         val isOnServer = alreadyUploaded[idx.toString()] ?: false
@@ -285,6 +289,8 @@ class CloudUploadWorker @AssistedInject constructor(
                             failedFiles.add(task.media.label)
                             printDebug("CloudUploadWorker: [${task.accountLabel}] upload failed for ${task.media.label}: ${e.message}")
                         }
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     failedItems++
                     failedFiles.add(task.media.label)
@@ -317,6 +323,8 @@ class CloudUploadWorker @AssistedInject constructor(
 
             printDebug("CloudUploadWorker: Upload check complete")
             return Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             printDebug("CloudUploadWorker: Failed: ${e.message}")
             return Result.retry()
@@ -344,7 +352,8 @@ class CloudUploadWorker @AssistedInject constructor(
                     printDebug("CloudUploadWorker: delete-local skipped for album $albumId — a destination is unavailable")
                     continue
                 }
-                val albumMedia = repository.getMediaByAlbumId(albumId, skipBatching = true).first().data ?: continue
+                val albumMedia = repository.getMediaByAlbumId(albumId, skipBatching = true)
+                    .firstOrNull()?.data ?: continue
                 val mediaWithHashes = albumMedia.mapNotNull { m -> computeSha1(m)?.let { m to it } }
                 if (mediaWithHashes.isEmpty()) continue
                 val hashes = mediaWithHashes.map { it.second }
@@ -392,7 +401,7 @@ class CloudUploadWorker @AssistedInject constructor(
                 val records = byConfig[config.id]?.takeIf { it.isNotEmpty() } ?: continue
                 val provider = registry.getByConfigId(config.id) as? RemoteMediaProvider ?: continue
 
-                val remoteAlbums = runCatching { provider.getRemoteAlbums().first().data }
+                val remoteAlbums = runCatching { provider.getRemoteAlbums().firstOrNull()?.data }
                     .getOrNull().orEmpty()
 
                 for ((albumLabel, items) in records.groupBy { it.albumLabel }) {

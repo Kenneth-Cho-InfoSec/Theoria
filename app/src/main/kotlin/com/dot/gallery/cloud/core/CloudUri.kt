@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.core
 
 import com.dot.gallery.cloud.core.capabilities.RemoteMediaProvider
+import java.net.URLDecoder
 
 /**
  * Parsed representation of a `cloud://` media URI, shared by every pipeline resolver
@@ -51,14 +52,15 @@ data class CloudUri(
             if (authorityEnd == -1) return null
 
             val providerType = try {
-                ProviderType.valueOf(withoutScheme.substring(0, authorityEnd))
+                ProviderType.parse(withoutScheme.substring(0, authorityEnd))
             } catch (_: Exception) {
                 return null
             }
 
             val pathAndQuery = withoutScheme.substring(authorityEnd + 1)
             val queryStart = pathAndQuery.indexOf('?')
-            val remoteId = if (queryStart == -1) pathAndQuery else pathAndQuery.substring(0, queryStart)
+            val encodedRemoteId = if (queryStart == -1) pathAndQuery else pathAndQuery.substring(0, queryStart)
+            val remoteId = decodeComponent(encodedRemoteId) ?: return null
             if (remoteId.isEmpty()) return null
 
             val params = if (queryStart != -1) {
@@ -66,20 +68,35 @@ data class CloudUri(
                     .split('&')
                     .mapNotNull { p ->
                         val idx = p.indexOf('=')
-                        if (idx == -1) null else p.substring(0, idx) to p.substring(idx + 1)
+                        if (idx == -1) null else {
+                            val key = decodeComponent(p.substring(0, idx)) ?: return@mapNotNull null
+                            val value = decodeComponent(p.substring(idx + 1)) ?: return@mapNotNull null
+                            key to value
+                        }
                     }
                     .toMap()
             } else emptyMap()
 
+            val requestedSize = params["size"]
+            val size = when (requestedSize) {
+                "thumbnail", "preview", "original" -> requestedSize
+                else -> "preview"
+            }
+
             return CloudUri(
                 providerType = providerType,
                 remoteId = remoteId,
-                size = params["size"] ?: "preview",
+                size = size,
                 typeParam = params["type"],
                 fileId = params["fileId"],
                 configId = params["cfg"]?.toLongOrNull() ?: -1L
             )
         }
+
+        /** Android's Uri.decode leaves '+' untouched; URLDecoder normally treats it as space. */
+        private fun decodeComponent(value: String): String? = runCatching {
+            URLDecoder.decode(value.replace("+", "%2B"), "UTF-8")
+        }.getOrNull()
     }
 }
 
@@ -89,4 +106,10 @@ data class CloudUri(
  * URIs minted before the `cfg` query param existed.
  */
 fun ProviderRegistry.resolveRemote(providerType: ProviderType, configId: Long): RemoteMediaProvider? =
-    ((if (configId > 0L) getByConfigId(configId) else null) ?: get(providerType)) as? RemoteMediaProvider
+    if (configId > 0L) {
+        // An explicit account ID is authoritative. Falling back to another account of the same
+        // provider type could display or stream data from the wrong server.
+        getByConfigId(configId) as? RemoteMediaProvider
+    } else {
+        get(providerType) as? RemoteMediaProvider
+    }

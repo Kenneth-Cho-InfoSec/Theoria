@@ -33,9 +33,6 @@
          Stripped from the offline variant (see manifestConfig in app/build.gradle.kts). -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-    <!-- Remove unwanted permissions from being added -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove"/>
-
     <!-- Required to access media for SDK < 33 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -96,7 +93,7 @@
         </activity>
 
         <activity-alias
-            android:name=".Launcher_ReFra"
+            android:name=".Launcher_Theoria"
             android:label="@string/app_name"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher_round"
@@ -131,9 +128,9 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- App name "ReFra" with the legacy Gallery launcher logo -->
+        <!-- App name "Theoria" with the legacy Gallery launcher logo -->
         <activity-alias
-            android:name=".Launcher_ReFra_GalleryLogo"
+            android:name=".Launcher_Theoria_GalleryLogo"
             android:label="@string/app_name"
             android:icon="@mipmap/ic_launcher_gallery"
             android:roundIcon="@mipmap/ic_launcher_gallery_round"
@@ -310,7 +307,7 @@
         </activity>
 
         <!--
-            Handles the legacy crop intent so ReFra can crop images for callers such as the
+            Handles the legacy crop intent so Theoria can crop images for callers such as the
             Settings AvatarPicker (profile picture), matching Gallery2/Google Photos (#997).
         -->
         <activity
@@ -397,7 +394,7 @@
             android:isolatedProcess="true" />
 
         <!-- Isolated-process service for sandboxed image decoding (HEIF/AVIF/JXL).
-             Codec bugs in HeifCoder or JxlCoder cannot reach the main app process.
+             Image decoding bugs cannot reach the main app process.
              Data is exchanged via SharedMemory for zero-copy IPC. -->
         <service
             android:name=".core.sandbox.IsolatedDecoderService"

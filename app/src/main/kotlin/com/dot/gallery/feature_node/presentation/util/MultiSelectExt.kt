@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.util
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -57,8 +62,8 @@ private fun LazyGridState.hitInfoAt(raw: Offset, padL: Float): HitInfo? {
     val rel = contentOffset - Offset(info.offset.x.toFloat(), info.offset.y.toFloat())
     return HitInfo(
         key = key,
-        normalizedX = (rel.x / info.size.width).coerceIn(0f, 1f),
-        normalizedY = (rel.y / info.size.height).coerceIn(0f, 1f)
+        normalizedX = if (info.size.width > 0) (rel.x / info.size.width).coerceIn(0f, 1f) else 0.5f,
+        normalizedY = if (info.size.height > 0) (rel.y / info.size.height).coerceIn(0f, 1f) else 0.5f
     )
 }
 

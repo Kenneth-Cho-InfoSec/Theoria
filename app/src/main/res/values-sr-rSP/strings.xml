@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">Галерија</string>
     <string name="change_app_name">Назив апликације</string>
     <string name="change_app_name_summary">Промените назив апликације који се приказује у покретачу</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Отвори спољашњом апликацијом</string>
     <string name="no_map_app">Није доступна апликација за приказивање локације</string>
     <string name="app_dev">од %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">Донирај</string>
     <string name="github">GitHub</string>
     <string name="donate_button_cd">Дугме „Донирај”</string>
     <string name="github_button_cd">Дугме „GitHub”</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">Уклони банер</string>
     <string name="dismiss_banner_title">Премести банер?</string>
     <string name="dismiss_banner_message">Дугмад за донацију и GitHub ће се преместити у компактну траку на дну странице Подешавања.</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">Сви метаподаци</string>
     <string name="no_metadata_found">Нису пронађени метаподаци</string>
     <string name="loading_metadata">Учитавање метаподатака…</string>
-    <string name="categorise_your_media">Категоризујте своје медије</string>
-    <string name="disclaimer_classification">Ваши медији се не шаљу ни на један сервер, сва класификација се обавља локално на вашем уређају коришћењем TensorFlow-Lite са претходно обученим моделом који је доступан у ресурсима апликације.</string>
+
     <string name="ai_category">Паметне функције</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">AI модели нису инсталирани. Преузмите их из Подешавања &gt; Паметне функције.</string>
+
     <string name="ai_models_manager">Управљање AI моделима</string>
     <string name="ai_models_download">Преузми AI моделе</string>
-    <string name="ai_models_download_summary">Преузмите AI моделе за претрагу и класификацију слика (~147 MB)</string>
+
     <string name="ai_models_downloading">Преузимање AI модела…</string>
-    <string name="ai_models_ready_summary">AI претрага и класификација су доступне</string>
-    <string name="ai_models_error">Грешка AI модела</string>
+
     <string name="ai_models_delete">Избриши AI моделе</string>
     <string name="ai_models_delete_confirm">Да ли сте сигурни да желите да избришете AI моделе? Мораћете поново да их преузмете да бисте користили AI функције.</string>
     <string name="ai_models_size">Величина модела: %s</string>
-    <string name="ai_models_unavailable">Није доступно — Захтева функцију AI модела</string>
+
     <string name="ai_models_description">AI модели омогућавају интелигентну претрагу слика и аутоматску класификацију медија. Апликација користи CLIP (Contrastive Language-Image Pretraining) моделе у ONNX формату за разумевање садржаја ваших фотографија.</string>
     <string name="ai_models_privacy_description">Целокупна AI обрада се врши искључиво на вашем уређају. Ниједна слика, упит за претрагу или податак о класификацији никада не напуштају ваш телефон. Модели се покрећу локално користећи ONNX Runtime и није им потребна интернет веза након преузимања. Ваши медији остају потпуно приватни.</string>
     <string name="ai_models_source">Извор</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">Фајлови модела</string>
-    <string name="ai_models_feature_search">Претрага према опису</string>
-    <string name="ai_models_feature_categories">Аутоматске категорије</string>
+
     <!-- New Category System -->
-    <string name="add_category">Додај категорију</string>
-    <string name="edit_category">Измени категорију</string>
-    <string name="delete_category_title">Избрисати категорију?</string>
-    <string name="delete_category_confirmation">Да ли сте сигурни да желите да избришете ову категорију? Ова радња се не може поништити.</string>
-    <string name="category_name">Назив категорије</string>
-    <string name="category_name_hint">нпр. Природа, Храна, Путовања</string>
-    <string name="search_terms">Кључне речи за претрагу</string>
-    <string name="search_terms_hint">Кључне речи раздвојене зарезом за проналажење слика</string>
-    <string name="search_terms_example">залазак сунца, излазак сунца, златни сат, небо</string>
-    <string name="accuracy_threshold">Праг тачности</string>
-    <string name="more_results">Више резултата</string>
-    <string name="more_accurate">Прецизније</string>
+
     <string name="preview">Преглед</string>
-    <string name="matching_photos">Фотографије које се подударају</string>
-    <string name="best_match">Најбоље подударање</string>
-    <string name="matching_photos_count">%1$d се подудара</string>
-    <string name="recommended">препоручено</string>
-    <string name="no_matching_photos">Нису пронађене фотографије које се подударају</string>
-    <string name="category_helper_text">Унесите назив, кључне речи за претрагу и подесите тачност како бисте креирали своју категорију</string>
-    <string name="reset_categories">Ресетуј категорије</string>
-    <string name="reset_categories_summary">Избриши све категорије и врати на подразумеване вредности</string>
+
     <string name="create">Креирај</string>
     <string name="save">Сачувај</string>
-    <string name="browse_categories">Прегледај категорије</string>
-    <string name="category_media_count">%1$d ставки</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">Нова категорија</string>
-    <string name="describe_content">Опишите шта треба укључити</string>
-    <string name="describe_content_hint">Опишите које фотографије ова категорија треба да садржи</string>
-    <string name="describe_content_example">нпр. фотографије мог пса на плажи</string>
-    <string name="quick_start">Брзи почетак</string>
-    <string name="quick_start_subtitle">Додирните предлог да бисте започели</string>
-    <string name="matching_preview">Преглед</string>
-    <string name="see_all_matches">Погледај свих %1$d подударања</string>
-    <string name="sensitivity">Осетљивост</string>
-    <string name="sensitivity_broad">Широка</string>
-    <string name="sensitivity_broad_desc">Укључи овлаш повезане фотографије</string>
-    <string name="sensitivity_balanced">Уравнотежена</string>
-    <string name="sensitivity_balanced_desc">Добар баланс релевантности</string>
-    <string name="sensitivity_strict">Строга</string>
-    <string name="sensitivity_strict_desc">Само снажна подударања</string>
-    <string name="sensitivity_exact">Прецизна</string>
-    <string name="sensitivity_exact_desc">Само скоро савршена подударања</string>
-    <string name="fine_tune">Фина подешавања</string>
-    <string name="category_created">Категорија је креирана — класификација фотографија у току…</string>
-    <string name="category_updated">Категорија је ажурирана — поновна класификација…</string>
-    <string name="category_deleted">Категорија је избрисана</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">Референтне фотографије</string>
-    <string name="reference_images_hint">Додајте фотографије да бисте пронашли визуелно сличне</string>
-    <string name="add_reference_photos">Додај фотографије</string>
-    <string name="reference_images_count">%1$d изабрано</string>
+
     <string name="restore">Поврати</string>
     <string name="encrypted">Шифровано</string>
     <string name="date_format_settings">Формат датума</string>
     <string name="date_header">Формати датума</string>
     <string name="date_header_summary">Поставите сопствене формате датума</string>
     <string name="launch_on_library">Покрени у Библиотеци</string>
-    <string name="categories">Категорије</string>
-    <string name="classified_media">%1$s класификованих медија</string>
-    <string name="scan_for_new_categories">Потражи нове категорије</string>
-    <string name="ai_models_not_available">AI модели нису преузети. Преузмите их из Подешавања → Паметне функције.</string>
-    <string name="scanning_media">Скенирање медија...</string>
+
     <string name="date_header_title">Заглавље датума</string>
     <string name="media_view">Приказ медија</string>
     <string name="exif_date">EXIF датум</string>
@@ -439,7 +390,7 @@
     <string name="vault_notification_channel_name">Операције у сефу</string>
     <string name="vault_notification_channel_description">Напредак шифровања / дешифровања</string>
     <string name="decrypt_vault">Дешифруј сеф</string>
-    <string name="restore_vault_summary">Тренутни сеф и његов садржај ће бити дешифровани и враћени.\nОва радња ће поново учинити ваш садржај доступним у апликацији ReFra.</string>
+    <string name="restore_vault_summary">Тренутни сеф и његов садржај ће бити дешифровани и враћени.\nОва радња ће поново учинити ваш садржај доступним у апликацији Theoria.</string>
     <string name="restore_vault_title">Потврђујете дешифровање?</string>
     <string name="yes">Да</string>
     <string name="vault_deletion_title">Потврђујете брисање?</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" y %1$s"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">Прикупљање метаподатака...</string>
@@ -930,7 +881,7 @@
     <string name="backup_encrypt_header">Шифровање</string>
     <string name="backup_restore_header">Изаберите шта желите да вратите</string>
     <string name="backup_restore">Врати</string>
-    <string name="backup_made_with_version">Направљено помоћу ReFra %1$s</string>
+    <string name="backup_made_with_version">Направљено помоћу Theoria %1$s</string>
     <string name="backup_empty">Ова резервна копија не садржи податке који се могу вратити.</string>
     <string name="backup_items_count">%1$d ставки</string>
     <string name="backup_pick_file_prompt">Изаберите датотеку резервне копије из које желите да вратите податке.</string>

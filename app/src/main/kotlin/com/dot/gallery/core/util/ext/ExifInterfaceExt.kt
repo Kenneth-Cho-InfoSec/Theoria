@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2023 The LineageOS Project
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.util.ext
@@ -116,16 +116,12 @@ var ExifInterface.userComment
     }
 
 val ExifInterface.isSupportedFormatForSavingAttributes: Boolean
-    get() {
+    get() = runCatching {
         val mimeType = ExifInterface::class.java.getDeclaredField("mMimeType").apply {
             isAccessible = true
-        }.get(this) as Int
-
-        val isSupportedFormatForSavingAttributes = ExifInterface::class.java.getDeclaredMethod(
+        }.get(this) as? Int ?: return@runCatching false
+        ExifInterface::class.java.getDeclaredMethod(
             "isSupportedFormatForSavingAttributes", Int::class.java
-        ).apply {
-            isAccessible = true
-        }
-
-        return isSupportedFormatForSavingAttributes.invoke(null, mimeType) as Boolean
-    }
+        ).apply { isAccessible = true }
+            .invoke(null, mimeType) as? Boolean ?: false
+    }.getOrDefault(false)

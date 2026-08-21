@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decoder.glide
 
 import android.content.Context
@@ -101,6 +106,7 @@ private class EncryptedVaultFetcher(
         if (cancelled) return
         try {
             val result = decryptVaultFile(file, context)
+            if (cancelled) return
             stream = result
             callback.onDataReady(result)
         } catch (e: Exception) {

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.mediaview
 
 import android.content.Context
@@ -86,7 +91,14 @@ class MediaViewViewModel @Inject constructor(
     fun probeMetadataSanitization(media: Media) {
         _metadataSanitizationState.value = MetadataSanitizationUiState.Probing(media.id)
         viewModelScope.launch(Dispatchers.IO) {
-            val capability = repository.probeMetadataSanitization(media)
+            val capability = runCatching { repository.probeMetadataSanitization(media) }
+                .getOrElse { error ->
+                    SanitizationCapability(
+                        format = com.dot.gallery.core.metadata.MediaContainerFormat.UNKNOWN,
+                        supportedModes = emptySet(),
+                        limitation = error.message ?: "Unable to inspect this media."
+                    )
+                }
             _metadataSanitizationState.value = MetadataSanitizationUiState.Ready(media.id, capability)
         }
     }
@@ -94,7 +106,13 @@ class MediaViewViewModel @Inject constructor(
     fun sanitizeMetadata(media: Media, mode: MetadataRemovalMode) {
         _metadataSanitizationState.value = MetadataSanitizationUiState.Running(media.id, mode)
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.sanitizeMediaMetadata(media, mode)
+            val result = runCatching { repository.sanitizeMediaMetadata(media, mode) }
+                .getOrElse { error ->
+                    SanitizationResult.CommitFailed(
+                        reason = error.message ?: "Unable to sanitize this media.",
+                        rolledBack = true
+                    )
+                }
             if (result is SanitizationResult.Success) {
                 cleanupMotionPhoto()
                 currentMotionMediaId = null

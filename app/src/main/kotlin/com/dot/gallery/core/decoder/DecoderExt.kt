@@ -141,7 +141,7 @@ fun imageDataFromBitmap(
 
 /**
  * Decodes a static image from pre-read bytes using the provided [getSize] and [decodeSampled]
- * callbacks (typically from HeifCoder). Replicates [withCustomDecoder] logic without re-reading
+ * callbacks. Replicates [withCustomDecoder] logic without re-reading
  * from the DataSource.
  */
 fun decodeStaticFromBytes(

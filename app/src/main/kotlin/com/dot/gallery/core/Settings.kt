@@ -1,6 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2026 kennethcho
+ * SPDX-License-Identifier: MPL-2.0
+ *
  */
 
 @file:Suppress("MemberVisibilityCanBePrivate")
@@ -11,6 +12,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Environment
 import android.os.Parcelable
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
@@ -225,6 +227,19 @@ object Settings {
         @Composable
         fun rememberShowMediaTypeAlbums() =
             rememberPreference(key = SHOW_MEDIA_TYPE_ALBUMS, defaultValue = true)
+
+        private val ALBUM_THUMBNAIL_PADDING = intPreferencesKey("album_thumbnail_padding_dp")
+
+        const val ALBUM_THUMBNAIL_PADDING_SMALL = 4
+        const val ALBUM_THUMBNAIL_PADDING_MEDIUM = 8
+        const val ALBUM_THUMBNAIL_PADDING_LARGE = 16
+
+        @Composable
+        fun rememberAlbumThumbnailPadding() =
+            rememberPreference(
+                key = ALBUM_THUMBNAIL_PADDING,
+                defaultValue = ALBUM_THUMBNAIL_PADDING_MEDIUM
+            )
     }
 
     object Slideshow {
@@ -565,6 +580,31 @@ object Settings {
         fun getSecureMode(context: Context) =
             context.activeDataStore.data.map { it[SECURE_MODE] ?: false }
 
+        private val EDITED_MEDIA_PATH = stringPreferencesKey("edited_media_relative_path")
+        const val DEFAULT_EDITED_MEDIA_PATH = "Pictures/Edited"
+
+        @Composable
+        fun rememberEditedMediaPath() =
+            rememberPreference(key = EDITED_MEDIA_PATH, defaultValue = DEFAULT_EDITED_MEDIA_PATH)
+
+        suspend fun getEditedMediaPath(context: Context): String =
+            context.activeDataStore.data.first()[EDITED_MEDIA_PATH] ?: DEFAULT_EDITED_MEDIA_PATH
+
+        /**
+         * MediaStore relative paths must stay below a public media root. Normalize user input
+         * before it reaches RELATIVE_PATH so a malformed value cannot escape that root.
+         */
+        fun normalizeEditedMediaPath(value: String): String {
+            val normalized = value.trim().trim('/').replace(Regex("/+"), "/")
+            val valid = normalized.isNotEmpty() &&
+                    (normalized == Environment.DIRECTORY_PICTURES ||
+                            normalized.startsWith("${Environment.DIRECTORY_PICTURES}/") ||
+                            normalized == Environment.DIRECTORY_DCIM ||
+                            normalized.startsWith("${Environment.DIRECTORY_DCIM}/")) &&
+                    normalized.split('/').none { it == "." || it == ".." }
+            return if (valid) normalized else DEFAULT_EDITED_MEDIA_PATH
+        }
+
         private val TIMELINE_GROUP_BY_MONTH = booleanPreferencesKey("timeline_group_by_month")
 
         @Composable
@@ -860,19 +900,19 @@ object Settings {
                 defaultValue = SelectionSheetConfig()
             )
 
-        const val ALIAS_REFRA = "ReFra"
+        const val ALIAS_THEORIA = "Theoria"
         const val ALIAS_GALLERY = "Gallery"
         private val APP_NAME_ALIAS = stringPreferencesKey("app_name_alias")
 
         @Composable
         fun rememberAppNameAlias() =
-            rememberPreference(key = APP_NAME_ALIAS, defaultValue = ALIAS_REFRA)
+            rememberPreference(key = APP_NAME_ALIAS, defaultValue = ALIAS_THEORIA)
 
         private val APP_LOGO_ALIAS = stringPreferencesKey("app_logo_alias")
 
         @Composable
         fun rememberAppLogoAlias() =
-            rememberPreference(key = APP_LOGO_ALIAS, defaultValue = ALIAS_REFRA)
+            rememberPreference(key = APP_LOGO_ALIAS, defaultValue = ALIAS_THEORIA)
 
         /**
          * Version of the first-launch setup wizard the user last completed. Bump
@@ -1134,6 +1174,18 @@ object Settings {
 
         fun getPrivateFolderUri(context: Context) =
             context.activeDataStore.data.map { it[PRIVATE_FOLDER_URI] ?: "" }
+
+        private val LOCK_TRASH = booleanPreferencesKey("lock_trash")
+
+        @Composable
+        fun rememberLockTrash() =
+            rememberPreference(key = LOCK_TRASH, defaultValue = false)
+
+        private val LOCK_APP = booleanPreferencesKey("lock_app")
+
+        @Composable
+        fun rememberLockApp() =
+            rememberPreference(key = LOCK_APP, defaultValue = false)
     }
 
     object Vault {

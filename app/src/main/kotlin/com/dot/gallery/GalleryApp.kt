@@ -1,6 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2026 kennethcho
+ * SPDX-License-Identifier: MPL-2.0
+ *
  */
 
 package com.dot.gallery
@@ -23,23 +24,13 @@ import com.dot.gallery.cloud.offline.CloudCacheInterceptor
 import com.dot.gallery.cloud.offline.CloudMediaCache
 import com.dot.gallery.cloud.offline.OfflineModeManager
 import com.dot.gallery.core.MediaDistributor
-import com.dot.gallery.core.ml.ModelManager
 import com.dot.gallery.core.metadata.MetadataSanitizer
 import com.dot.gallery.core.sandbox.IsolatedImageDecoder
 import com.dot.gallery.core.sandbox.SandboxedDecoderHolder
 import com.dot.gallery.core.security.AdvancedProtectionMonitor
 import com.dot.gallery.core.decoder.supportApng
-import com.dot.gallery.core.decoder.supportHeifDecoder
-import com.dot.gallery.core.decoder.supportAnimatedJxlDecoder
-import com.dot.gallery.core.decoder.supportJxlDecoder
-import com.dot.gallery.core.decoder.supportSandboxedHeifDecoder
-import com.dot.gallery.core.decoder.supportSandboxedJxlDecoder
 import com.dot.gallery.core.decoder.supportVaultDecoder
 import com.dot.gallery.core.decoder.supportVideoFrame2
-import com.dot.gallery.core.decoder.supportPsdDecoder
-import com.dot.gallery.core.decoder.supportJp2Decoder
-import com.dot.gallery.core.decoder.supportTiffDecoder
-import com.dot.gallery.core.decoder.supportRawDecoder
 import com.dot.gallery.core.workers.MetadataCollectionWorker
 import com.dot.gallery.core.workers.TempVaultCleanupWorker
 import com.dot.gallery.feature_node.domain.repository.MediaRepository
@@ -48,8 +39,8 @@ import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.cache.MemoryCache
-import com.github.panpf.sketch.decode.supportAnimatedHeif
 import com.github.panpf.sketch.decode.supportAnimatedWebp
+import com.github.panpf.sketch.decode.supportAnimatedHeif
 import com.github.panpf.sketch.decode.supportGif
 import com.github.panpf.sketch.decode.supportSvg
 import com.github.panpf.sketch.request.ImageOptions
@@ -74,9 +65,6 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-/** Reserved [com.dot.gallery.cloud.core.ProviderRegistry] config id for the local People provider. */
-private const val LOCAL_PEOPLE_CONFIG_ID = -1000L
-
 @HiltAndroidApp
 class GalleryApp : Application(), SingletonSketch.Factory, Configuration.Provider {
 
@@ -87,18 +75,9 @@ class GalleryApp : Application(), SingletonSketch.Factory, Configuration.Provide
             supportSvg()
             supportGif()
             supportApng()
+            supportAnimatedHeif()
             supportVideoFrame2()
             supportAnimatedWebp()
-            supportAnimatedHeif()
-            supportSandboxedHeifDecoder()
-            supportSandboxedJxlDecoder()
-            supportAnimatedJxlDecoder()
-            supportHeifDecoder()
-            supportJxlDecoder()
-            supportPsdDecoder()
-            supportJp2Decoder()
-            supportTiffDecoder()
-            supportRawDecoder()
             supportVaultDecoder()
             supportCloudMedia()
         }
@@ -147,9 +126,6 @@ class GalleryApp : Application(), SingletonSketch.Factory, Configuration.Provide
     lateinit var mediaDistributor: MediaDistributor
 
     @Inject
-    lateinit var modelManager: ModelManager
-
-    @Inject
     lateinit var isolatedImageDecoder: IsolatedImageDecoder
 
     @Inject
@@ -157,9 +133,6 @@ class GalleryApp : Application(), SingletonSketch.Factory, Configuration.Provide
 
     @Inject
     lateinit var cloudProviderInitializer: CloudProviderInitializer
-
-    @Inject
-    lateinit var localPeopleProvider: com.dot.gallery.cloud.local.LocalPeopleProvider
 
     @Inject
     lateinit var cloudMediaCache: CloudMediaCache
@@ -184,10 +157,6 @@ class GalleryApp : Application(), SingletonSketch.Factory, Configuration.Provide
         }
 
         CloudFetcherRegistryHolder.registry = providerRegistry
-        // Register on-device local capability providers (People). Keyed by a reserved negative
-        // config id so it never collides with real cloud account ids. isAvailable() gates on the
-        // face model being installed, so it stays hidden until models are present.
-        providerRegistry.register(LOCAL_PEOPLE_CONFIG_ID, localPeopleProvider)
         // ONE shared OkHttp client for all cloud image/video loading (Glide, Sketch, ZoomImage,
         // ExoPlayer). A single pooled client keeps connections warm — a big win for a flinging
         // grid hitting the same host repeatedly — and a disk cache avoids re-downloading
@@ -243,13 +212,6 @@ class GalleryApp : Application(), SingletonSketch.Factory, Configuration.Provide
         // One-time cleanup of leaked vault temp files for users upgrading from affected versions
         appScope.launch(Dispatchers.IO) {
             TempVaultCleanupWorker.runLegacyFilesdirCleanup(this@GalleryApp)
-        }
-
-        // Initialize ML models (copies from assets on withML, checks presence on noML)
-        appScope.launch {
-            StartupTracer.trace("ModelManager.initializeModels") {
-                modelManager.initializeModels()
-            }
         }
 
         // Auto-configure cloud providers asynchronously (off main thread)

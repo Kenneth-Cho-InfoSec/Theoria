@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 /**
  * Source
  * https://github.com/saparkhid/AndroidFileNamePicker/blob/main/javautil/FileUtils.java
@@ -25,7 +30,6 @@ import java.text.DecimalFormat
 import java.util.Locale
 import java.util.UUID
 import kotlin.math.log10
-import kotlin.math.min
 import kotlin.math.pow
 
 @Suppress("NOTHING_TO_INLINE")
@@ -111,8 +115,9 @@ class FileUtils(var context: Context) {
                         getDataColumn(context, contentUri, null, null)
                     } catch (e: NumberFormatException) {
                         //In Android 8 and Android P the id is not a number
-                        uri.path!!.replaceFirst("^/document/raw:".toRegex(), "")
-                            .replaceFirst("^raw:".toRegex(), "")
+                        uri.path?.replaceFirst("^/document/raw:".toRegex(), "")
+                            ?.replaceFirst("^raw:".toRegex(), "")
+                            .orEmpty()
                     }
                 }
             }
@@ -164,32 +169,25 @@ class FileUtils(var context: Context) {
     }
 
     private fun getDriveFilePath(uri: Uri): String {
-        val returnCursor = context.contentResolver.query(uri, null, null, null, null)
-        /*
-         * Get the column indexes of the data in the Cursor,
-         *     * move to the first row in the Cursor, get the data,
-         *     * and display it.
-         * */
-        val name = returnCursor!!.use {
-            it.moveToFirst()
-            it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-        }
+        val name = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex >= 0 && cursor.moveToFirst()) cursor.getString(nameIndex) else null
+        }?.takeUnless { it.isNullOrBlank() } ?: "downloaded_file"
         val file = File(context.cacheDir, name)
         try {
-            context.contentResolver.openInputStream(uri)!!.use { inputStream ->
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return ""
+            inputStream.use { stream ->
                 FileOutputStream(file).use { outputStream ->
+                    val buffer = ByteArray(8 * 1024)
                     var read: Int
-                    val maxBufferSize = 1 * 1024 * 1024
-                    val bytesAvailable = inputStream.available()
-                    val bufferSize = min(bytesAvailable, maxBufferSize)
-                    val buffers = ByteArray(bufferSize)
-                    while (inputStream.read(buffers).also { read = it } != -1) {
-                        outputStream.write(buffers, 0, read)
+                    while (stream.read(buffer).also { read = it } != -1) {
+                        outputStream.write(buffer, 0, read)
                     }
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, e.message!!)
+            Log.e(TAG, "Unable to copy Drive file $uri", e)
+            return ""
         }
         return file.path
     }
@@ -201,22 +199,14 @@ class FileUtils(var context: Context) {
      * @return
      */
     private fun copyFileToInternalStorage(uri: Uri, newDirName: String): String {
-        val returnCursor = context.contentResolver.query(
+        val name = context.contentResolver.query(
             uri, arrayOf(
                 OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE
             ), null, null, null
-        )
-
-
-        /*
-         * Get the column indexes of the data in the Cursor,
-         *     * move to the first row in the Cursor, get the data,
-         *     * and display it.
-         * */
-        val name = returnCursor!!.use {
-            it.moveToFirst()
-            it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-        }
+        )?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex >= 0 && cursor.moveToFirst()) cursor.getString(nameIndex) else null
+        }?.takeUnless { it.isNullOrBlank() } ?: return ""
         val output: File = if (newDirName != "") {
             val randomCollisionAvoidance = UUID.randomUUID().toString()
             val dir =
@@ -229,18 +219,19 @@ class FileUtils(var context: Context) {
             File(context.filesDir.toString() + File.separator + name)
         }
         try {
-            context.contentResolver.openInputStream(uri)!!.use { inputStream ->
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return ""
+            inputStream.use { stream ->
                 FileOutputStream(output).use { outputStream ->
+                    val buffer = ByteArray(8 * 1024)
                     var read: Int
-                    val bufferSize = 1024
-                    val buffers = ByteArray(bufferSize)
-                    while (inputStream.read(buffers).also { read = it } != -1) {
-                        outputStream.write(buffers, 0, read)
+                    while (stream.read(buffer).also { read = it } != -1) {
+                        outputStream.write(buffer, 0, read)
                     }
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, e.message!!)
+            Log.e(TAG, "Unable to copy content URI $uri", e)
+            return ""
         }
         return output.path
     }
@@ -255,24 +246,25 @@ class FileUtils(var context: Context) {
         selection: String?,
         selectionArgs: Array<String>?
     ): String? {
-        var cursor: Cursor? = null
+        val sourceUri = uri ?: return null
         val column = "_data"
-        val projection = arrayOf(
-            column
-        )
-        try {
-            cursor = context.contentResolver.query(
-                uri!!, projection,
-                selection, selectionArgs, null
-            )
-            if (cursor != null && cursor.moveToFirst()) {
-                val index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(index)
+        return try {
+            context.contentResolver.query(
+                sourceUri,
+                arrayOf(column),
+                selection,
+                selectionArgs,
+                null
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    cursor.getString(cursor.getColumnIndexOrThrow(column))
+                } else {
+                    null
+                }
             }
-        } finally {
-            cursor?.close()
+        } catch (_: Exception) {
+            null
         }
-        return null
     }
 
     private fun isMediaDocument(uri: Uri): Boolean {
@@ -301,6 +293,7 @@ class FileUtils(var context: Context) {
         }
 
         private fun getPathFromExtSD(pathData: Array<String>): String? {
+            if (pathData.size < 2) return null
             val type = pathData[0]
             val relativePath = File.separator + pathData[1]
             var fullPath: String
@@ -327,14 +320,13 @@ class FileUtils(var context: Context) {
             //
             // instead, for each possible path, check if file exists
             // we'll start with secondary storage as this could be our (physically) removable sd card
-            fullPath = System.getenv("SECONDARY_STORAGE")!! + relativePath
-            if (fileExists(fullPath)) {
-                return fullPath
+            System.getenv("SECONDARY_STORAGE")?.let { secondaryStorage ->
+                fullPath = secondaryStorage + relativePath
+                if (fileExists(fullPath)) return fullPath
             }
-            fullPath = System.getenv("EXTERNAL_STORAGE")!! + relativePath
-            return if (fileExists(fullPath)) {
-                fullPath
-            } else null
+            return System.getenv("EXTERNAL_STORAGE")?.let { externalStorage ->
+                (externalStorage + relativePath).takeIf(::fileExists)
+            }
         }
 
         private fun isExternalStorageDocument(uri: Uri): Boolean {

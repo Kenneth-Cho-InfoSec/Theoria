@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui
@@ -28,6 +28,9 @@ import com.dot.gallery.cloud.data.repository.CloudRepository
 import com.dot.gallery.cloud.di.CloudProviderInitializer
 import com.dot.gallery.cloud.network.ServerUrlResolver
 import com.dot.gallery.core.Resource
+import com.dot.gallery.core.error.ErrorReporter
+import com.dot.gallery.core.error.toAppError
+import com.dot.gallery.core.error.userMessage
 import com.dot.gallery.feature_node.domain.model.Album
 import com.dot.gallery.feature_node.domain.repository.MediaRepository
 import com.dot.gallery.feature_node.domain.util.MediaOrder
@@ -37,7 +40,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -154,13 +157,22 @@ class CloudAccountsViewModel @Inject constructor(
                 }
                 val config = urlResolver.resolve(buildConfig(state))
                 provider.configure(config)
-                provider.authenticate(config)
+                provider.authenticate(config).onFailure { failure ->
+                    val error = failure.toAppError("authenticate cloud provider")
+                    ErrorReporter.report(error)
+                    _addServerState.value = _addServerState.value.copy(
+                        isLoadingRemoteAlbums = false,
+                        remoteAlbumsLoaded = true,
+                        remoteAlbumsError = error.userMessage()
+                    )
+                    return@launch
+                }
                 var albums: List<CloudAlbum> = emptyList()
                 provider.getRemoteAlbums().collect { resource ->
                     if (resource is Resource.Success) albums = resource.data ?: emptyList()
                     else if (resource is Resource.Error) {
                         _addServerState.value = _addServerState.value.copy(
-                            remoteAlbumsError = resource.message
+                            remoteAlbumsError = resource.error?.userMessage() ?: resource.message
                         )
                     }
                 }
@@ -172,10 +184,12 @@ class CloudAccountsViewModel @Inject constructor(
                     selectedRemoteAlbumIds = albums.map { it.remoteId }.toSet()
                 )
             } catch (e: Exception) {
+                val error = e.toAppError("load remote cloud albums")
+                ErrorReporter.report(error)
                 _addServerState.value = _addServerState.value.copy(
                     isLoadingRemoteAlbums = false,
                     remoteAlbumsLoaded = true,
-                    remoteAlbumsError = e.message ?: "Failed to load albums"
+                    remoteAlbumsError = error.userMessage()
                 )
             }
         }
@@ -281,9 +295,11 @@ class CloudAccountsViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
+                val error = e.toAppError("test cloud connection")
+                ErrorReporter.report(error)
                 _addServerState.value = _addServerState.value.copy(
                     isTesting = false,
-                    testResult = e.message ?: "Unknown error",
+                    testResult = error.userMessage(),
                     testSuccess = false
                 )
             }
@@ -343,9 +359,11 @@ class CloudAccountsViewModel @Inject constructor(
 
                 _syncCompleted.value = true
             } catch (e: Exception) {
+                val error = e.toAppError("save cloud account")
+                ErrorReporter.report(error)
                 _addServerState.value = _addServerState.value.copy(
                     isSaving = false,
-                    error = e.message ?: "Save failed"
+                    error = error.userMessage()
                 )
             }
         }
@@ -403,20 +421,22 @@ class CloudAccountsViewModel @Inject constructor(
 
     fun loadStorageInfo() {
         viewModelScope.launch {
-            configDao.getAll().first().forEach { config ->
+            configDao.getAll().firstOrNull().orEmpty().forEach { config ->
                 val provider = registry.getByConfigId(config.id) as? RemoteMediaProvider ?: return@forEach
-                try {
-                    provider.getStorageInfo().onSuccess { info ->
+                provider.getStorageInfo()
+                    .onSuccess { info ->
                         _storageInfo.value = _storageInfo.value + (config.id to info)
                     }
-                } catch (_: Exception) { }
+                    .onFailure { failure ->
+                        ErrorReporter.report(failure.toAppError("load storage info"))
+                    }
             }
         }
     }
 
     fun loadAssetCounts() {
         viewModelScope.launch {
-            configDao.getAll().first().forEach { config ->
+            configDao.getAll().firstOrNull().orEmpty().forEach { config ->
                 _assetCounts.value = _assetCounts.value + (config.id to cloudMediaDao.countByConfig(config.id))
             }
         }
@@ -424,13 +444,15 @@ class CloudAccountsViewModel @Inject constructor(
 
     fun loadServerVersions() {
         viewModelScope.launch {
-            configDao.getAll().first().forEach { config ->
+            configDao.getAll().firstOrNull().orEmpty().forEach { config ->
                 val provider = registry.getByConfigId(config.id) as? RemoteMediaProvider ?: return@forEach
-                try {
-                    provider.getServerVersion().onSuccess { version ->
+                provider.getServerVersion()
+                    .onSuccess { version ->
                         _serverVersions.value = _serverVersions.value + (config.id to version)
                     }
-                } catch (_: Exception) { }
+                    .onFailure { failure ->
+                        ErrorReporter.report(failure.toAppError("load cloud server version"))
+                    }
             }
         }
     }
@@ -475,8 +497,10 @@ class CloudAccountsViewModel @Inject constructor(
                     message = "Done: $mediaCount media, $albumCount albums"
                 ))
             } catch (e: Exception) {
+                val error = e.toAppError("sync cloud account")
+                ErrorReporter.report(error)
                 _syncProgress.value = _syncProgress.value + (configId to SyncProgress(
-                    isSyncing = false, message = "Sync failed: ${e.message}"
+                    isSyncing = false, message = error.userMessage()
                 ))
             }
         }

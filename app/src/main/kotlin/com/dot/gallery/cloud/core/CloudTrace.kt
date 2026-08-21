@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.core
@@ -30,12 +30,23 @@ object CloudTrace {
     val enabled: Boolean get() = buildEnabled || CloudRuntimeSettings.verboseLogging
 
     fun d(message: String) {
-        if (enabled) Log.d(TAG, message)
+        if (enabled) Log.d(TAG, sanitize(message))
     }
 
     fun w(message: String, t: Throwable? = null) {
-        if (enabled) Log.w(TAG, message, t)
+        if (enabled) Log.w(TAG, sanitize(message), t)
     }
+
+    /**
+     * Keep request diagnostics useful without putting credentials into logcat. Providers may
+     * authenticate with query parameters or URL user-info, and exception messages can echo them.
+     */
+    private fun sanitize(message: String): String = message
+        .replace(URL_USER_INFO, "$1[REDACTED]@")
+        .replace(URL_QUERY, "$1?[REDACTED]")
+
+    private val URL_USER_INFO = Regex("(https?://)[^\\s/@]+@", RegexOption.IGNORE_CASE)
+    private val URL_QUERY = Regex("(https?://[^\\s?()]+)\\?[^\\s()]+", RegexOption.IGNORE_CASE)
 
     /** Human-readable byte size, e.g. "14.0 MB". */
     fun bytes(n: Long): String = when {

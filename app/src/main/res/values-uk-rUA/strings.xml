@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">Галерея</string>
     <string name="change_app_name">Назва додатку</string>
     <string name="change_app_name_summary">Змінити назву додатку в запускачі програм</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Open externally</string>
     <string name="no_map_app">Немає доступних програм для показу розташування</string>
     <string name="app_dev">від %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">Пожертвувати</string>
     <string name="github">GitHub</string>
     <string name="donate_button_cd">Кнопка пожертви</string>
     <string name="github_button_cd">Кнопка GitHub</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">Закрити банер</string>
     <string name="dismiss_banner_title">Перемістити банер?</string>
     <string name="dismiss_banner_message">Кнопки \"Пожертвувати\" та \"GitHub\" перемістяться на компактну панель внизу сторінки налаштувань.</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">Всі метадані</string>
     <string name="no_metadata_found">Не знайдено метаданих</string>
     <string name="loading_metadata">Завантаження метаданих…</string>
-    <string name="categorise_your_media">Категоризуйте свої медіа</string>
-    <string name="disclaimer_classification">Ваші медіа не завантажуються на сервер, вся класифікація виконується локально на вашому пристрої за допомогою TensorFlow-Lite з попередньо навченою моделлю, доступною у ресурсах застосунку.</string>
+
     <string name="ai_category">Розумні функції</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">ШІ моделі не встановлено. Завантажте їх з Налаштування &gt; Розумні Функції.</string>
+
     <string name="ai_models_manager">Менеджер ШІ Моделей</string>
     <string name="ai_models_download">Завантажити Моделі ШІ</string>
-    <string name="ai_models_download_summary">Завантажити Моделі ШІ для пошуку та класифікації зображень (~147 МБ)</string>
+
     <string name="ai_models_downloading">Завантаження Моделей ШІ…</string>
-    <string name="ai_models_ready_summary">Доступні пошук та класифікація на базі ШІ</string>
-    <string name="ai_models_error">Помилка Моделі ШІ</string>
+
     <string name="ai_models_delete">Видалити Моделі ШІ</string>
     <string name="ai_models_delete_confirm">Ви впевнені, що хочете видалити Моделі ШІ? Вам потрібно буде завантажити їх знову, щоб використовувати функції ШІ.</string>
     <string name="ai_models_size">Розмір Моделі: %s</string>
-    <string name="ai_models_unavailable">Недоступно – потрібна функція Моделі ШІ</string>
+
     <string name="ai_models_description">Моделі ШІ забезпечують інтелектуальний пошук зображень та автоматичну класифікацію медіафайлів. Додаток використовує моделі CLIP (Contrastive Language-Image Pretraining) у форматі ONNX для розуміння вмісту ваших фотографій.</string>
     <string name="ai_models_privacy_description">Уся обробка ШІ виконується виключно на вашому пристрої. Жодні зображення, пошукові запити чи дані класифікації ніколи не залишають ваш телефон. Моделі працюють локально за допомогою середовища виконання ONNX і не потребують підключення до Інтернету після завантаження. Ваші медіафайли залишаються повністю конфіденційними.</string>
     <string name="ai_models_source">Джерело</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">Файли Моделі</string>
-    <string name="ai_models_feature_search">Пошук за описом</string>
-    <string name="ai_models_feature_categories">Автоматичні категорії</string>
+
     <!-- New Category System -->
-    <string name="add_category">Додати категорію</string>
-    <string name="edit_category">Редагувати категорію</string>
-    <string name="delete_category_title">Видалити категорію?</string>
-    <string name="delete_category_confirmation">Ви впевнені, що хочете видалити цю категорію? Ця дія не може бути скасована.</string>
-    <string name="category_name">Назва категорії</string>
-    <string name="category_name_hint">наприклад, Природа, Їжа, Подорожі</string>
-    <string name="search_terms">Пошукові фрази</string>
-    <string name="search_terms_hint">Ключові слова, розділені комами, для зіставлення зображень</string>
-    <string name="search_terms_example">захід сонця, схід сонця, золота година, небо</string>
-    <string name="accuracy_threshold">Поріг точності</string>
-    <string name="more_results">Більше результатів</string>
-    <string name="more_accurate">Більша точність</string>
+
     <string name="preview">Попередній перегляд</string>
-    <string name="matching_photos">Відповідні фото</string>
-    <string name="best_match">Найкращій збіг</string>
-    <string name="matching_photos_count">%1$d збігів</string>
-    <string name="recommended">рекомендовано</string>
-    <string name="no_matching_photos">Збігів фото не знайдено</string>
-    <string name="category_helper_text">Додайте ім\'я, пошукові фрази та налаштуйте точність, щоб створити свою категорію</string>
-    <string name="reset_categories">Скинути категорії</string>
-    <string name="reset_categories_summary">Видалити всі категорії та повторно ініціалізувати їх за замовчуванням</string>
+
     <string name="create">Створити</string>
     <string name="save">Зберегти</string>
-    <string name="browse_categories">Переглянути категорії</string>
-    <string name="category_media_count">%1$d елементів</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">Нова категорія</string>
-    <string name="describe_content">Опишіть, що включити</string>
-    <string name="describe_content_hint">Опишіть, які фотографії має містити ця категорія</string>
-    <string name="describe_content_example">наприклад, фото мого собаки на пляжі</string>
-    <string name="quick_start">Швидкий старт</string>
-    <string name="quick_start_subtitle">Натисніть на пропозицію, щоб розпочати</string>
-    <string name="matching_preview">Попередній перегляд</string>
-    <string name="see_all_matches">Показати всі %1$d збігів</string>
-    <string name="sensitivity">Чутливість</string>
-    <string name="sensitivity_broad">Широка</string>
-    <string name="sensitivity_broad_desc">Включити вільно пов\'язані фотографії</string>
-    <string name="sensitivity_balanced">Збалансована</string>
-    <string name="sensitivity_balanced_desc">Гарне поєднання релевантності</string>
-    <string name="sensitivity_strict">Сувора</string>
-    <string name="sensitivity_strict_desc">Тільки прямі збіги</string>
-    <string name="sensitivity_exact">Точна</string>
-    <string name="sensitivity_exact_desc">Тільки майже ідеальні збіги</string>
-    <string name="fine_tune">Точне налаштування</string>
-    <string name="category_created">Категорію створено - класифікація фото…</string>
-    <string name="category_updated">Категорію оновлено - перекласифікація…</string>
-    <string name="category_deleted">Категорію видалено</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">Схожі фото</string>
-    <string name="reference_images_hint">Додайте фотографії, щоб знайти візуально схожі</string>
-    <string name="add_reference_photos">Додати фото</string>
-    <string name="reference_images_count">%1$d вибрано</string>
+
     <string name="restore">Відновити</string>
     <string name="encrypted">Зашифровано</string>
     <string name="date_format_settings">Формат дати</string>
     <string name="date_header">Формати дат</string>
     <string name="date_header_summary">Налаштуйте власні формати дат</string>
     <string name="launch_on_library">Запустити у бібліотеці</string>
-    <string name="categories">Категорії</string>
-    <string name="classified_media">%1$s класифікованих медіа</string>
-    <string name="scan_for_new_categories">Сканувати нові категорії</string>
-    <string name="ai_models_not_available">Моделі ШІ не завантажено. Завантажте їх з меню Налаштування → Розумні функції.</string>
-    <string name="scanning_media">Сканування медіа...</string>
+
     <string name="date_header_title">Заголовок дати</string>
     <string name="media_view">Перегляд медіа</string>
     <string name="exif_date">Exif-дані</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s МП</string>
     <string name="ppi">пк / дюйм</string>
     <string name="ppcm">пк / см</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">"зі швидкістю %1$s"</string>
     <string name="video_fps">%.1f к / с</string>
     <string name="collecting_metadata">Збір метаданих...</string>
@@ -932,7 +883,7 @@
     <string name="backup_encrypt_header">Encryption</string>
     <string name="backup_restore_header">Choose what to restore</string>
     <string name="backup_restore">Restore</string>
-    <string name="backup_made_with_version">Created with ReFra %1$s</string>
+    <string name="backup_made_with_version">Created with Theoria %1$s</string>
     <string name="backup_empty">This backup doesn\'t contain any restorable data.</string>
     <string name="backup_items_count">%1$d items</string>
     <string name="backup_pick_file_prompt">Choose a backup file to restore from.</string>

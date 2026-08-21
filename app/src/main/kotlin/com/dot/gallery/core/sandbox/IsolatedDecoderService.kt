@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.sandbox
@@ -8,6 +8,7 @@ package com.dot.gallery.core.sandbox
 import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -15,8 +16,6 @@ import android.os.Looper
 import android.os.Message
 import android.os.Messenger
 import android.os.SharedMemory
-import com.awxkee.jxlcoder.JxlCoder
-import com.radzivon.bartoshyk.avif.coder.HeifCoder
 import java.nio.ByteBuffer
 
 /**
@@ -33,7 +32,6 @@ import java.nio.ByteBuffer
 class IsolatedDecoderService : Service() {
 
     private lateinit var messenger: Messenger
-    private val heifCoder = HeifCoder()
 
     override fun onCreate() {
         super.onCreate()
@@ -96,12 +94,9 @@ class IsolatedDecoderService : Service() {
 
         // Decode based on mime type
         val bitmap = when {
-            isHeifMime(mimeType) -> decodeHeif(encodedBytes, targetW, targetH)
-            mimeType.equals("image/jxl", ignoreCase = true) -> decodeJxl(encodedBytes, targetW, targetH)
-            else -> return Bundle().apply {
-                putBoolean(KEY_ERROR, true)
-                putString(KEY_ERROR_MESSAGE, "Unsupported mime type: $mimeType")
-            }
+            isHeifMime(mimeType) -> decodeBitmap(encodedBytes, targetW, targetH)
+            mimeType.equals("image/jxl", ignoreCase = true) -> decodeBitmap(encodedBytes, targetW, targetH)
+            else -> decodeBitmap(encodedBytes, targetW, targetH)
         } ?: return Bundle().apply {
             putBoolean(KEY_ERROR, true)
             putString(KEY_ERROR_MESSAGE, "Decode returned null")
@@ -125,18 +120,25 @@ class IsolatedDecoderService : Service() {
         return result
     }
 
-    private fun decodeHeif(bytes: ByteArray, targetW: Int, targetH: Int): Bitmap? {
-        val size = heifCoder.getSize(bytes) ?: return null
-        val w = if (targetW > 0) targetW else size.width
-        val h = if (targetH > 0) targetH else size.height
-        return heifCoder.decodeSampled(bytes, w, h)
-    }
+    private fun decodeBitmap(bytes: ByteArray, targetW: Int, targetH: Int): Bitmap? {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
 
-    private fun decodeJxl(bytes: ByteArray, targetW: Int, targetH: Int): Bitmap? {
-        val size = JxlCoder.getSize(bytes) ?: return null
-        val w = if (targetW > 0) targetW else size.width
-        val h = if (targetH > 0) targetH else size.height
-        return JxlCoder.decodeSampled(bytes, w, h)
+        var inSampleSize = 1
+        if (targetW > 0 && targetH > 0) {
+            val halfW = bounds.outWidth / 2
+            val halfH = bounds.outHeight / 2
+            while (halfW / inSampleSize >= targetW && halfH / inSampleSize >= targetH) {
+                inSampleSize *= 2
+            }
+        }
+
+        val opts = BitmapFactory.Options().apply {
+            this.inSampleSize = inSampleSize
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+        }
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
     }
 
     private fun isHeifMime(mime: String): Boolean {

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 /**
  * Original from
  * https://medium.com/scalereal/observing-live-connectivity-status-in-jetpack-compose-way-f849ce8431c7
@@ -58,8 +63,7 @@ private fun Context.observeConnectivityAsFlow() = callbackFlow {
 
     // Remove callback when not used
     awaitClose {
-        // Remove listeners
-        connectivityManager.unregisterNetworkCallback(callback)
+        runCatching { connectivityManager.unregisterNetworkCallback(callback) }
     }
 }
 

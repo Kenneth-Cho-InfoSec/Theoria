@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core
 
 import android.content.ContentValues
@@ -35,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import javax.inject.Inject
 
 val LocalMediaHandler = compositionLocalOf<MediaHandler> {
@@ -64,9 +70,14 @@ class MediaHandlerImpl @Inject constructor(
     }
 
     private fun getCloudProvider(providerName: String, configId: Long = -1L): RemoteMediaProvider? {
-        val providerType = try { ProviderType.valueOf(providerName) } catch (_: Exception) { return null }
-        val provider = (if (configId > 0L) providerRegistry.getByConfigId(configId) else null)
-            ?: providerRegistry.get(providerType)
+        val providerType = try {
+            ProviderType.valueOf(providerName.uppercase(Locale.ROOT))
+        } catch (_: Exception) { return null }
+        val provider = if (configId > 0L) {
+            providerRegistry.getByConfigId(configId)
+        } else {
+            providerRegistry.get(providerType)
+        }
         return provider as? RemoteMediaProvider
     }
 
@@ -83,10 +94,16 @@ class MediaHandlerImpl @Inject constructor(
             withContext(Dispatchers.IO) {
                 cloudMedia.forEach { media ->
                     val (providerName, remoteId, configId) = extractCloudInfo(media) ?: return@forEach
-                    val providerType = try { ProviderType.valueOf(providerName) } catch (_: Exception) { return@forEach }
+                    val providerType = try {
+                        ProviderType.valueOf(providerName.uppercase(Locale.ROOT))
+                    } catch (_: Exception) { return@forEach }
                     val provider = getCloudProvider(providerName, configId) ?: return@forEach
                     provider.toggleFavorite(remoteId, favorite)
-                    cloudMediaDao.updateFavorite(remoteId, providerType, favorite)
+                    if (configId > 0L) {
+                        cloudMediaDao.updateFavoriteForConfig(remoteId, providerType, configId, favorite)
+                    } else {
+                        cloudMediaDao.updateFavorite(remoteId, providerType, favorite)
+                    }
                 }
             }
         }
@@ -140,7 +157,10 @@ class MediaHandlerImpl @Inject constructor(
                     if (hasFullAccess) {
                         repository.trashMediaDirectly(sdCardMedia, trash)
                     } else {
-                        repository.deleteMedia(result, sdCardMedia)
+                        // Scoped storage still permits the MediaStore trash/delete request.
+                        // Do not fall back to a permanent delete here: that bypassed the
+                        // trash preference for SD-card media without all-files access.
+                        repository.trashMedia(result, sdCardMedia, trash)
                     }
                 }
             } else {
@@ -180,10 +200,16 @@ class MediaHandlerImpl @Inject constructor(
             withContext(Dispatchers.IO) {
                 cloudMedia.forEach { media ->
                     val (providerName, remoteId, configId) = extractCloudInfo(media) ?: return@forEach
-                    val providerType = try { ProviderType.valueOf(providerName) } catch (_: Exception) { return@forEach }
+                    val providerType = try {
+                        ProviderType.valueOf(providerName.uppercase(Locale.ROOT))
+                    } catch (_: Exception) { return@forEach }
                     val provider = getCloudProvider(providerName, configId) ?: return@forEach
                     provider.deleteAsset(remoteId)
-                    cloudMediaDao.delete(remoteId, providerType)
+                    if (configId > 0L) {
+                        cloudMediaDao.deleteForConfig(remoteId, providerType, configId)
+                    } else {
+                        cloudMediaDao.delete(remoteId, providerType)
+                    }
                 }
             }
         }
@@ -264,12 +290,15 @@ class MediaHandlerImpl @Inject constructor(
             for (media in cloudMedia) {
                 val (providerName, remoteId, configId) = extractCloudInfo(media) ?: continue
                 val providerType = try {
-                    ProviderType.valueOf(providerName)
+                    ProviderType.valueOf(providerName.uppercase(Locale.ROOT))
                 } catch (_: Exception) {
                     continue
                 }
-                val provider = (if (configId > 0L) providerRegistry.getByConfigId(configId) else null)
-                    ?: providerRegistry.get(providerType)
+                val provider = if (configId > 0L) {
+                    providerRegistry.getByConfigId(configId)
+                } else {
+                    providerRegistry.get(providerType)
+                }
                 val syncProvider = provider as? SyncCapableProvider ?: continue
 
                 val downloadResult = syncProvider.downloadAsset(remoteId)

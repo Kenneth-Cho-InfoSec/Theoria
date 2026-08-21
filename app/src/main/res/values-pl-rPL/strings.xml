@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">Galeria</string>
     <string name="change_app_name">Nazwa aplikacji</string>
     <string name="change_app_name_summary">Zmień nazwę aplikacji wyświetlanej w launcherze</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Open externally</string>
     <string name="no_map_app">Brak dostępnej aplikacji do pokazywania lokalizacji</string>
     <string name="app_dev">przez %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">Wesprzyj</string>
     <string name="github">Github</string>
     <string name="donate_button_cd">Przycisk Wsparcia</string>
     <string name="github_button_cd">Przycisk Github</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">Odrzuć powiadomienie</string>
     <string name="dismiss_banner_title">Przenieść powiadomienie?</string>
     <string name="dismiss_banner_message">Przyciski darowizny i GitHub będą przesunięte do paska stanu na dole strony Ustawienia.</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">Wszystkie metadane</string>
     <string name="no_metadata_found">Brak metadanych</string>
     <string name="loading_metadata">Ładowanie metadanych...</string>
-    <string name="categorise_your_media">Kategoryzuj swoje media</string>
-    <string name="disclaimer_classification">Twoje media nie zostały przesłane na żaden serwer, cała klasyfikacja jest wykonywana lokalnie na Twoim urządzeniu za pomocą TensorFlow Lite ze wstępnie trenowanym modelem dostępnym w aktywach aplikacji.</string>
+
     <string name="ai_category">Inteligentne funkcje</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">Modele AI nie są zainstalowane. Pobierz je z Ustawień &gt; Inteligentne funkcje.</string>
+
     <string name="ai_models_manager">Menedżer modeli AI</string>
     <string name="ai_models_download">Pobierz modele AI</string>
-    <string name="ai_models_download_summary">Pobierz modele AI do wyszukiwania i klasyfikacji zdjęć (~147 MB)</string>
+
     <string name="ai_models_downloading">Pobieranie modeli AI...</string>
-    <string name="ai_models_ready_summary">Wyszukiwanie i klasyfikacja oparte na sztucznej inteligencji są dostępne</string>
-    <string name="ai_models_error">Błąd modelu AI</string>
+
     <string name="ai_models_delete">Usuń modele AI</string>
     <string name="ai_models_delete_confirm">Czy na pewno chcesz usunąć modele AI? Musisz je pobrać ponownie, żeby korzystać z funkcji AI.</string>
     <string name="ai_models_size">Rozmiar modelu: %s</string>
-    <string name="ai_models_unavailable">Nie dostępne — wymaga modele AI</string>
+
     <string name="ai_models_description">Modele AI umożliwiają inteligentne wyszukiwanie zdjęć i automatyczną klasyfikację mediów. Aplikacja używa modele CLIP (Contrastive Language-Image Pretraining) w formacie ONNX, aby zrozumieć zawartość Twoich zdjęć.</string>
     <string name="ai_models_privacy_description">Całe przetwarzanie AI odbywa się w całości na Twoim urządzeniu. Żadne zdjęcia, wyszukiwania, ani dane klasyfikacyjne nie opuszczają Twojego telefonu. Modele działają lokalnie używając ONNX Runtime i nie potrzebują połączenia z Internetem po pobraniu. Twoje media pozostają w pełni prywatne.</string>
     <string name="ai_models_source">Źródło</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">Pliki modelów</string>
-    <string name="ai_models_feature_search">Wyszukaj po opisie</string>
-    <string name="ai_models_feature_categories">Automatyczne kategorie</string>
+
     <!-- New Category System -->
-    <string name="add_category">Dodaj kategorię</string>
-    <string name="edit_category">Edytuj kategorię</string>
-    <string name="delete_category_title">Usunąć kategorię?</string>
-    <string name="delete_category_confirmation">Czy na pewno chcesz usunąć tę kategorię? Ta czynność nie można cofnąć.</string>
-    <string name="category_name">Nazwa kategorii</string>
-    <string name="category_name_hint">np. Natura, Żywność, Podróże</string>
-    <string name="search_terms">Kryteria wyszukiwania</string>
-    <string name="search_terms_hint">Słowa kluczowe oddzielone przecinkami w celu dopasowania zdjęć</string>
-    <string name="search_terms_example">zachód słońca, wschód słońca, złota godzina, niebo</string>
-    <string name="accuracy_threshold">Próg dokładności</string>
-    <string name="more_results">Więcej wyników</string>
-    <string name="more_accurate">Dokładniejsze</string>
+
     <string name="preview">Podgląd</string>
-    <string name="matching_photos">Pasujące zdjęcia</string>
-    <string name="best_match">Najlepiej dopasowane</string>
-    <string name="matching_photos_count">%1$d dopasowane</string>
-    <string name="recommended">zalecane</string>
-    <string name="no_matching_photos">Nie znaleziono pasujących zdjęć</string>
-    <string name="category_helper_text">Dodaj nazwę, kryteria wyszukiwania i dostosuj dokładność, aby utworzyć kategorię</string>
-    <string name="reset_categories">Resetuj kategorie</string>
-    <string name="reset_categories_summary">Usuń wszystkie kategorie i przywróć ustawienia domyślne</string>
+
     <string name="create">Utwórz</string>
     <string name="save">Zapisz</string>
-    <string name="browse_categories">Przeglądaj kategorie</string>
-    <string name="category_media_count">%1$d items</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">Nowa kategoria</string>
-    <string name="describe_content">Describe what to include</string>
-    <string name="describe_content_hint">Describe what photos this category should contain</string>
-    <string name="describe_content_example">e.g., photos of my dog at the beach</string>
-    <string name="quick_start">Szybki start</string>
-    <string name="quick_start_subtitle">Tap a suggestion to get started</string>
-    <string name="matching_preview">Preview</string>
-    <string name="see_all_matches">See all %1$d matches</string>
-    <string name="sensitivity">Czułość</string>
-    <string name="sensitivity_broad">Broad</string>
-    <string name="sensitivity_broad_desc">Include loosely related photos</string>
-    <string name="sensitivity_balanced">Balanced</string>
-    <string name="sensitivity_balanced_desc">Good mix of relevance</string>
-    <string name="sensitivity_strict">Strict</string>
-    <string name="sensitivity_strict_desc">Only strong matches</string>
-    <string name="sensitivity_exact">Exact</string>
-    <string name="sensitivity_exact_desc">Near-perfect matches only</string>
-    <string name="fine_tune">Fine-tune</string>
-    <string name="category_created">Category created — classifying photos…</string>
-    <string name="category_updated">Category updated — reclassifying…</string>
-    <string name="category_deleted">Category deleted</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">Zdjęcia referencyjne</string>
-    <string name="reference_images_hint">Dodaj zdjęcia, żeby znaleźć inne podobne wizualnie</string>
-    <string name="add_reference_photos">Dodaj zdjęcia</string>
-    <string name="reference_images_count">%1$d selected</string>
+
     <string name="restore">Przywróć</string>
     <string name="encrypted">Zaszyfrowane</string>
     <string name="date_format_settings">Format Daty</string>
     <string name="date_header">Formaty Dat</string>
     <string name="date_header_summary">Ustaw własne formaty dat</string>
     <string name="launch_on_library">Uruchom na bibliotece</string>
-    <string name="categories">Kategorie</string>
-    <string name="classified_media">%1$s sklasyfikowanych multimediów</string>
-    <string name="scan_for_new_categories">Przeskanuj w poszukiwaniu nowych kategorii</string>
-    <string name="ai_models_not_available">AI models are not downloaded. Download them from Settings → Smart Features.</string>
-    <string name="scanning_media">Skanowanie multimediów...</string>
+
     <string name="date_header_title">Date Header</string>
     <string name="media_view">Media View</string>
     <string name="exif_date">Data Exif</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" at %1$s"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">Zbieranie metadanych...</string>
@@ -932,7 +883,7 @@
     <string name="backup_encrypt_header">Encryption</string>
     <string name="backup_restore_header">Choose what to restore</string>
     <string name="backup_restore">Restore</string>
-    <string name="backup_made_with_version">Created with ReFra %1$s</string>
+    <string name="backup_made_with_version">Created with Theoria %1$s</string>
     <string name="backup_empty">This backup doesn\'t contain any restorable data.</string>
     <string name="backup_items_count">%1$d items</string>
     <string name="backup_pick_file_prompt">Choose a backup file to restore from.</string>

@@ -37,6 +37,9 @@ val mlPartsDir = "src/main/model-parts"        // committed parts + manifest.jso
 val mlMaxBytes = 100L * 1024 * 1024            // 100 MiB guard/detection threshold
 val mlPartBytes = 90L * 1024 * 1024            // 90 MiB per part (safe margin)
 val mlManifestName = "manifest.json"
+// Models kept OUT of the bundle/asset-pack (still available via on-demand download,
+// see ModelDownloadWorker). Prevents them from being reassembled into assets at build time.
+val mlBundleExcludes = setOf("arcface.onnx")
 val mlGitignoreBegin = "# >>> ml-models split (managed) — reassembled at build time, do not commit"
 val mlGitignoreEnd = "# <<< ml-models split (managed)"
 
@@ -209,7 +212,10 @@ val assembleModels = tasks.register("assembleModels") {
     val models = MlSplit.readManifest(manifestFile)
     if (manifestFile.exists()) inputs.file(manifestFile)
     if (partsRoot.exists()) inputs.dir(partsRoot)
-    val targets = models.map { it to File(mlProjectDir, "${it.sourceDir}/${it.asset}") }
+    val bundleExcludes = mlBundleExcludes
+    val targets = models
+        .filterNot { it.asset in bundleExcludes }
+        .map { it to File(mlProjectDir, "${it.sourceDir}/${it.asset}") }
     outputs.files(*targets.map { it.second }.toTypedArray())
     doLast {
         targets.forEach { (m, target) ->

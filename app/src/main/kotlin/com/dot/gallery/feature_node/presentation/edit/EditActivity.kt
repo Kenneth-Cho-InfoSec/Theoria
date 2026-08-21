@@ -23,10 +23,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
-import com.dot.gallery.core.presentation.components.CutoutSaveChoice
-import com.dot.gallery.core.presentation.components.CutoutSaveChoiceSheet
+import androidx.core.content.FileProvider
 import com.dot.gallery.core.presentation.components.OverwriteFallbackSheet
-import com.dot.gallery.feature_node.presentation.edit.components.develop.RawExportSheet
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dot.gallery.feature_node.presentation.edit.adjustments.Crop
@@ -44,6 +42,8 @@ import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 @AndroidEntryPoint
 class EditActivity : ComponentActivity() {
@@ -130,20 +130,10 @@ class EditActivity : ComponentActivity() {
                     val isProcessing by viewModel.isProcessing.collectAsStateWithLifecycle()
                     val previewRotation90 by viewModel.previewRotation90.collectAsStateWithLifecycle()
                     val previewFlipH by viewModel.previewFlipH.collectAsStateWithLifecycle()
-                    val pendingFaceRegions by viewModel.pendingFaceRegions.collectAsStateWithLifecycle()
-                    val isDetectingFaces by viewModel.isDetectingFaces.collectAsStateWithLifecycle()
-                    val isRawEdit by viewModel.isRawEdit.collectAsStateWithLifecycle()
-                    val rawDevelopParams by viewModel.rawDevelopParams.collectAsStateWithLifecycle()
 
                     val scope = rememberCoroutineScope { Dispatchers.IO }
 
                     var showOverwriteFallback by remember { mutableStateOf(false) }
-                    var showRawExportSheet by remember { mutableStateOf(false) }
-                    // A cut-out (background-removal) edit produces transparency: before saving we ask
-                    // the user for PNG vs flatten. `cutoutSavePendingOverride` records whether the
-                    // triggering action was an overwrite (true) or a copy (false).
-                    var showCutoutSaveChoice by remember { mutableStateOf(false) }
-                    var cutoutSavePendingOverride by remember { mutableStateOf(false) }
 
                     val onSaveCopyFailed: () -> Unit = {
                         printError("Failed to save copy")
@@ -166,27 +156,41 @@ class EditActivity : ComponentActivity() {
                     }
 
                     val doSaveCopy: () -> Unit = {
-                        if (viewModel.hasTransparentEdit) {
-                            cutoutSavePendingOverride = false
-                            showCutoutSaveChoice = true
-                        } else {
-                            performSaveCopy(false, null)
-                        }
+                        performSaveCopy(false, null)
                     }
 
-                    if (showRawExportSheet) {
-                        RawExportSheet(
-                            allowTiff = appliedAdjustments.isEmpty(),
-                            onFormatSelected = { format ->
-                                showRawExportSheet = false
-                                viewModel.saveRawCopy(
-                                    format = format,
-                                    onSuccess = { finish() },
-                                    onFail = onSaveCopyFailed
+                    val shareEditedImage: () -> Unit = share@{
+                        val bitmap = targetImage ?: return@share
+                        scope.launch {
+                            val shareUri = withContext(Dispatchers.IO) {
+                                runCatching {
+                                    val shareFile = File(
+                                        cacheDir,
+                                        "edited_share_${System.currentTimeMillis()}.png"
+                                    )
+                                    shareFile.outputStream().use { output ->
+                                        check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, output))
+                                    }
+                                    FileProvider.getUriForFile(
+                                        this@EditActivity,
+                                        com.dot.gallery.BuildConfig.CONTENT_AUTHORITY,
+                                        shareFile
+                                    )
+                                }.getOrNull()
+                            } ?: return@launch
+                            withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                startActivity(
+                                    Intent.createChooser(
+                                        Intent(Intent.ACTION_SEND).apply {
+                                            type = "image/png"
+                                            putExtra(Intent.EXTRA_STREAM, shareUri)
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        },
+                                        getString(R.string.share)
+                                    )
                                 )
-                            },
-                            onDismiss = { showRawExportSheet = false }
-                        )
+                            }
+                        }
                     }
 
                     val performOverride: (Int?) -> Unit = { flattenColor ->
@@ -213,48 +217,17 @@ class EditActivity : ComponentActivity() {
                     }
 
                     val doOverride: () -> Unit = {
-                        if (viewModel.hasTransparentEdit) {
-                            cutoutSavePendingOverride = true
-                            showCutoutSaveChoice = true
-                        } else {
-                            performOverride(null)
-                        }
+                        performOverride(null)
                     }
 
                     if (showOverwriteFallback) {
                         OverwriteFallbackSheet(
                             onCreateCopy = {
                                 showOverwriteFallback = false
-                                // A transparent edit forces a PNG copy; other non-encodable sources
-                                // fall back to their default lossless PNG copy.
-                                performSaveCopy(viewModel.hasTransparentEdit, null)
+                                // Non-encodable sources fall back to their default lossless PNG copy.
+                                performSaveCopy(false, null)
                             },
                             onDismiss = { showOverwriteFallback = false }
-                        )
-                    }
-
-                    if (showCutoutSaveChoice) {
-                        CutoutSaveChoiceSheet(
-                            onChoice = { choice ->
-                                showCutoutSaveChoice = false
-                                when (choice) {
-                                    CutoutSaveChoice.TRANSPARENT_PNG -> {
-                                        // PNG holds alpha; overwrite-in-place of an alpha-less source
-                                        // isn't possible, so route override to a PNG copy.
-                                        if (cutoutSavePendingOverride) showOverwriteFallback = true
-                                        else performSaveCopy(true, null)
-                                    }
-                                    CutoutSaveChoice.FLATTEN_WHITE -> {
-                                        if (cutoutSavePendingOverride) performOverride(android.graphics.Color.WHITE)
-                                        else performSaveCopy(false, android.graphics.Color.WHITE)
-                                    }
-                                    CutoutSaveChoice.FLATTEN_BLACK -> {
-                                        if (cutoutSavePendingOverride) performOverride(android.graphics.Color.BLACK)
-                                        else performSaveCopy(false, android.graphics.Color.BLACK)
-                                    }
-                                }
-                            },
-                            onDismiss = { showCutoutSaveChoice = false }
                         )
                     }
                     val overrideRequest = rememberActivityResult(
@@ -369,8 +342,7 @@ class EditActivity : ComponentActivity() {
                         hasOriginalBackup = hasOriginalBackup,
                         isReverting = isReverting,
                         canOverride = canOverride,
-                        // RAW is always saveable (developing to a copy is valid even at defaults).
-                        isChanged = appliedAdjustments.isNotEmpty() || isRawEdit,
+                        isChanged = appliedAdjustments.isNotEmpty(),
                         isSaving = isSaving,
                         saveProgress = saveProgress,
                         isProcessing = isProcessing,
@@ -402,9 +374,9 @@ class EditActivity : ComponentActivity() {
                             }
                         },
                         onSaveCopy = {
-                            // RAW opens a format chooser (JPEG/PNG/TIFF); other media save directly.
-                            if (isRawEdit) showRawExportSheet = true else doSaveCopy()
+                            doSaveCopy()
                         },
+                        onShare = shareEditedImage,
                         onAdjustItemLongClick = viewModel::removeKind,
                         onAdjustmentChange = viewModel::applyAdjustment,
                         onAdjustmentPreview = viewModel::previewAdjustment,
@@ -449,27 +421,6 @@ class EditActivity : ComponentActivity() {
                         previewFlipH = previewFlipH,
                         onRotate90 = viewModel::applyRotate90,
                         onFlipH = viewModel::applyFlipH,
-                        pendingFaceRegions = pendingFaceRegions,
-                        onFaceRegionsConsumed = viewModel::consumeFaceRegions,
-                        onDetectFaces = viewModel::detectFacesForMarkup,
-                        faceDetectAvailable = viewModel.faceDetectAvailable,
-                        isDetectingFaces = isDetectingFaces,
-                        isRawEdit = isRawEdit,
-                        rawDevelopParams = rawDevelopParams,
-                        onRawDevelopChange = viewModel::updateRawDevelop,
-                        rawThumbnailProvider = viewModel::rawOptionThumbnail,
-                        cutoutAvailable = viewModel.cutoutAvailable,
-                        cutoutState = viewModel.cutoutState,
-                        onCutoutAddPoint = viewModel::addCutoutPoint,
-                        onCutoutToolChange = viewModel::setCutoutTool,
-                        onCutoutStart = viewModel::startCutout,
-                        onCutoutUndo = viewModel::undoCutout,
-                        onCutoutRedo = viewModel::redoCutout,
-                        onCutoutReset = viewModel::resetCutout,
-                        onCutoutApply = viewModel::applyCutoutAsEdit,
-                        onCutoutCancel = viewModel::cancelCutout,
-                        onCutoutCopy = viewModel::cutoutCopy,
-                        onCutoutShare = viewModel::cutoutShare,
                     )
                 }
             }

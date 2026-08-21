@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.exif
 
 import android.media.MediaScannerConnection
@@ -94,6 +99,7 @@ fun <T: Media> MoveMediaSheet(
 
     val scope = rememberCoroutineScope()
     var progress by remember(mediaList) { mutableFloatStateOf(0f) }
+    var isMoving by remember(mediaList) { mutableStateOf(false) }
     var newPath by remember(mediaList) { mutableStateOf("") }
 
     val newAlbumSheetState = rememberAppBottomSheetState()
@@ -104,6 +110,8 @@ fun <T: Media> MoveMediaSheet(
     val doMove: () -> Unit = {
         scope.launch {
             val localMedia = mediaList.filter { !it.isCloud }
+            if (localMedia.isEmpty()) return@launch
+            isMoving = true
             val done = async {
                 localMedia.forEachIndexed { index, it ->
                     if (handler.moveMedia(media = it, newPath = newPath)) {
@@ -114,7 +122,7 @@ fun <T: Media> MoveMediaSheet(
                             arrayOf(it.mimeType),
                             null
                         )
-                        progress = index.toFloat() / mediaList.size
+                        progress = (index + 1).toFloat() / localMedia.size
                     } else {
                         return@async false
                     }
@@ -132,6 +140,7 @@ fun <T: Media> MoveMediaSheet(
                 delay(1000)
                 sheetState.hide()
             }
+            isMoving = false
         }
     }
 
@@ -205,7 +214,7 @@ fun <T: Media> MoveMediaSheet(
                 )
 
                 AnimatedVisibility(
-                    visible = progress == 0f,
+                    visible = !isMoving,
                     enter = Constants.Animation.enterAnimation,
                     exit = Constants.Animation.exitAnimation
                 ) {
@@ -238,7 +247,7 @@ fun <T: Media> MoveMediaSheet(
                 }
 
                 AnimatedVisibility(
-                    visible = progress > 0f,
+                    visible = isMoving,
                     modifier = Modifier
                         .padding(32.dp)
                         .padding(bottom = 64.dp)
@@ -258,7 +267,7 @@ fun <T: Media> MoveMediaSheet(
 
                 val albumSize by rememberAlbumGridSize()
                 AnimatedVisibility(
-                    visible = progress == 0f,
+                    visible = !isMoving,
                     enter = Constants.Animation.enterAnimation,
                     exit = Constants.Animation.exitAnimation
                 ) {
@@ -325,22 +334,16 @@ fun <T: Media> MoveMediaSheet(
                                 items = filteredGroupAlbums,
                                 key = { item -> "group_album_${item.id}" }
                             ) { item ->
-                                val mediaVolume = (mediaList.firstOrNull()?.volume ?: item.volume)
-                                val albumOwnership =
-                                    item.relativePath.substringBeforeLast("Android/media/", "allow")
-                                val mediaOwnership =
-                                    mediaList.firstOrNull()?.relativePath?.substringBeforeLast(
-                                        "Android/media/",
-                                        "allow"
-                                    ) ?: albumOwnership
-                                val mediaAlbum = mediaList.firstOrNull()?.albumLabel ?: item.label
+                                val sourceAlbumPath = mediaList.firstOrNull()?.path
+                                    ?.substringBeforeLast('/')
+                                    ?.trimEnd('/')
                                 AlbumComponent(
                                     modifier = Modifier.animateItem(),
                                     album = item,
-                                    isEnabled = hasFullMediaAccess || (item.volume == mediaVolume
-                                            && albumOwnership == "allow"
-                                            && mediaOwnership == "allow"
-                                            && item.label != mediaAlbum),
+                                    // The write request below grants scoped access to the
+                                    // selected destination. Volume/label comparisons disabled
+                                    // valid existing albums on Android 17/GrapheneOS (#1121).
+                                    isEnabled = item.absolutePath.trimEnd('/') != sourceAlbumPath,
                                     onItemClick = { album ->
                                         if (album.isLocked) {
                                             if (!biometricState.isSupported) {
@@ -386,21 +389,14 @@ fun <T: Media> MoveMediaSheet(
                                 items = filteredUngroupedAlbums,
                                 key = { item -> item.toString() }
                             ) { item ->
-                                val mediaVolume = (mediaList.firstOrNull()?.volume ?: item.volume)
-                                val albumOwnership =
-                                    item.relativePath.substringBeforeLast("Android/media/", "allow")
-                                val mediaOwnership =
-                                    mediaList.firstOrNull()?.relativePath?.substringBeforeLast(
-                                        "Android/media/",
-                                        "allow"
-                                    ) ?: albumOwnership
-                                val mediaAlbum = mediaList.firstOrNull()?.albumLabel ?: item.label
+                                val sourceAlbumPath = mediaList.firstOrNull()?.path
+                                    ?.substringBeforeLast('/')
+                                    ?.trimEnd('/')
                                 AlbumComponent(
                                     album = item,
-                                    isEnabled = hasFullMediaAccess || (item.volume == mediaVolume
-                                            && albumOwnership == "allow"
-                                            && mediaOwnership == "allow"
-                                            && item.label != mediaAlbum),
+                                    // Let the scoped write request authorize destinations on
+                                    // another volume; only the current source folder is invalid.
+                                    isEnabled = item.absolutePath.trimEnd('/') != sourceAlbumPath,
                                     onItemClick = { album ->
                                         if (album.isLocked) {
                                             if (!biometricState.isSupported) {
@@ -444,4 +440,3 @@ fun <T: Media> MoveMediaSheet(
         }
     )
 }
-

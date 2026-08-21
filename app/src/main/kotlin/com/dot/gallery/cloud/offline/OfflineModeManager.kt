@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.offline
@@ -101,7 +101,17 @@ class OfflineModeManager @Inject constructor(
             }
 
             override fun onLost(network: Network) {
-                _connected.value = false
+                // A lost Wi-Fi network does not necessarily mean the device is offline; a
+                // cellular or replacement network may already be active. Re-read the active
+                // network instead of trusting the callback's network identity.
+                runCatching {
+                    val active = cm.activeNetwork
+                    val caps = active?.let { cm.getNetworkCapabilities(it) }
+                    _connected.value = caps != null
+                    updateFromCapabilities(caps)
+                }.onFailure {
+                    _connected.value = false
+                }
                 recomputeSnapshots()
             }
 
@@ -125,7 +135,7 @@ class OfflineModeManager @Inject constructor(
                 _forceOffline.value = prefs[KEY_FORCE_OFFLINE] ?: false
                 _cacheOnView.value = prefs[KEY_CACHE_ON_VIEW] ?: true
                 _cacheWifiOnly.value = prefs[KEY_CACHE_WIFI_ONLY] ?: false
-                _budgetBytes.value = (prefs[KEY_BUDGET_MB] ?: DEFAULT_BUDGET_MB).toLong() * 1024L * 1024L
+                _budgetBytes.value = normalizedBudgetMb(prefs[KEY_BUDGET_MB]).toLong() * 1024L * 1024L
                 recomputeSnapshots()
             }
         }
@@ -149,14 +159,19 @@ class OfflineModeManager @Inject constructor(
     suspend fun setCacheWifiOnly(enabled: Boolean) = edit { it[KEY_CACHE_WIFI_ONLY] = enabled }
     suspend fun setBudgetMb(mb: Int) = edit { it[KEY_BUDGET_MB] = mb.coerceIn(64, 32768) }
 
-    val budgetMbFlow = context.activeDataStore.data.map { it[KEY_BUDGET_MB] ?: DEFAULT_BUDGET_MB }
+    val budgetMbFlow = context.activeDataStore.data.map { normalizedBudgetMb(it[KEY_BUDGET_MB]) }
 
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.activeDataStore.edit(block)
     }
 
+    private fun normalizedBudgetMb(value: Int?): Int =
+        (value ?: DEFAULT_BUDGET_MB).coerceIn(MIN_BUDGET_MB, MAX_BUDGET_MB)
+
     companion object {
         const val DEFAULT_BUDGET_MB = 512
+        private const val MIN_BUDGET_MB = 64
+        private const val MAX_BUDGET_MB = 32768
 
         private val KEY_FORCE_OFFLINE = booleanPreferencesKey("cloud_offline_force")
         private val KEY_CACHE_ON_VIEW = booleanPreferencesKey("cloud_offline_cache_on_view")

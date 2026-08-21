@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.help.data
@@ -13,7 +13,6 @@ import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Security
 import com.dot.gallery.core.Position
 import com.dot.gallery.core.SettingsEntity
-import com.dot.gallery.feature_node.data.data_source.CategoryWithMediaCount
 import com.dot.gallery.feature_node.domain.model.Album
 import com.dot.gallery.feature_node.domain.model.AlbumState
 import com.dot.gallery.feature_node.domain.model.LocationMedia
@@ -164,38 +163,6 @@ object HelpMockData {
         override val metadataFlow: StateFlow<MediaMetadataState> = MutableStateFlow(MOCK_METADATA_STATE)
     }
 
-    val MOCK_CATEGORIES_WITH_COUNT: List<CategoryWithMediaCount> = listOf(
-        CategoryWithMediaCount(
-            id = 1L, name = "Nature", searchTerms = "nature,landscape,trees",
-            embedding = null, referenceImageIds = emptyList(), threshold = 0.5f, isUserCreated = false,
-            isPinned = true, createdAt = 1735689600000L, updatedAt = 1735689600000L,
-            mediaCount = 42, thumbnailMediaId = 1L
-        ),
-        CategoryWithMediaCount(
-            id = 2L, name = "People", searchTerms = "people,portrait,face",
-            embedding = null, referenceImageIds = emptyList(), threshold = 0.5f, isUserCreated = false,
-            isPinned = false, createdAt = 1735689600000L, updatedAt = 1735689600000L,
-            mediaCount = 28, thumbnailMediaId = 3L
-        ),
-        CategoryWithMediaCount(
-            id = 3L, name = "Food", searchTerms = "food,meal,dish",
-            embedding = null, referenceImageIds = emptyList(), threshold = 0.5f, isUserCreated = true,
-            isPinned = false, createdAt = 1735689600000L, updatedAt = 1735689600000L,
-            mediaCount = 15, thumbnailMediaId = 5L
-        ),
-        CategoryWithMediaCount(
-            id = 4L, name = "Architecture", searchTerms = "building,architecture,city",
-            embedding = null, referenceImageIds = emptyList(), threshold = 0.5f, isUserCreated = false,
-            isPinned = false, createdAt = 1735689600000L, updatedAt = 1735689600000L,
-            mediaCount = 12, thumbnailMediaId = 7L
-        ),
-        CategoryWithMediaCount(
-            id = 5L, name = "Pets", searchTerms = "pet,dog,cat,animal",
-            embedding = null, referenceImageIds = emptyList(), threshold = 0.5f, isUserCreated = true,
-            isPinned = true, createdAt = 1735689600000L, updatedAt = 1735689600000L,
-            mediaCount = 8, thumbnailMediaId = 9L
-        ),
-    )
 
     val MOCK_LOCATIONS: List<LocationMedia> = listOf(
         LocationMedia(media = MOCK_PHOTOS[0], location = "Bucharest, Romania"),

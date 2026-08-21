@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.common.components
@@ -162,7 +162,11 @@ fun GridPinchZoomLayout(
                                     }
                                 }
 
-                                if (pastTouchSlop && zoomChange != 1f) {
+                                // calculateZoom() can return zero or NaN while pointers are
+                                // being lifted/converged. Never feed that into Animatable:
+                                // invalid scales were the source of intermittent grid crashes
+                                // while pinching out to change the column count (#1119).
+                                if (pastTouchSlop && zoomChange.isFinite() && zoomChange > 0f && zoomChange != 1f) {
                                     state.accumulatedScale *= zoomChange
                                     scope.launch {
                                         state.scaleAnimatable.snapTo(state.accumulatedScale)

@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.media
@@ -41,8 +41,10 @@ class CloudDataSource private constructor(
 
     // OkHttp call handle for cancellation
     private var activeCall: okhttp3.Call? = null
+    private var activeResponse: okhttp3.Response? = null
     private var inputStream: java.io.InputStream? = null
     private var bytesRemaining: Long = 0L
+    private var activeUri: Uri? = null
 
     override fun open(dataSpec: DataSpec): Long {
         val uri = dataSpec.uri
@@ -51,6 +53,7 @@ class CloudDataSource private constructor(
             // Delegate non-cloud URIs to the default pipeline
             val fallback = fallbackFactory.createDataSource()
             activeSource = fallback
+            activeUri = null
             return fallback.open(dataSpec)
         }
 
@@ -91,19 +94,40 @@ class CloudDataSource private constructor(
             throw java.io.IOException("HTTP ${response.code}: ${response.message}")
         }
 
+        activeResponse = response
+        activeUri = uri
         val body = response.body
-            ?: throw java.io.IOException("Empty response body from $url")
 
         inputStream = body.byteStream()
         val contentLength = body.contentLength()
-        CloudTrace.d("Video[$providerType] '$remoteId' streaming ${CloudTrace.bytes(contentLength)}")
-        bytesRemaining = if (contentLength > 0) contentLength else Long.MAX_VALUE
+        // Some servers ignore Range and return 200 with the full object. Discard the
+        // requested prefix so ExoPlayer still starts at the requested position.
+        if (dataSpec.position > 0 && response.code != 206) {
+            skipFully(inputStream!!, dataSpec.position)
+        }
+        val available = if (dataSpec.position > 0 && response.code != 206 && contentLength > 0) {
+            (contentLength - dataSpec.position).coerceAtLeast(0L)
+        } else {
+            contentLength
+        }
+        bytesRemaining = when {
+            dataSpec.length != androidx.media3.common.C.LENGTH_UNSET.toLong() && available >= 0L ->
+                minOf(available, dataSpec.length)
+            dataSpec.length != androidx.media3.common.C.LENGTH_UNSET.toLong() -> dataSpec.length
+            available >= 0L -> available
+            else -> Long.MAX_VALUE
+        }
+        CloudTrace.d("Video[$providerType] '$remoteId' streaming ${CloudTrace.bytes(bytesRemaining)}")
         openedCloudStream = true
 
         transferInitializing(dataSpec)
         transferStarted(dataSpec)
 
-        return if (contentLength > 0) contentLength else androidx.media3.common.C.LENGTH_UNSET.toLong()
+        return if (bytesRemaining == Long.MAX_VALUE) {
+            androidx.media3.common.C.LENGTH_UNSET.toLong()
+        } else {
+            bytesRemaining
+        }
     }
 
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
@@ -131,7 +155,7 @@ class CloudDataSource private constructor(
     }
 
     override fun getUri(): Uri? {
-        return activeSource?.uri
+        return activeSource?.uri ?: activeUri
     }
 
     override fun close() {
@@ -140,15 +164,34 @@ class CloudDataSource private constructor(
             activeSource = null
         } finally {
             try {
+                activeCall?.cancel()
+                activeCall = null
                 inputStream?.close()
                 inputStream = null
             } finally {
-                activeCall = null
+                activeResponse?.close()
+                activeResponse = null
+                activeUri = null
                 if (openedCloudStream) {
                     openedCloudStream = false
                     transferEnded()
                 }
             }
+        }
+    }
+
+    private fun skipFully(stream: java.io.InputStream, bytes: Long) {
+        var remaining = bytes
+        while (remaining > 0L) {
+            val skipped = stream.skip(remaining)
+            if (skipped > 0L) {
+                remaining -= skipped
+                continue
+            }
+            if (stream.read() == -1) {
+                throw java.io.EOFException("Unable to seek to byte $bytes")
+            }
+            remaining--
         }
     }
 

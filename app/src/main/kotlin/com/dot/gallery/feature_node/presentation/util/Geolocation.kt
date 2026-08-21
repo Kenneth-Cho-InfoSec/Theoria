@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.util
 
 import android.location.Address
@@ -9,19 +14,26 @@ import androidx.core.text.isDigitsOnly
 
 @Composable
 fun rememberGeocoder(): Geocoder? {
-    val geocoder = Geocoder(LocalContext.current)
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Geocoder.isPresent())
-        geocoder else null
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !Geocoder.isPresent()) return null
+    val context = LocalContext.current
+    return try {
+        Geocoder(context)
+    } catch (_: RuntimeException) {
+        null
+    }
 }
 
 fun Geocoder.getLocation(lat: Double, long: Double, onLocationFound: (Address?) -> Unit) {
+    if (!lat.isFinite() || !long.isFinite() || lat !in -90.0..90.0 || long !in -180.0..180.0) {
+        onLocationFound(null)
+        return
+    }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getFromLocation(
-            /* latitude = */ lat, /* longitude = */ long, /* maxResults = */ 1
-        ) {
-            if (it.isEmpty()) onLocationFound(null)
-            else onLocationFound(it.first())
-        }
+        runCatching {
+            getFromLocation(lat, long, 1) { results ->
+                onLocationFound(results.firstOrNull())
+            }
+        }.onFailure { onLocationFound(null) }
     } else {
         onLocationFound(null)
     }

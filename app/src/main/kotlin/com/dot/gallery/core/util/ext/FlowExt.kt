@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2023 The LineageOS Project
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.util.ext

@@ -2,18 +2,10 @@ package com.dot.gallery.feature_node.presentation.edit
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Environment
-import android.widget.Toast
 import com.dot.gallery.R
-import com.dot.gallery.core.ml.CutoutHelper
-import com.dot.gallery.core.ml.ModelGroup
-import com.dot.gallery.feature_node.presentation.edit.adjustments.Cutout
 import com.dot.gallery.feature_node.presentation.edit.adjustments.FlattenBackground
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.CutoutState
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.ZoomablePagerImagePointTool
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorMatrix
@@ -26,26 +18,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.dot.gallery.feature_node.presentation.edit.bake.EditReplay
-import com.dot.gallery.feature_node.presentation.edit.bake.NativeHeifEncoder
 import com.dot.gallery.feature_node.presentation.edit.bake.NativeImageEncoder
 import com.dot.gallery.feature_node.presentation.edit.bake.TiledBakeEngine
-import com.dot.gallery.feature_node.presentation.edit.components.develop.RawSaveFormat
 import com.dot.gallery.core.util.ext.saveImageStreaming
 import com.dot.gallery.core.util.ext.overrideImageStreaming
 import com.dot.gallery.core.EditBackupManager
 import com.dot.gallery.core.MediaHandler
 import com.dot.gallery.core.Settings
-import com.dot.gallery.core.decoder.NativeRawDecoder
-import com.dot.gallery.core.decoder.RawDevelopParams
-import com.dot.gallery.core.decoder.RawDevelopStore
-import com.dot.gallery.core.decoder.RawOrientation
-import com.dot.gallery.core.decoder.RawRegionDecoder
-import com.dot.gallery.core.decoder.RawThumbnailCache
 import com.dot.gallery.core.decoder.format.ImageReencoder
-import com.dot.gallery.core.decoder.format.SourceQualityProbe
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.model.Media.UriMedia
-import com.dot.gallery.feature_node.domain.util.isRaw
 import com.dot.gallery.feature_node.domain.model.editor.Adjustment
 import com.dot.gallery.feature_node.domain.model.editor.DrawMode
 import com.dot.gallery.feature_node.domain.model.editor.DrawType
@@ -98,229 +80,7 @@ class EditViewModel @Inject constructor(
     private val mediaHandler: MediaHandler,
     private val editBackupManager: EditBackupManager,
     private val workManager: WorkManager,
-    private val modelManager: com.dot.gallery.core.ml.ModelManager,
 ) : ViewModel() {
-
-    /** Normalized face rects awaiting conversion into markup regions by the painter. */
-    private val _pendingFaceRegions = MutableStateFlow<List<android.graphics.RectF>>(emptyList())
-    val pendingFaceRegions = _pendingFaceRegions.asStateFlow()
-
-    private val _isDetectingFaces = MutableStateFlow(false)
-    val isDetectingFaces = _isDetectingFaces.asStateFlow()
-
-    /** True when the on-device face detector model is installed (gates the "Blur faces" action). */
-    val faceDetectAvailable: Boolean
-        get() = modelManager.isReady(com.dot.gallery.core.ml.ModelGroup.FACE_DETECT)
-
-    /** Run face detection on the current image; results are emitted via [pendingFaceRegions]. */
-    fun detectFacesForMarkup() {
-        if (!faceDetectAvailable) return
-        val bmp = lastRealBitmap() ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            _isDetectingFaces.value = true
-            val helper = com.dot.gallery.core.ml.FaceHelper(modelManager)
-            try {
-                val faces = helper.detect(bmp)
-                _pendingFaceRegions.value = faces.map {
-                    android.graphics.RectF(it.left, it.top, it.right, it.bottom)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                helper.close()
-                _isDetectingFaces.value = false
-            }
-        }
-    }
-
-    fun consumeFaceRegions() {
-        _pendingFaceRegions.value = emptyList()
-    }
-
-    // ── Cutout tool (on-device MobileSAM) ─────────────────────────────────────
-    /** True when the MobileSAM models are installed (gates the Cutout editor tab). */
-    val cutoutAvailable: Boolean
-        get() = modelManager.isReady(ModelGroup.CUTOUT)
-
-    /** Interactive cut-out session state (session, prompt points, mask result, tool, history). */
-    val cutoutState = CutoutState()
-
-    /** True while a cut-out edit (background removal) is part of the recipe → transparency present. */
-    val hasTransparentEdit: Boolean
-        get() = _appliedAdjustments.value.any { it is Cutout }
-
-    fun setCutoutTool(tool: ZoomablePagerImagePointTool) {
-        cutoutState.activeTool = tool
-    }
-
-    /** Records which Smart tool opened the session (Cutout vs Background Removal). */
-    private var cutoutBackgroundRemoval = false
-
-    /**
-     * Enter the interactive cut-out: encode the current editor proxy and auto-select the most likely
-     * subject (a centred seed, kept only when it looks like a real subject). The user then refines
-     * with include/exclude taps. [backgroundRemoval] records which Smart tool launched the session;
-     * both share the same interactive workings.
-     */
-    fun startCutout(backgroundRemoval: Boolean) {
-        if (cutoutState.session != null || cutoutState.isProcessing) return
-        val base = _targetBitmap.value ?: return
-        val media = activeMedia.value ?: return
-        cutoutBackgroundRemoval = backgroundRemoval
-        cutoutState.activeTool = ZoomablePagerImagePointTool.ADD
-        viewModelScope.launch(Dispatchers.Default) {
-            cutoutState.isProcessing = true
-            try {
-                val session = CutoutHelper.CutoutSession(context, media, modelManager)
-                if (!session.initAndRunEncoder(base)) {
-                    session.close()
-                    toastCutout(R.string.cutout_init_failed)
-                    return@launch
-                }
-                // Auto pre-select: seed a single centre point (the usual subject location).
-                val seed = CutoutHelper.PromptPoint(
-                    x = session.widthOrig / 2f,
-                    y = session.heightOrig / 2f,
-                    isPositive = true
-                )
-                val result = session.runDecoder(listOf(seed))
-                if (result != null && isPlausibleSubject(result, session)) {
-                    cutoutState.initSession(session, listOf(seed))
-                    cutoutState.updateResult(result, null)
-                } else {
-                    // No confident subject — keep the encoded session ready for manual taps.
-                    result?.bitmap?.recycle()
-                    cutoutState.initSession(session, emptyList())
-                }
-            } finally {
-                cutoutState.isProcessing = false
-            }
-        }
-    }
-
-    /** Rejects specks and near-full-frame masks that usually mean "no clear subject". */
-    private fun isPlausibleSubject(
-        result: CutoutHelper.CutoutResult,
-        session: CutoutHelper.CutoutSession
-    ): Boolean {
-        val subjectArea = result.originalBounds.width().toLong() * result.originalBounds.height().toLong()
-        val total = session.widthOrig.toLong() * session.heightOrig.toLong()
-        if (total <= 0L || subjectArea <= 0L) return false
-        val fraction = subjectArea.toFloat() / total.toFloat()
-        return fraction in 0.03f..0.9f
-    }
-
-    /**
-     * Place a prompt point (in working-bitmap pixel coordinates). Normally the session already
-     * exists (auto pre-select encoded it on entry); the first point is only encoded here as a
-     * fallback when auto-encode failed. Mirrors the media viewer's refine loop.
-     */
-    fun addCutoutPoint(x: Float, y: Float, isPositive: Boolean) {
-        val session = cutoutState.session
-        if (session == null) {
-            if (cutoutState.isProcessing) return
-            val base = _targetBitmap.value ?: return
-            val media = activeMedia.value ?: return
-            viewModelScope.launch(Dispatchers.Default) {
-                cutoutState.isProcessing = true
-                try {
-                    val newSession = CutoutHelper.CutoutSession(context, media, modelManager)
-                    val ok = newSession.initAndRunEncoder(base)
-                    if (ok) {
-                        val point = CutoutHelper.PromptPoint(x = x, y = y, isPositive = true)
-                        val points = listOf(point)
-                        val result = newSession.runDecoder(points)
-                        if (result != null) {
-                            cutoutState.initSession(newSession, points)
-                            cutoutState.updateResult(result, null)
-                        } else {
-                            newSession.close()
-                            toastCutout(R.string.cutout_no_object)
-                        }
-                    } else {
-                        newSession.close()
-                        toastCutout(R.string.cutout_init_failed)
-                    }
-                } finally {
-                    cutoutState.isProcessing = false
-                }
-            }
-        } else {
-            val newPoint = CutoutHelper.PromptPoint(x = x, y = y, isPositive = isPositive)
-            val previousPoints = cutoutState.promptPoints
-            val updatedPoints = cutoutState.promptPoints + newPoint
-            cutoutState.pushPoints(updatedPoints)
-            viewModelScope.launch(Dispatchers.Default) {
-                cutoutState.isProcessing = true
-                try {
-                    val res = session.runDecoder(updatedPoints)
-                    val newCache = cutoutState.result?.let { Pair(previousPoints, it) }
-                    cutoutState.updateResult(res, newCache)
-                } finally {
-                    cutoutState.isProcessing = false
-                }
-            }
-        }
-    }
-
-    fun undoCutout() = navigateCutout(-1)
-    fun redoCutout() = navigateCutout(1)
-
-    private fun navigateCutout(delta: Int) {
-        val pts = cutoutState.navigateHistory(delta) ?: return
-        val session = cutoutState.session ?: return
-        viewModelScope.launch(Dispatchers.Default) {
-            cutoutState.isProcessing = true
-            try {
-                val res = session.runDecoder(pts.second)
-                val newCache = cutoutState.result?.let { Pair(pts.first, it) }
-                cutoutState.updateResult(res, newCache)
-            } finally {
-                cutoutState.isProcessing = false
-            }
-        }
-    }
-
-    fun resetCutout() {
-        cutoutState.clearPoints()
-    }
-
-    fun cancelCutout() {
-        cutoutState.dismiss()
-    }
-
-    /** Bake the current mask into the recipe as a background-removal [Cutout] adjustment. */
-    fun applyCutoutAsEdit() {
-        val result = cutoutState.result ?: return
-        val base = _targetBitmap.value ?: return
-        val mask = Bitmap.createBitmap(base.width, base.height, Bitmap.Config.ARGB_8888)
-        Canvas(mask).drawBitmap(
-            result.bitmap,
-            null,
-            Rect(
-                result.originalBounds.left,
-                result.originalBounds.top,
-                result.originalBounds.right,
-                result.originalBounds.bottom
-            ),
-            null
-        )
-        cutoutState.dismiss()
-        applyAdjustment(Cutout(mask))
-    }
-
-    fun cutoutCopy() = exportCutout { CutoutHelper.copyToClipboard(context, it) }
-    fun cutoutShare() = exportCutout { CutoutHelper.shareCutout(context, it) }
-    fun cutoutSaveNew() = exportCutout { CutoutHelper.saveToGallery(context, it) }
-
-    private fun exportCutout(action: suspend (Bitmap) -> Unit) {
-        val bmp = cutoutState.result?.bitmap ?: return
-        viewModelScope.launch(Dispatchers.IO) { action(bmp) }
-    }
-
-    private suspend fun toastCutout(resId: Int) = withContext(Dispatchers.Main) {
-        Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show()
-    }
 
     /**
      * Composite the current (transparent) working image onto a solid [color] and push it as a
@@ -406,26 +166,6 @@ class EditViewModel @Inject constructor(
 
     private val _isProcessing = MutableStateFlow(false)
     val isProcessing = _isProcessing.asStateFlow()
-
-    // ── RAW develop integration ───────────────────────────────────────────────
-    /** Cached RAW bytes (read once), EXIF-derived orientation, and the tone-neutral base bitmap. */
-    private var rawBytes: ByteArray? = null
-    private var rawUserFlip: Int = -1
-    private var rawBaseBitmap: Bitmap? = null
-
-    /** The live develop recipe when editing a RAW (null for non-RAW media). */
-    private val _rawDevelopParams = MutableStateFlow<RawDevelopParams?>(null)
-    val rawDevelopParams = _rawDevelopParams.asStateFlow()
-
-    /** True while the current edit session is a RAW being developed in-editor. */
-    private val _isRawEdit = MutableStateFlow(false)
-    val isRawEdit = _isRawEdit.asStateFlow()
-
-    /** True when the RAW develop recipe deviates from the neutral default (drives the Save pill). */
-    val isRawModified: Boolean
-        get() = _isRawEdit.value && _rawDevelopParams.value?.let { it != RawDevelopParams.AUTO } == true
-
-    private var rawToneJob: Job? = null
 
     private val _uri = MutableStateFlow<Uri?>(null)
     val uri = _uri.asStateFlow()
@@ -557,22 +297,12 @@ class EditViewModel @Inject constructor(
     }
 
     /**
-     * Builds the re-encode config from settings, folding in a best-effort estimate of the source's
-     * original quality (JPEG only) so overwrites in AUTO mode match the original fidelity.
+     * Builds the re-encode config from settings. AUTO mode falls back to the configured default
+     * quality (the source-quality probe was removed with the RAW decode stack).
      */
     private fun reencodeConfigForSource(): ImageReencoder.ReencodeConfig {
-        val media = activeMedia.value
-        val detected = media?.let { m ->
-            runCatching {
-                val prefix = context.contentResolver.openInputStream(m.uri)?.use { input ->
-                    val buf = ByteArray(256 * 1024)
-                    val read = input.read(buf)
-                    if (read <= 0) null else buf.copyOf(read)
-                }
-                prefix?.let { SourceQualityProbe.detect(it, m.mimeType) }
-            }.getOrNull()
-        }
-        return Settings.Misc.getReencodeConfig(context, detected)
+        val detectedQuality: Int? = null
+        return Settings.Misc.getReencodeConfig(context, detectedQuality)
     }
 
     private fun clearRedoStack() {
@@ -747,10 +477,6 @@ class EditViewModel @Inject constructor(
 
     private suspend fun setOriginalBitmap(context: Context) {
         try {
-            // RAW: demosaic a bounded base and develop it in-editor instead of loading the
-            // embedded JPEG preview. Falls through to the Glide path when native RAW is
-            // unavailable or the decode fails.
-            if (setupRawBase()) return
             val mediaUri = activeMedia.value?.uri
                 ?: throw IllegalStateException("No media uri to load")
             // Decode a memory-safe PROXY (bounded to the screen) for interactive editing instead of
@@ -793,163 +519,6 @@ class EditViewModel @Inject constructor(
         return maxOf(metrics.widthPixels, metrics.heightPixels).coerceIn(1080, 2560)
     }
 
-    // ── RAW develop ───────────────────────────────────────────────────────────
-
-    /**
-     * When the active media is a native-decodable RAW, reads the bytes once, demosaics a bounded
-     * tone-neutral base, applies the stored develop recipe, and installs it as the editor base.
-     * Returns false (so the caller falls back to the embedded-preview path) for non-RAW media or
-     * when native RAW is unavailable / the decode fails.
-     */
-    private suspend fun setupRawBase(): Boolean {
-        val media = activeMedia.value ?: return false
-        if (!media.isRaw || !NativeRawDecoder.isAvailable) return false
-        val bytes = runCatching {
-            context.contentResolver.openInputStream(media.uri)?.use { it.readBytes() }
-        }.getOrNull() ?: return false
-        rawBytes = bytes
-        rawUserFlip = RawOrientation.libRawUserFlip(bytes)
-        val params = RawDevelopStore.paramsFor(media.id)
-        val base = NativeRawDecoder.demosaic(bytes, rawProxyParams(params).baseOnly, rawUserFlip)
-            ?: return false
-        val bounded = boundProxy(base)
-        rawBaseBitmap = bounded
-        _rawDevelopParams.value = params
-        _isRawEdit.value = true
-        val developed = developWithTone(bounded, params)
-        installBase(developed)
-        return true
-    }
-
-    /** Auto half-size the proxy demosaic for very large sensors to bound decode time/memory. */
-    private fun rawProxyParams(params: RawDevelopParams): RawDevelopParams {
-        val size = rawBytes?.let { NativeRawDecoder.getSize(it) } ?: return params
-        val large = size.width.toLong() * size.height.toLong() > RawRegionDecoder.AUTO_HALFSIZE_PIXELS
-        return if (large && !params.halfSize) params.copy(halfSize = true) else params
-    }
-
-    /** Downscale a demosaiced bitmap to the interactive proxy cap when it exceeds it. */
-    private fun boundProxy(bmp: Bitmap): Bitmap {
-        val proxyDim = proxyMaxDim()
-        return if (bmp.width > proxyDim || bmp.height > proxyDim) resizeBitmap(bmp, proxyDim, proxyDim) else bmp
-    }
-
-    /** Apply the tone stage to a base bitmap (no-op copy when the recipe has no tone). */
-    private fun developWithTone(base: Bitmap, params: RawDevelopParams): Bitmap =
-        if (params.hasTone) NativeRawDecoder.applyTone(base, params) ?: base else base
-
-    /** Reset the editor's stack to a fresh single-checkpoint base (used on load / develop change). */
-    private fun installBase(base: Bitmap) {
-        _originalBitmap.value = base
-        _targetBitmap.value = base
-        _currentBitmap.value = base
-        bitmaps.clear()
-        bitmaps.add(base to null)
-        _appliedAdjustments.value = emptyList()
-        clearRedoStack()
-        _previewMatrix.value = null
-        _isSaving.value = false
-        updateUndoRedoState()
-    }
-
-    /**
-     * Live develop update. Tone-only changes re-tone the cached base instantly (debounced, no
-     * re-demosaic); base changes (white balance, exposure, demosaic algo, colour space, highlight,
-     * noise reduction, half-size) re-demosaic with a brief spinner. Either way the recorded
-     * crop/filter/markup recipe is replayed on top so prior edits are preserved.
-     */
-    fun updateRawDevelop(newParams: RawDevelopParams) {
-        val old = _rawDevelopParams.value ?: return
-        _rawDevelopParams.value = newParams
-        activeMedia.value?.id?.let { RawDevelopStore.update(it, newParams) }
-        rawToneJob?.cancel()
-        if (newParams.sharesBaseWith(old)) {
-            rawToneJob = viewModelScope.launch(Dispatchers.Default) {
-                delay(40) // debounce rapid slider ticks
-                if (!isActive) return@launch
-                regenerateDeveloped(newParams)
-            }
-        } else {
-            rawToneJob = viewModelScope.launch(Dispatchers.IO) {
-                delay(180) // debounce so dragging a base slider (exposure/WB) doesn't thrash decodes
-                if (!isActive) return@launch
-                _isProcessing.value = true
-                val bytes = rawBytes
-                if (bytes != null) {
-                    val base = NativeRawDecoder.demosaic(bytes, rawProxyParams(newParams).baseOnly, rawUserFlip)
-                    if (base != null) rawBaseBitmap = boundProxy(base)
-                }
-                regenerateDeveloped(newParams)
-                _isProcessing.value = false
-            }
-        }
-    }
-
-    /** Reset the develop recipe to neutral. */
-    fun resetRawDevelop() {
-        if (!_isRawEdit.value) return
-        activeMedia.value?.id?.let { RawDevelopStore.reset(it) }
-        updateRawDevelop(RawDevelopParams.AUTO)
-    }
-
-    /** Re-tone the cached base and rebuild the stack with the recorded adjustments replayed. */
-    private suspend fun regenerateDeveloped(params: RawDevelopParams) {
-        val base = rawBaseBitmap ?: return
-        val developed = developWithTone(base, params)
-        rebuildStackWithNewBase(developed)
-    }
-
-    /**
-     * Swap the editor base to [developed] and replay the recorded adjustments as fresh checkpoints
-     * so undo/redo and the applied-adjustment recipe survive a develop change.
-     */
-    private suspend fun rebuildStackWithNewBase(developed: Bitmap) {
-        flattenComposedMatrix() // bake any pending matrix preview so every entry is a real bitmap
-        val adjustments = _appliedAdjustments.value
-        val newStack = mutableListOf<Pair<Bitmap?, Adjustment?>>(developed to null)
-        var prev = developed
-        for (adj in adjustments) {
-            prev = adj.apply(prev)
-            newStack.add(prev to adj)
-        }
-        withContext(Dispatchers.Main) {
-            bitmaps.clear()
-            bitmaps.addAll(newStack)
-            _originalBitmap.value = developed
-            _currentBitmap.value = newStack.last().first
-            _targetBitmap.value = _currentBitmap.value
-            _previewMatrix.value = null
-            updateUndoRedoState()
-        }
-    }
-
-    /**
-     * Full-resolution developed source for the RAW bake: a single native demosaic that bakes the
-     * whole recipe (base + tone) at full res, matching the live preview exactly.
-     */
-    private fun rawFullResSource(): Bitmap? {
-        val bytes = rawBytes ?: return null
-        val params = _rawDevelopParams.value ?: return null
-        return NativeRawDecoder.demosaic(bytes, params, rawUserFlip)
-    }
-
-    /**
-     * Accurate cached thumbnail of the current RAW developed with [params] (used by the Develop tab
-     * to preview each option). Returns null for non-RAW sessions or when the decode fails.
-     */
-    suspend fun rawOptionThumbnail(params: RawDevelopParams): Bitmap? {
-        val bytes = rawBytes ?: return null
-        val id = activeMedia.value?.id ?: return null
-        return RawThumbnailCache.getOrCompute(id, bytes, rawUserFlip, params)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        cutoutState.dismiss()
-        rawToneJob?.cancel()
-        RawThumbnailCache.clear()
-    }
-
     /**
      * True when replaying the recorded recipe on the proxy original reproduces the live proxy result
      * exactly. The fidelity guard shared by every full-res save path: a `false` means the recipe is
@@ -970,13 +539,6 @@ class EditViewModel @Inject constructor(
         else -> null
     }
 
-    /** The native tiled HEIF grid format id for [writeFormat], or null. */
-    private fun heifFormatFor(writeFormat: ImageReencoder.ImageWriteFormat): Int? = when (writeFormat) {
-        ImageReencoder.ImageWriteFormat.HEIC -> NativeHeifEncoder.FORMAT_HEIC
-        ImageReencoder.ImageWriteFormat.AVIF -> NativeHeifEncoder.FORMAT_AVIF
-        else -> null
-    }
-
     /**
      * Returns a writer that streams the full-res result straight into a native tiled/scanline
      * encoder writing to a file descriptor — never holding the whole output bitmap — or `null` when
@@ -987,7 +549,6 @@ class EditViewModel @Inject constructor(
         writeFormat: ImageReencoder.ImageWriteFormat,
         config: ImageReencoder.ReencodeConfig,
     ): ((Int) -> Boolean)? {
-        if (_isRawEdit.value) return null // RAW has no source encoder / tiled decode; use bakeFullRes
         val mediaUri = activeMedia.value?.uri ?: return null
         val adjustments = _appliedAdjustments.value
         if (!recipeIsFaithful()) return null
@@ -1004,31 +565,10 @@ class EditViewModel @Inject constructor(
                 }
             }
         }
-        heifFormatFor(writeFormat)?.let { hfmt ->
-            if (NativeHeifEncoder.isAvailable) {
-                return { fd ->
-                    TiledBakeEngine.bakeToHeif(
-                        context, mediaUri, adjustments, hfmt, config.effectiveLossyQuality, fd, onProgress
-                    )
-                }
-            }
-        }
         return null
     }
 
     private suspend fun bakeFullRes(context: Context): Bitmap? {
-        // RAW: demosaic the full recipe (base + tone) at full resolution, then replay the
-        // crop/filter/markup recipe on top. RAW isn't tiled-decodable, so this is the only path.
-        if (_isRawEdit.value) {
-            val src = rawFullResSource() ?: return null
-            return try {
-                EditReplay.replay(src, _appliedAdjustments.value)
-            } catch (e: Exception) {
-                printError("Full-res RAW bake replay failed: ${e.message}")
-                if (!src.isRecycled) src.recycle()
-                null
-            }
-        }
         val mediaUri = activeMedia.value?.uri ?: return null
         val adjustments = _appliedAdjustments.value
         if (!recipeIsFaithful()) {
@@ -1500,9 +1040,10 @@ class EditViewModel @Inject constructor(
             // the bitmap path otherwise.
             val streamWriter = streamingWriter(writeFormat, config)
             if (streamWriter != null) {
+                val editedMediaPath = Settings.Misc.getEditedMediaPath(context)
                 val streamedUri = context.contentResolver.saveImageStreaming(
                     mimeType = writeFormat.mimeType,
-                    relativePath = Environment.DIRECTORY_PICTURES + "/Edited",
+                    relativePath = editedMediaPath,
                     displayName = media.label,
                     write = streamWriter,
                 )
@@ -1517,11 +1058,12 @@ class EditViewModel @Inject constructor(
             // couldn't be reproduced or decode failed → fail safe rather than write a wrong file.
             bakeFullRes(context)?.let { bitmap ->
                 try {
+                    val editedMediaPath = Settings.Misc.getEditedMediaPath(context)
                     if (mediaHandler.saveImage(
                             bitmap = bitmap,
                             writeFormat = writeFormat,
                             config = config,
-                            relativePath = Environment.DIRECTORY_PICTURES + "/Edited",
+                            relativePath = editedMediaPath,
                             displayName = media.label,
                             mimeType = writeFormat.mimeType
                         ) != null
@@ -1532,78 +1074,6 @@ class EditViewModel @Inject constructor(
                     }
                 } catch (_: Exception) {
                     _isSaving.value = false
-                    onFail().also { _isSaving.value = false }
-                } finally {
-                    if (!bitmap.isRecycled) bitmap.recycle()
-                }
-            } ?: onFail().also { _isSaving.value = false }
-        }
-    }
-
-    /**
-     * Saves a developed RAW copy into `Pictures/Edited` in the chosen [format], leaving the original
-     * RAW untouched. JPEG/PNG bake the full editor recipe (develop + crop/filters/markup) at full
-     * resolution; TIFF (8/16-bit) is streamed straight from LibRaw at full bit depth and reflects
-     * the develop recipe only (the UI restricts TIFF to sessions without post-develop adjustments).
-     */
-    fun saveRawCopy(
-        format: RawSaveFormat,
-        onSuccess: () -> Unit = {},
-        onFail: () -> Unit = {},
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isSaving.value = true
-            _saveProgress.value = null
-            val media = activeMedia.value
-            val bytes = rawBytes
-            val params = _rawDevelopParams.value
-            if (media == null || bytes == null || params == null) {
-                onFail().also { _isSaving.value = false }
-                return@launch
-            }
-            val relativePath = Environment.DIRECTORY_PICTURES + "/Edited"
-
-            if (format.isTiff) {
-                val base = media.label.substringBeforeLast('.').ifBlank { "developed" }
-                val displayName = "${base}_developed.${format.ext}"
-                val out = runCatching {
-                    context.contentResolver.saveImageStreaming(
-                        mimeType = format.mimeType,
-                        relativePath = relativePath,
-                        displayName = displayName,
-                    ) { fd ->
-                        NativeRawDecoder.exportTiff(bytes, params, fd, bits = format.bits, userFlip = rawUserFlip)
-                    }
-                }.getOrNull()
-                if (out != null) onSuccess().also { _isSaving.value = false }
-                else onFail().also { _isSaving.value = false }
-                return@launch
-            }
-
-            // JPEG/PNG: bake the full recipe (develop + crop/filters/markup) onto the full-res image.
-            flattenComposedMatrix()
-            val writeFormat = if (format == RawSaveFormat.JPEG) {
-                ImageReencoder.ImageWriteFormat.JPEG
-            } else {
-                ImageReencoder.ImageWriteFormat.PNG
-            }
-            val config = reencodeConfigForSource()
-            bakeFullRes(context)?.let { bitmap ->
-                try {
-                    if (mediaHandler.saveImage(
-                            bitmap = bitmap,
-                            writeFormat = writeFormat,
-                            config = config,
-                            relativePath = relativePath,
-                            displayName = media.label,
-                            mimeType = writeFormat.mimeType,
-                        ) != null
-                    ) {
-                        onSuccess().also { _isSaving.value = false }
-                    } else {
-                        onFail().also { _isSaving.value = false }
-                    }
-                } catch (_: Exception) {
                     onFail().also { _isSaving.value = false }
                 } finally {
                     if (!bitmap.isRecycled) bitmap.recycle()

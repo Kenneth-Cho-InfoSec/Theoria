@@ -3,6 +3,8 @@ package com.dot.gallery.core.util
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import com.dot.gallery.core.Settings
@@ -53,6 +55,7 @@ val GlideMediaImageRenderer = object : MediaImageRenderer {
         signature: Any?
     ) {
         val allowGifAnimation by Settings.Misc.rememberAllowGifAnimation()
+        val configuration = LocalConfiguration.current
         val signatureStr = signature?.toString() ?: ""
         val isGif = allowGifAnimation && signatureStr.contains(".gif", ignoreCase = true)
         val isAnimatable = allowGifAnimation && (
@@ -62,29 +65,35 @@ val GlideMediaImageRenderer = object : MediaImageRenderer {
         // Heavy software codecs (no hardware decode) are expensive to decode. The default 0.4x
         // thumbnail pass would decode them twice; skip it so they load closer to PNG speed.
         val isHeavyCodec = HEAVY_CODEC_EXTENSIONS.any { signatureStr.contains(it, ignoreCase = true) }
-        GlideImage(
-            modifier = modifier,
-            model = model,
-            contentDescription = contentDescription,
-            contentScale = contentScale,
-            loading = placeholder(0x4D444444.toDrawable()),
-            failure = placeholder(0x33444444.toDrawable()),
-            requestBuilderTransform = {
-                var request = it.centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
-                if (!isHeavyCodec) {
-                    request = request.thumbnail(request.clone().sizeMultiplier(0.4f))
+        // Glide Compose can retain the previous target while a freeform/foldable window is
+        // remeasured. Re-keying on the effective window size forces a fresh target/request and
+        // prevents thumbnails from remaining blank after resize (#999). The media signature is
+        // still the cache invalidation key, so this does not invalidate changed-file handling.
+        key(model, signatureStr, configuration.screenWidthDp, configuration.screenHeightDp) {
+            GlideImage(
+                modifier = modifier,
+                model = model,
+                contentDescription = contentDescription,
+                contentScale = contentScale,
+                loading = placeholder(0x4D444444.toDrawable()),
+                failure = placeholder(0x33444444.toDrawable()),
+                requestBuilderTransform = {
+                    var request = it.centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
+                    if (!isHeavyCodec) {
+                        request = request.thumbnail(request.clone().sizeMultiplier(0.4f))
+                    }
+                    if (signature != null) {
+                        request = request.signature(ObjectKey(signatureStr))
+                    }
+                    if (isGif) {
+                        request = request.decode(GifDrawable::class.java)
+                    } else if (isAnimatable) {
+                        request = request.decode(Drawable::class.java)
+                    }
+                    request
                 }
-                if (signature != null) {
-                    request = request.signature(ObjectKey(signatureStr))
-                }
-                if (isGif) {
-                    request = request.decode(GifDrawable::class.java)
-                } else if (isAnimatable) {
-                    request = request.decode(Drawable::class.java)
-                }
-                request
-            }
-        )
+            )
+        }
     }
 }
 

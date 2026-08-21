@@ -24,7 +24,6 @@ import com.dot.gallery.feature_node.domain.model.AlbumThumbnail
 import com.dot.gallery.feature_node.domain.model.CollectionWithCount
 import com.dot.gallery.feature_node.domain.model.GeoMedia
 import com.dot.gallery.feature_node.domain.model.IgnoredAlbum
-import com.dot.gallery.feature_node.domain.model.ImageEmbedding
 import com.dot.gallery.feature_node.domain.model.LocationMedia
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.model.MediaMetadataState
@@ -885,7 +884,8 @@ class MediaDistributorImpl @Inject constructor(
                     dateFormatsFlow,
                     albumMediaSortFlow,
                     groupSimilarMedia,
-                    enabledGroupTypes
+                    enabledGroupTypes,
+                    albumsFlow
                 ) { values ->
                     val mediaResult = values[0] as Resource<List<Media.UriMedia>>
                     val settings = values[1] as TimelineSettings?
@@ -897,6 +897,7 @@ class MediaDistributorImpl @Inject constructor(
                     val shouldGroupSimilar = values[5] as Boolean
                     @Suppress("UNCHECKED_CAST")
                     val groupTypes = values[6] as Set<MediaGroupType>
+                    val albumState = values[7] as AlbumState
 
                     val (defaultDateFormat, extendedDateFormat, weeklyDateFormat) = dateFormats
 
@@ -906,7 +907,23 @@ class MediaDistributorImpl @Inject constructor(
                         FilterKind.NAME -> MediaOrder.Label(albumSort.orderType)
                     }
 
-                    val filtered = (mediaResult.data ?: emptyList()).toMutableList().apply {
+                    val mediaList = (mediaResult.data ?: emptyList()).toMutableList()
+
+                    val album = albumState.albums.find { it.id == albumId }
+                    val mergedIds = album?.mergedAlbumIds?.filter { it != albumId } ?: emptyList()
+                    if (mergedIds.isNotEmpty()) {
+                        for (subId in mergedIds) {
+                            val subResult = repository.mediaFlow(subId, null).first()
+                            if (subResult is Resource.Success) {
+                                mediaList.addAll(subResult.data ?: emptyList())
+                            }
+                        }
+                        val distinct = mediaList.distinctBy { it.id }
+                        mediaList.clear()
+                        mediaList.addAll(distinct)
+                    }
+
+                    val filtered = mediaList.apply {
                         removeAll { media -> blacklistedAlbums.any { it.shouldIgnore(media, albumId) } }
                     }
                     mapMediaToItem(
@@ -1272,17 +1289,6 @@ class MediaDistributorImpl @Inject constructor(
                 weeklyDateFormat = weeklyDateFormat
             )
         }.stateIn(appScope, sharingMethod, MediaState())
-
-    /**
-     * Search
-     */
-    override val imageEmbeddingsFlow: StateFlow<List<ImageEmbedding>> =
-        repository.getImageEmbeddings()
-            .stateIn(
-                scope = appScope,
-                started = prioritySharingMethod,
-                initialValue = emptyList()
-            )
 
     /**
      * Triggers a MediaStore rescan for media items that have null DATE_TAKEN.

@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.backup
@@ -27,7 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
@@ -124,9 +124,10 @@ class UploadDetailsViewModel @Inject constructor(
     fun refreshQueue() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isScanning = true)
-            val activeConfigs = configDao.getAll().first().filter { it.isActive }
+            val activeConfigs = configDao.getAll().firstOrNull().orEmpty().filter { it.isActive }
             val perConfig = activeConfigs.mapNotNull { cfg ->
-                val provider = registry.get(cfg.providerType) as? SyncCapableProvider ?: return@mapNotNull null
+                val provider = registry.getByConfigId(cfg.id) as? SyncCapableProvider
+                    ?: return@mapNotNull null
                 Triple(cfg, provider, uploadPrefDao.getEnabledByConfigList(cfg.id))
             }
             withContext(Dispatchers.IO) {
@@ -138,14 +139,16 @@ class UploadDetailsViewModel @Inject constructor(
                 for ((cfg, provider, prefs) in perConfig) {
                     val accountLabel = cfg.displayName.ifBlank { cfg.providerType.displayName }
                     for (pref in prefs) {
-                        val media = (repository.getMediaByAlbumId(pref.albumId, skipBatching = true).first().data ?: emptyList())
+                        val media = (repository.getMediaByAlbumId(pref.albumId, skipBatching = true)
+                            .firstOrNull()?.data.orEmpty())
                             .filter { it.uri.scheme != "cloud" }
                         if (media.isEmpty()) continue
                         // Filename set from the durable cache. Immich stores the original
                         // filename in `label` (remoteId is an opaque UUID); path-based stores
                         // key by remote path — cover both. A live per-file stat can transiently
                         // fail and wrongly re-list already-uploaded files, so we trust the cache.
-                        val cachedNames: Set<String> = cloudMediaDao.getByServerConfig(cfg.id).first()
+                        val cachedNames: Set<String> = cloudMediaDao.getByServerConfig(cfg.id)
+                            .firstOrNull().orEmpty()
                             .mapNotNull { it.label.ifBlank { it.remoteId.substringAfterLast('/') }.ifBlank { null } }
                             .toSet()
                         // Only files we've never seen on this account need the expensive SHA-1 +

@@ -96,9 +96,8 @@ import com.dot.gallery.feature_node.domain.model.MediaItem
 import com.dot.gallery.feature_node.domain.model.MediaMetadataState
 import com.dot.gallery.feature_node.domain.model.MediaState
 import com.dot.gallery.feature_node.presentation.help.data.HelpSearchItem
-import com.dot.gallery.feature_node.presentation.classifier.components.CategoryCarousel
-import com.dot.gallery.feature_node.presentation.classifier.components.LocationCarousel
-import com.dot.gallery.feature_node.presentation.classifier.components.SearchCarousel
+import com.dot.gallery.feature_node.presentation.search.components.LocationCarousel
+import com.dot.gallery.feature_node.presentation.search.components.SearchCarousel
 import com.dot.gallery.feature_node.presentation.common.components.MediaGridView
 import com.dot.gallery.feature_node.presentation.common.components.MosaicMediaGrid
 import com.dot.gallery.feature_node.presentation.common.components.MosaicPinchZoomLayout
@@ -132,44 +131,25 @@ fun SearchScreen(
     val searchResults by viewModel.searchResultsState.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
     val tipResults by viewModel.tipResults.collectAsStateWithLifecycle()
-    val selectedImageMedia by viewModel.selectedImageMedia.collectAsStateWithLifecycle()
-    val isModelAvailable by viewModel.isModelAvailable.collectAsStateWithLifecycle()
     var searchHistory by rememberSearchHistory()
 
-    // Image-to-image search UI state
-    var showPickerSheet by rememberSaveable { mutableStateOf(false) }
-    var showPreviewDialog by rememberSaveable { mutableStateOf(false) }
-
-    // Categories for the carousel
-    val topCategories by viewModel.topCategories.collectAsStateWithLifecycle()
+    // Top locations, MIME types, camera models, media modes and groupings for the carousels
     val topLocations by viewModel.topLocations.collectAsStateWithLifecycle()
     val topMimeTypes by viewModel.topMimeTypes.collectAsStateWithLifecycle()
     val topLensModels by viewModel.topLensModels.collectAsStateWithLifecycle()
     val topMediaModes by viewModel.topMediaModes.collectAsStateWithLifecycle()
     val topGroupTypes by viewModel.topGroupTypes.collectAsStateWithLifecycle()
 
-    val visualSearchLabel = stringResource(R.string.visual_search)
     val historyItems by rememberedDerivedState {
         if (searchHistory.isEmpty()) {
             emptyList()
         } else {
             listOf(SettingsEntity.Header("History")) +
                     searchHistory.map { entry ->
-                        if (entry.mediaId != null) {
-                            SettingsEntity.Preference(
-                                icon = if (entry.mediaUri == null) Icons.Outlined.ImageSearch else null,
-                                iconUri = entry.mediaUri,
-                                title = entry.mediaLabel ?: entry.query,
-                                summary = visualSearchLabel,
-                                onClick = { viewModel.restoreImageSearch(entry.mediaId) },
-                                tag = entry.mediaId
-                            )
-                        } else {
-                            SettingsEntity.Preference(
-                                title = entry.query,
-                                onClick = { viewModel.setQuery(entry.query, apply = true) }
-                            )
-                        }
+                        SettingsEntity.Preference(
+                            title = entry.query,
+                            onClick = { viewModel.setQuery(entry.query, apply = true) }
+                        )
                     }.take(5)
         }
     }
@@ -185,7 +165,6 @@ fun SearchScreen(
     val suggestionItems = remember(suggestionProviders) {
         suggestionProviders.toSettingsEntities(viewModel)
     }
-    val searchIndexerState by viewModel.searchIndexerState.collectAsStateWithLifecycle()
     // Shared "Help & Tips" search results, rendered inline in whichever scroll
     // container is active (history list, media grid, or empty state) so tips and
     // results scroll together as one surface.
@@ -221,7 +200,7 @@ fun SearchScreen(
                                     shape = CircleShape
                                 ),
                             onClick = {
-                                if (query.isNotEmpty() || selectedImageMedia != null) {
+                                if (query.isNotEmpty()) {
                                     viewModel.clearQuery()
                                 } else {
                                     eventHandler.navigateUp()
@@ -272,21 +251,9 @@ fun SearchScreen(
                                     viewModel.addHistory(query)
                                 }
                             ),
-                            leadingIcon = selectedImageMedia?.let { media ->
-                                {
-                                    ImageSearchChip(
-                                        media = media,
-                                        onClick = { showPreviewDialog = true },
-                                        onRemove = { viewModel.clearSelectedMedia() }
-                                    )
-                                }
-                            },
                             placeholder = {
                                 Text(
-                                    text = if (selectedImageMedia != null)
-                                        stringResource(R.string.find_similar)
-                                    else
-                                        stringResource(R.string.search_images_videos),
+                                    text = stringResource(R.string.search_images_videos),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
@@ -316,27 +283,6 @@ fun SearchScreen(
                                             Icon(
                                                 imageVector = Icons.Outlined.Search,
                                                 contentDescription = stringResource(id = R.string.search_images_videos),
-                                                tint = MaterialTheme.colorScheme.onSurface
-                                            )
-                                        }
-                                    }
-                                    AnimatedVisibility(
-                                        visible = isModelAvailable && selectedImageMedia == null && !searchResults.isSearching,
-                                        enter = fadeIn() + slideInHorizontally { it },
-                                        exit = fadeOut() + slideOutHorizontally { it }
-                                    ) {
-                                        IconButton(
-                                            modifier = Modifier
-                                                .padding(end = 4.dp)
-                                                .background(
-                                                    color = MaterialTheme.colorScheme.surfaceContainer,
-                                                    shape = CircleShape
-                                                ),
-                                            onClick = { showPickerSheet = true }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Outlined.ImageSearch,
-                                                contentDescription = stringResource(R.string.search_by_image),
                                                 tint = MaterialTheme.colorScheme.onSurface
                                             )
                                         }
@@ -372,77 +318,13 @@ fun SearchScreen(
                         if (tipResults.isNotEmpty()) {
                             item(key = "help_tips") { helpTipsContent() }
                         }
-                        if (searchIndexerState.isIndexing)
-                            item {
-                                ListItem(
-                                    modifier = Modifier
-                                        .animateItem()
-                                        .padding(16.dp)
-                                        .clip(RoundedCornerShape(16.dp)),
-                                    leadingContent = {
-                                        Icon(
-                                            imageVector = Icons.Outlined.ImageSearch,
-                                            contentDescription = "Search Indexer",
-                                            tint = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                    },
-                                    headlineContent = {
-                                        Text(
-                                            text = "Search function limited"
-                                        )
-                                    },
-                                    supportingContent = {
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                                            modifier = Modifier.padding(bottom = 8.dp)
-                                        ) {
-                                            Text(
-                                                text = "Search indexer is running. Results may not be accurate."
-                                            )
-                                            if (searchIndexerState.progress == 0f) {
-                                                LinearProgressIndicator(
-                                                    color = MaterialTheme.colorScheme.onPrimary,
-                                                    trackColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                                                        alpha = 0.5f
-                                                    ),
-                                                    gapSize = 0.dp,
-                                                    strokeCap = StrokeCap.Round
-                                                )
-                                            } else {
-                                                LinearProgressIndicator(
-                                                    progress = { searchIndexerState.progress / 100f },
-                                                    color = MaterialTheme.colorScheme.onPrimary,
-                                                    trackColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                                                        alpha = 0.5f
-                                                    ),
-                                                    drawStopIndicator = {},
-                                                    gapSize = 0.dp,
-                                                    strokeCap = StrokeCap.Round
-                                                )
-                                            }
-                                        }
-                                    },
-                                    colors = ListItemDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        headlineColor = MaterialTheme.colorScheme.onPrimary,
-                                        supportingColor = MaterialTheme.colorScheme.onPrimary.copy(
-                                            alpha = 0.7f
-                                        )
-                                    )
-                                )
-                            }
                         // History and Suggestions
                         SettingsOptionLayout(
                             optionList = historyItems,
                             slimLayout = true,
                             swipeToDismiss = true,
                             onDismiss = { item ->
-                                val mediaId = item.tag as? Long
-                                if (mediaId != null) {
-                                    viewModel.removeImageHistory(mediaId)
-                                } else {
-                                    viewModel.removeHistory(item.title)
-                                }
+                                viewModel.removeHistory(item.title)
                                 viewModel.clearQuery()
                             }
                         )
@@ -450,28 +332,6 @@ fun SearchScreen(
                             optionList = suggestionItems,
                             slimLayout = true
                         )
-
-                        // Category Carousel
-                        if (topCategories.isNotEmpty()) {
-                            SettingsOptionLayout(
-                                modifier = Modifier.padding(top = 12.dp),
-                                optionList = listOf(SettingsEntity.Header(resources.getString(R.string.browse_categories))),
-                                slimLayout = true
-                            )
-                            item {
-                                CategoryCarousel(
-                                    categories = topCategories,
-                                    onCategoryClick = { categoryMedia ->
-                                        eventHandler.navigate(
-                                            Screen.CategoryViewScreen.categoryId(
-                                                categoryMedia.category.id
-                                            )
-                                        )
-                                    },
-                                    title = null
-                                )
-                            }
-                        }
 
                         // Location Carousel
                         if (topLocations.isNotEmpty()) {
@@ -789,7 +649,7 @@ fun SearchScreen(
                 }
                 AnimatedVisibility(
                     visible = !searchResults.isSearching
-                            && (query.isNotEmpty() || selectedImageMedia != null)
+                            && query.isNotEmpty()
                             && searchResults.results.media.isEmpty()
                             && searchResults.hasSearched,
                     enter = enterAnimation,
@@ -813,33 +673,6 @@ fun SearchScreen(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 allMedia = searchResults.results,
                 selectedMedia = selectedMediaList
-            )
-        }
-
-        // Image search picker bottom sheet
-        if (showPickerSheet) {
-            ImageSearchPickerSheet(
-                onMediaSelected = { media ->
-                    showPickerSheet = false
-                    viewModel.setSelectedMedia(media)
-                },
-                onDismiss = { showPickerSheet = false }
-            )
-        }
-
-        // Image search preview dialog
-        if (showPreviewDialog && selectedImageMedia != null) {
-            ImageSearchPreviewDialog(
-                media = selectedImageMedia!!,
-                onDismiss = { showPreviewDialog = false },
-                onRemove = {
-                    showPreviewDialog = false
-                    viewModel.clearSelectedMedia()
-                },
-                onPickAnother = {
-                    showPreviewDialog = false
-                    showPickerSheet = true
-                }
             )
         }
     }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.withLock
  * Provides suspend emit to allow calling code to perform suspend work inside the block safely.
  */
 class ProgressThrottler {
-    private var last: Int = -1
+    private var lastSuccessful: Int? = null
     private val mutex = Mutex()
 
     /**
@@ -16,19 +16,16 @@ class ProgressThrottler {
      * @param p progress percent (0..100 typically) – coerced to Int.
      * @param block suspend block executed only when progress changes.
      */
-    internal suspend inline fun emit(p: Int, crossinline block: suspend (Int) -> Unit) {
+    internal suspend fun emit(p: Int, block: suspend (Int) -> Unit) {
         val normalized = p.coerceIn(0, 100)
-        var shouldRun = false
         mutex.withLock {
-            if (normalized != last) {
-                last = normalized
-                shouldRun = true
+            if (normalized == lastSuccessful) {
+                return
             }
-        }
-        if (shouldRun) {
             block(normalized)
+            lastSuccessful = normalized
         }
     }
 
-    internal suspend inline fun reset() = mutex.withLock { last = -1 }
+    internal suspend fun reset() = mutex.withLock { lastSuccessful = null }
 }

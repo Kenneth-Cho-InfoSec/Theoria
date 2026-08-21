@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.data.data_source
@@ -15,6 +15,7 @@ import com.dot.gallery.cloud.data.CloudConverters
 import com.dot.gallery.cloud.data.dao.CloudAlbumSyncDao
 import com.dot.gallery.cloud.data.dao.CloudDeleteLocalPrefDao
 import com.dot.gallery.cloud.data.dao.CloudMediaDao
+import com.dot.gallery.cloud.data.dao.OcrResultDao
 import com.dot.gallery.cloud.data.dao.CloudOfflinePinDao
 import com.dot.gallery.cloud.data.dao.CloudServerConfigDao
 import com.dot.gallery.cloud.data.dao.DetectedFaceDao
@@ -181,6 +182,8 @@ abstract class InternalDatabase : RoomDatabase() {
     abstract fun getScannedMediaDao(): ScannedMediaDao
 
     abstract fun getCloudMediaDao(): CloudMediaDao
+
+    abstract fun getOcrResultDao(): OcrResultDao
 
     abstract fun getCloudServerConfigDao(): CloudServerConfigDao
 

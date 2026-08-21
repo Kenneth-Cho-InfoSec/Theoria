@@ -146,12 +146,12 @@
     <string name="help_tip_personalize_shared_elements_p1_s2">Uključi/isključi \'Prijelazi zajedničkih elemenata\'</string>
     <string name="help_tip_personalize_shared_elements_p1_s3">Dodirni bilo koju fotografiju da vidiš efekt</string>
     <string name="help_tip_personalize_app_name_title">Promijeni naziv aplikacije</string>
-    <string name="help_tip_personalize_app_name_subtitle">Prikaži kao \'Galerija\' ili \'Refra\' na početnom zaslonu</string>
+    <string name="help_tip_personalize_app_name_subtitle">Prikaži kao \'Galerija\' ili \'Theoria\' na početnom zaslonu</string>
     <string name="help_tip_personalize_app_name_p1_title">Naziv aplikacije</string>
-    <string name="help_tip_personalize_app_name_p1_desc">Odaberi hoće li se aplikacija prikazivati kao \'Galerija\' ili \'Refra\' na tvom početnom zaslonu i u izborniku s aplikacijama. \'Refra\' je alternativni naziv aplikacije. Ovo mijenja samo oznaku ikone — sama aplikacija ostaje ista. Možda ćeš morati ponovno pokrenuti pokretač (launcher) ili pričekati trenutak da se promjena pojavi na početnom zaslonu.</string>
+    <string name="help_tip_personalize_app_name_p1_desc">Odaberi hoće li se aplikacija prikazivati kao \'Galerija\' ili \'Theoria\' na tvom početnom zaslonu i u izborniku s aplikacijama. \'Theoria\' je alternativni naziv aplikacije. Ovo mijenja samo oznaku ikone — sama aplikacija ostaje ista. Možda ćeš morati ponovno pokrenuti pokretač (launcher) ili pričekati trenutak da se promjena pojavi na početnom zaslonu.</string>
     <string name="help_tip_personalize_app_name_p1_s1">Idi na Postavke &gt; Općenito</string>
     <string name="help_tip_personalize_app_name_p1_s2">Dodirni \'Naziv aplikacije\'</string>
-    <string name="help_tip_personalize_app_name_p1_s3">Odaberi Galerija ili Refra</string>
+    <string name="help_tip_personalize_app_name_p1_s3">Odaberi Galerija ili Theoria</string>
     <string name="help_tip_personalize_app_name_p1_s4">Oznaka ikone na početnom zaslonu će se ažurirati</string>
     <!-- TIMELINE &amp; ALBUMS -->
     <string name="help_tip_timeline_group_month_title">Grupiraj medije po mjesecima</string>

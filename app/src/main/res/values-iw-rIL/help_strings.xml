@@ -146,12 +146,12 @@
     <string name="help_tip_personalize_shared_elements_p1_s2">החלף את \"מעברי אלמנטים משותפים\"</string>
     <string name="help_tip_personalize_shared_elements_p1_s3">הקש על כל תמונה כדי לראות את האפקט</string>
     <string name="help_tip_personalize_app_name_title">שינוי שם האפליקציה</string>
-    <string name="help_tip_personalize_app_name_subtitle">להציג כ-\"Gallery\" או \"Refra\" במסך הבית שלך</string>
+    <string name="help_tip_personalize_app_name_subtitle">להציג כ-\"Gallery\" או \"Theoria\" במסך הבית שלך</string>
     <string name="help_tip_personalize_app_name_p1_title">שם האפליקציה</string>
-    <string name="help_tip_personalize_app_name_p1_desc">בחר אם האפליקציה מוצגת כ-\"Gallery\" או \"Refra\" במסך הבית שלך ובמגירת האפליקציות. \"Refra\" הוא השם החלופי של האפליקציה. זה משנה רק את תווית הסמל — האפליקציה עצמה נשארת זהה. ייתכן שיהיה עליך להפעיל מחדש את המפעיל שלך או לחכות רגע עד שהשינוי יופיע במסך הבית שלך.</string>
+    <string name="help_tip_personalize_app_name_p1_desc">בחר אם האפליקציה מוצגת כ-\"Gallery\" או \"Theoria\" במסך הבית שלך ובמגירת האפליקציות. \"Theoria\" הוא השם החלופי של האפליקציה. זה משנה רק את תווית הסמל — האפליקציה עצמה נשארת זהה. ייתכן שיהיה עליך להפעיל מחדש את המפעיל שלך או לחכות רגע עד שהשינוי יופיע במסך הבית שלך.</string>
     <string name="help_tip_personalize_app_name_p1_s1">עבור להגדרות &gt; כללי</string>
     <string name="help_tip_personalize_app_name_p1_s2">הקש על \"שם האפליקציה\"</string>
-    <string name="help_tip_personalize_app_name_p1_s3">בחר Gallery או Refra</string>
+    <string name="help_tip_personalize_app_name_p1_s3">בחר Gallery או Theoria</string>
     <string name="help_tip_personalize_app_name_p1_s4">תווית סמל מסך הבית תתעדכן</string>
     <!-- TIMELINE &amp; ALBUMS -->
     <string name="help_tip_timeline_group_month_title">קיבוץ מדיה לפי חודש</string>

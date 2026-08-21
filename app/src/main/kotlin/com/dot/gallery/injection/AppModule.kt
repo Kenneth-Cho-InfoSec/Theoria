@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.injection
@@ -37,9 +37,7 @@ import com.dot.gallery.feature_node.data.data_source.migration.MIGRATION_37_38
 import com.dot.gallery.feature_node.data.repository.MediaRepositoryImpl
 import com.dot.gallery.feature_node.domain.repository.MediaRepository
 import com.dot.gallery.feature_node.domain.util.EventHandler
-import com.dot.gallery.core.ml.ModelManager
-import com.dot.gallery.feature_node.presentation.search.SearchHelper
-import com.dot.gallery.feature_node.presentation.search.SearchHelperImpl
+
 import com.dot.gallery.core.decryption.DecryptManager
 import com.dot.gallery.core.decryption.MediaMetadataSidecarCache
 import com.dot.gallery.core.memory.AdaptiveDecryptConfig
@@ -161,16 +159,6 @@ object AppModule {
             metadataSanitizer
         )
     }
-
-    @Provides
-    @Singleton
-    fun provideModelManager(@ApplicationContext context: Context): ModelManager =
-        StartupTracer.trace("AppModule.provideModelManager") { ModelManager(context) }
-
-    @Provides
-    @Singleton
-    fun provideSearchHelper(modelManager: ModelManager): SearchHelper =
-        StartupTracer.trace("AppModule.provideSearchHelper") { SearchHelperImpl(modelManager) }
 
     @Provides
     @Singleton

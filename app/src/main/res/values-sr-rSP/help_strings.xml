@@ -146,12 +146,12 @@
     <string name="help_tip_personalize_shared_elements_p1_s2">Укључите \"Прелази дељених елемената\"</string>
     <string name="help_tip_personalize_shared_elements_p1_s3">Тапните на било коју фотографију да видите ефекат</string>
     <string name="help_tip_personalize_app_name_title">Промените име апликације</string>
-    <string name="help_tip_personalize_app_name_subtitle">Приказује се као \"Gallery\" или \"Refra\" на почетном екрану</string>
+    <string name="help_tip_personalize_app_name_subtitle">Приказује се као \"Gallery\" или \"Theoria\" на почетном екрану</string>
     <string name="help_tip_personalize_app_name_p1_title">Име апликације</string>
-    <string name="help_tip_personalize_app_name_p1_desc">Изаберите да ли се апликација приказује као \"Gallery\" или \"Refra\" на вашем почетном екрану и у фиоци апликација. \"Refra\" је алтернативно име апликације. Ово мења само ознаку иконе — сама апликација остаје иста. Можда ћете морати да поново покренете покретач (launcher) или сачекате тренутак да се промена појави на почетном екрану.</string>
+    <string name="help_tip_personalize_app_name_p1_desc">Изаберите да ли се апликација приказује као \"Gallery\" или \"Theoria\" на вашем почетном екрану и у фиоци апликација. \"Theoria\" је алтернативно име апликације. Ово мења само ознаку иконе — сама апликација остаје иста. Можда ћете морати да поново покренете покретач (launcher) или сачекате тренутак да се промена појави на почетном екрану.</string>
     <string name="help_tip_personalize_app_name_p1_s1">Идите на Подешавања &gt; Опште</string>
     <string name="help_tip_personalize_app_name_p1_s2">Тапните на \"Име апликације\"</string>
-    <string name="help_tip_personalize_app_name_p1_s3">Изаберите Gallery или Refra</string>
+    <string name="help_tip_personalize_app_name_p1_s3">Изаберите Gallery или Theoria</string>
     <string name="help_tip_personalize_app_name_p1_s4">Ознака иконе на почетном екрану ће се ажурирати</string>
     <!-- TIMELINE &amp; ALBUMS -->
     <string name="help_tip_timeline_group_month_title">Груписање медија по месецима</string>

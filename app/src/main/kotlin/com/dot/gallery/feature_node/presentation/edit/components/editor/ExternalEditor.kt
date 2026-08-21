@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.edit.components.editor
 
 import android.net.Uri
@@ -81,21 +86,23 @@ fun ExternalEditor(
                         null
                     }
                 }
-                AnimatedVisibility(
-                    visible = icon != null,
+                icon?.let { bitmap ->
+                    AnimatedVisibility(
+                    visible = true,
                     enter = enterAnimation,
                     exit = exitAnimation
                 ) {
                     EditApp(
-                        bitmap = icon!!,
+                        bitmap = bitmap,
                         title = app.loadLabel(context.packageManager).toString(),
                         horizontal = isSupportingPanel
                     ) {
                         context.launchEditImageIntent(
                             app.activityInfo.packageName,
-                            currentUri!!
+                            currentUri ?: return@EditApp
                         )
                     }
+                }
                 }
             }
         }

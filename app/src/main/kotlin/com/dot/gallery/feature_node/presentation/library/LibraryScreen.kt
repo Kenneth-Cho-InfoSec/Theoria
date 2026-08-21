@@ -38,7 +38,6 @@ import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.FolderOff
-import androidx.compose.material.icons.outlined.ImageSearch
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
@@ -63,12 +62,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -89,8 +84,6 @@ import com.dot.gallery.core.animateOrJumpToTop
 import com.dot.gallery.core.Settings
 import com.dot.gallery.core.Settings.Album.rememberAlbumGridSize
 import com.dot.gallery.core.Settings.Misc.rememberAllowBlur
-import com.dot.gallery.core.Settings.Misc.rememberNoClassification
-import com.dot.gallery.core.ml.ModelStatus
 import com.dot.gallery.core.navigate
 import com.dot.gallery.core.util.SdkCompat
 import com.dot.gallery.feature_node.domain.util.getUri
@@ -101,13 +94,11 @@ import com.dot.gallery.feature_node.presentation.library.components.EditableLibr
 import com.dot.gallery.feature_node.presentation.library.components.mergeShortcutPrefs
 import com.dot.gallery.feature_node.presentation.library.components.rememberLibraryRuntimeShortcuts
 import com.dot.gallery.feature_node.presentation.library.components.MapPreviewCard
-import com.dot.gallery.feature_node.presentation.library.components.dashedBorder
 import com.dot.gallery.feature_node.presentation.mediaview.rememberedDerivedState
 import com.dot.gallery.feature_node.presentation.search.MainSearchBar
 import com.dot.gallery.feature_node.presentation.util.GlideInvalidation
 import com.dot.gallery.feature_node.presentation.util.LocalHazeState
 import com.dot.gallery.feature_node.presentation.util.Screen
-import com.dot.gallery.feature_node.presentation.util.categorySharedElement
 import com.dot.gallery.feature_node.presentation.util.rememberBottomBarInset
 import com.dot.gallery.ui.core.icons.Encrypted
 import com.dot.gallery.ui.theme.BlackScrim
@@ -157,20 +148,11 @@ fun LibraryScreen(
 
     val indicatorState by viewModel.indicatorState.collectAsStateWithLifecycle()
 
-    // New category system
-    val topCategories by viewModel.topCategories.collectAsStateWithLifecycle()
-    val totalCategoryCount by viewModel.totalCategoryCount.collectAsStateWithLifecycle()
-    val noCategoriesFound by rememberedDerivedState { topCategories.isEmpty() }
-
     // Locations
     val noLocationsFound by rememberedDerivedState { locations.isEmpty() }
     val totalLocationsCount by rememberedDerivedState { locations.size }
     val mapsEnabled = remember { BuildConfig.MAPS_ENABLED }
     val isDark = isDarkTheme()
-
-    val modelStatus by viewModel.modelStatus.collectAsStateWithLifecycle()
-    val aiAvailable = viewModel.areAiFeaturesAvailable
-    var noClassification by rememberNoClassification()
 
     // Cloud state
     val cloudState by viewModel.cloudState.collectAsStateWithLifecycle()
@@ -496,175 +478,6 @@ fun LibraryScreen(
                     }
                 }
 
-                if (aiAvailable && !noClassification) {
-                    if (!noCategoriesFound) {
-                        // "See all categories" header below carousel
-                        item(
-                            span = { GridItemSpan(maxLineSpan) },
-                            key = "CategoriesHeader"
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .pinchItem(key = "CategoriesHeader")
-                                    .padding(horizontal = 16.dp)
-                                    .padding(top = 8.dp)
-                                    .editLock(shortcutsEditMode),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                LibrarySmallItem(
-                                    title = stringResource(R.string.categories),
-                                    icon = null,
-                                    contentColor = MaterialTheme.colorScheme.onSurface,
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                    useIndicator = true,
-                                    indicatorCounter = totalCategoryCount,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            eventHandler.navigate(Screen.CategoriesScreen())
-                                        }
-                                )
-                            }
-                        }
-                        // Categories carousel first
-                        item(
-                            span = { GridItemSpan(maxLineSpan) },
-                            key = "CategoriesList"
-                        ) {
-                            LazyRow(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .padding(top = 8.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .editLock(shortcutsEditMode),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                items(
-                                    items = topCategories,
-                                    key = { categoryMedia -> "category_${categoryMedia.category.id}" }
-                                ) { (category, thumbnailMedia) ->
-                                    with(sharedTransitionScope) {
-                                        val isDarkTheme = isDarkTheme()
-                                        val allowBlur by rememberAllowBlur()
-                                        val followTheme = remember(allowBlur) { !allowBlur }
-                                        val gradientColor by animateColorAsState(
-                                            if (followTheme) {
-                                                if (isDarkTheme) BlackScrim else WhiterBlackScrim
-                                            } else BlackScrim,
-                                        )
-                                        Box(
-                                            modifier = Modifier
-                                                .width(164.dp)
-                                                .height(256.dp)
-                                                .categorySharedElement(
-                                                    categoryId = category.id,
-                                                    animatedVisibilityScope = animatedContentScope
-                                                )
-                                                .clip(RoundedCornerShape(24.dp))
-                                                .combinedClickable(
-                                                    onClick = {
-                                                        eventHandler.navigate(
-                                                            Screen.CategoryViewScreen.categoryId(
-                                                                category.id
-                                                            )
-                                                        )
-                                                    },
-                                                    onLongClick = {
-                                                        eventHandler.navigate(
-                                                            Screen.EditCategoryScreen.categoryId(
-                                                                category.id
-                                                            )
-                                                        )
-                                                    }
-                                                ),
-                                        ) {
-                                            if (thumbnailMedia != null) {
-                                                GlideImage(
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    contentScale = ContentScale.Crop,
-                                                    model = thumbnailMedia.getUri(),
-                                                    contentDescription = category.name,
-                                                    requestBuilderTransform = {
-                                                        it.signature(
-                                                            GlideInvalidation.signature(
-                                                                thumbnailMedia
-                                                            )
-                                                        )
-                                                    }
-                                                )
-                                            } else {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Outlined.ImageSearch,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(48.dp),
-                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                            alpha = 0.5f
-                                                        )
-                                                    )
-                                                }
-                                            }
-                                            Column(
-                                                modifier = Modifier
-                                                    .align(Alignment.BottomCenter)
-                                                    .fillMaxWidth()
-                                                    .background(
-                                                        Brush.verticalGradient(
-                                                            colors = listOf(
-                                                                Color.Transparent,
-                                                                gradientColor
-                                                            )
-                                                        )
-                                                    )
-                                                    .padding(16.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = category.name,
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    color = Color.White,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    textAlign = TextAlign.Center,
-                                                    overflow = TextOverflow.Ellipsis,
-                                                    maxLines = 1
-                                                )
-                                                Text(
-                                                    text = stringResource(
-                                                        R.string.category_media_count,
-                                                        category.mediaCount
-                                                    ),
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = Color.White.copy(alpha = 0.7f),
-                                                    textAlign = TextAlign.Center
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (noCategoriesFound && modelStatus == ModelStatus.READY) {
-                        item(
-                            span = { GridItemSpan(maxLineSpan) },
-                            key = "NoCategories"
-                        ) {
-                            NoCategories(
-                                modifier = Modifier
-                                    .pinchItem(key = "NoCategories")
-                                    .padding(16.dp)
-                                    .editLock(shortcutsEditMode)
-                            ) {
-                                eventHandler.navigate(Screen.CategoriesScreen())
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -689,54 +502,4 @@ private fun Modifier.editLock(locked: Boolean): Modifier = composed {
                 }
             }
         }
-}
-
-@Composable
-fun NoCategories(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-) {
-    val brush = Brush.linearGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.secondary,
-            MaterialTheme.colorScheme.tertiary,
-        )
-    )
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .dashedBorder(
-                brush = brush,
-                shape = RoundedCornerShape(16.dp),
-                gapLength = 8.dp
-            )
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = rememberVectorPainter(image = Icons.Outlined.ImageSearch),
-            contentDescription = null,
-            modifier = Modifier
-                .size(64.dp)
-                .drawWithContent {
-                    with(drawContext.canvas.nativeCanvas) {
-                        val checkPoint = saveLayer(null, null)
-                        drawContent()
-                        drawRect(
-                            brush = brush,
-                            blendMode = BlendMode.SrcIn
-                        )
-                        restoreToCount(checkPoint)
-                    }
-                }
-        )
-        Text(
-            text = stringResource(R.string.categorise_your_media),
-            style = MaterialTheme.typography.titleMedium.copy(brush = brush),
-        )
-    }
 }

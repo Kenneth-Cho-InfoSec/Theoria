@@ -628,7 +628,7 @@ fun DateFormatPreview(
     ) {
         ListItem(
             modifier = Modifier.fillMaxWidth(),
-            headlineContent = {
+            content = {
                 Text(title)
             },
             overlineContent = {

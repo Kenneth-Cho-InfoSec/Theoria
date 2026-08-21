@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.network
@@ -39,9 +39,10 @@ class ServerUrlResolver @Inject constructor(
 
     /** Computes the effective base URL without copying the config. */
     fun effectiveUrl(config: CloudServerConfig): String {
-        if (!config.autoUrlSwitch || config.localServerUrl.isBlank()) return config.serverUrl
-        if (!isOnConfiguredLocalNetwork(config)) return config.serverUrl
-        return config.localServerUrl.trimEnd('/')
+        val external = normalizeBaseUrl(config.serverUrl)
+        if (!config.autoUrlSwitch || config.localServerUrl.isBlank()) return external
+        if (!isOnConfiguredLocalNetwork(config)) return external
+        return normalizeBaseUrl(config.localServerUrl)
     }
 
     /** Whether the device is currently on the local network the [config] targets. */
@@ -57,5 +58,16 @@ class ServerUrlResolver @Inject constructor(
         // so URL switching still works instead of silently never matching.
         if (currentSsid == null) return true
         return currentSsid.equals(targetSsid, ignoreCase = true)
+    }
+
+    /**
+     * Providers append their own paths to the configured base URL. Keep that composition stable
+     * across edits/imports by removing surrounding whitespace and redundant trailing separators.
+     * A scheme-only value is left intact so malformed input is still rejected by the provider's
+     * normal URL validation rather than silently transformed into a different scheme.
+     */
+    private fun normalizeBaseUrl(value: String): String {
+        val trimmed = value.trim()
+        return if (trimmed.endsWith("://")) trimmed else trimmed.trimEnd('/')
     }
 }

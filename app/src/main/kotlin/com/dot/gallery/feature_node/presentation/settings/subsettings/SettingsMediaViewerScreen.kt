@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.settings.subsettings
@@ -48,6 +48,10 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -127,6 +131,7 @@ private const val DETAIL_AUTO_PLAY = "auto_play"
 private const val DETAIL_SURFACE_REBIND = "surface_rebind"
 private const val DETAIL_DISABLE_SMOOTHING = "disable_smoothing"
 private const val DETAIL_LONG_PRESS_CUTOUT = "long_press_cutout"
+private const val DETAIL_EDITED_PATH = "edited_path"
 
 @Composable
 fun SettingsMediaViewerScreen() {
@@ -146,6 +151,7 @@ fun SettingsMediaViewerScreen() {
     var reencodeMode by rememberReencodeQualityMode()
     var reencodeLossyQuality by rememberReencodeLossyQuality()
     var reencodeJxlEffort by rememberReencodeJxlEffort()
+    var editedMediaPath by Settings.Misc.rememberEditedMediaPath()
 
     val editApps = remember(context, context::getEditImageCapableApps)
 
@@ -250,6 +256,37 @@ fun SettingsMediaViewerScreen() {
                 description = stringResource(R.string.video_surface_rebind_description),
             )
         }
+        DETAIL_EDITED_PATH -> {
+            BackHandler { detailKey = null }
+            var draft by rememberSaveable(editedMediaPath) { mutableStateOf(editedMediaPath) }
+            AlertDialog(
+                onDismissRequest = { detailKey = null },
+                title = { Text(stringResource(R.string.edited_media_path_title)) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(stringResource(R.string.edited_media_path_description))
+                        OutlinedTextField(
+                            value = draft,
+                            onValueChange = { draft = it },
+                            singleLine = true,
+                            label = { Text(stringResource(R.string.edited_media_path_label)) },
+                            supportingText = { Text("Pictures/... or DCIM/...") }
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        editedMediaPath = Settings.Misc.normalizeEditedMediaPath(draft)
+                        detailKey = null
+                    }) { Text(stringResource(R.string.save)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { detailKey = null }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
         else -> {
             MediaViewerListScreen(
                 fullBrightnessView = fullBrightnessView,
@@ -270,6 +307,7 @@ fun SettingsMediaViewerScreen() {
                 onAutoPlayChange = { autoPlayVideo = it },
                 videoSurfaceRebind = videoSurfaceRebind,
                 onSurfaceRebindChange = { videoSurfaceRebind = it },
+                editedMediaPath = editedMediaPath,
                 reencodeMode = reencodeMode,
                 onReencodeModeChange = { reencodeMode = it },
                 reencodeLossyQuality = reencodeLossyQuality,
@@ -303,6 +341,7 @@ private fun MediaViewerListScreen(
     onAutoPlayChange: (Boolean) -> Unit,
     videoSurfaceRebind: Boolean,
     onSurfaceRebindChange: (Boolean) -> Unit,
+    editedMediaPath: String,
     reencodeMode: String,
     onReencodeModeChange: (String) -> Unit,
     reencodeLossyQuality: Int,
@@ -473,11 +512,20 @@ private fun MediaViewerListScreen(
             screenPosition = Position.Bottom
         )
 
+        val editedMediaPathPref = remember(context, editedMediaPath) {
+            SettingsEntity.Preference(
+                title = context.getString(R.string.edited_media_path_title),
+                summary = editedMediaPath,
+                onClick = { onDetailClick(DETAIL_EDITED_PATH) },
+                screenPosition = Position.Bottom
+            )
+        }
+
         return remember(
             fullBrightnessViewPref, showMediaDateHeaderPref, showFavoriteButtonPref,
             defaultEditorPref, disableSmoothingPref, longPressCutoutPref, slideshowPref,
             saveQualityHeader, manualQualityPref, lossyQualityPref, jxlEffortPref, isManualQuality,
-            autoHideOnVideoPlayPref, autoPlayVideoPref, videoSurfaceRebindPref
+            autoHideOnVideoPlayPref, autoPlayVideoPref, videoSurfaceRebindPref, editedMediaPathPref
         ) {
             mutableStateListOf<SettingsEntity>().apply {
                 add(viewingHeader)
@@ -502,6 +550,7 @@ private fun MediaViewerListScreen(
                 add(autoHideOnVideoPlayPref)
                 add(autoPlayVideoPref)
                 add(videoSurfaceRebindPref)
+                add(editedMediaPathPref)
             }
         }
     }

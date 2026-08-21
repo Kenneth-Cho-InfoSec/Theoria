@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">Galerie</string>
     <string name="change_app_name">App-Name</string>
     <string name="change_app_name_summary">Den auf deinem Startbildschirm angezeigten App-Namen ändern</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Extern öffnen</string>
     <string name="no_map_app">Keine App zum Anzeigen des Standorts verfügbar</string>
     <string name="app_dev">von %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">Spenden</string>
     <string name="github">GitHub</string>
     <string name="donate_button_cd">\"Spenden\"-Knopf</string>
     <string name="github_button_cd">\"GitHub\"-Knopf</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">Banner schließen</string>
     <string name="dismiss_banner_title">Banner verschieben?</string>
     <string name="dismiss_banner_message">Die Knöpfe „Spenden“ und „GitHub“ werden in eine kompakte Leiste am unteren Rand der Einstellungsseite verschoben.</string>
@@ -187,7 +187,7 @@
     <string name="edit_backups_delete_selected">Ausgewählte löschen</string>
     <string name="edit_backups_free_space">Freier Speicherplatz</string>
     <string name="edit_backups_section_actions">Aktionen</string>
-    <string name="edit_backups_used_percent">%1$s% % verwendet</string>
+    <string name="edit_backups_used_percent">%1$s%% verwendet</string>
     <string name="edit_backups_selected_count">%1$d ausgewählt</string>
     <string name="edit_backups_select">Auswählen</string>
     <string name="edit_backups_viewing_original">Original</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">Alle Metadaten</string>
     <string name="no_metadata_found">Keine Metadaten gefunden</string>
     <string name="loading_metadata">Metadaten werden geladen…</string>
-    <string name="categorise_your_media">Kategorisiere deine Medien</string>
-    <string name="disclaimer_classification">Deine Medien werden auf keinen Server hochgeladen. Die gesamte Klassifizierung erfolgt lokal auf deinem Gerät mithilfe der ONNX Software und einem vorab trainierten Modell, das in den Anwendungsdaten enthalten ist.</string>
+
     <string name="ai_category">Intelligente Funktionen</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">KI-Modelle sind nicht installiert. Lade sie unter Einstellungen &gt; Smart Features.</string>
+
     <string name="ai_models_manager">Manager für KI-Modelle</string>
     <string name="ai_models_download">KI-Modelle herunterladen</string>
-    <string name="ai_models_download_summary">KI-Modelle für Bildsuche und Klassifizierung herunterladen (~147 MB)</string>
+
     <string name="ai_models_downloading">KI-Modelle herunterladen…</string>
-    <string name="ai_models_ready_summary">KI-basierte Suche und Klassifizierung sind verfügbar</string>
-    <string name="ai_models_error">Fehler im KI-Modell</string>
+
     <string name="ai_models_delete">KI-Modelle löschen</string>
     <string name="ai_models_delete_confirm">Möchten Sie die KI-Modelle wirklich löschen? Sie müssen sie erneut herunterladen, um die KI-Funktionen nutzen zu können.</string>
     <string name="ai_models_size">Modellgröße: %s</string>
-    <string name="ai_models_unavailable">Nicht verfügbar — KI Modelle sind nötig</string>
+
     <string name="ai_models_description">KI Modelle ermöglichen eine verbesserte Bildsuche und die automatische Sortierung von Medien. Die Anwendung nutzt Bilderkennungsmodelle auf Basis von CLIP (kontrastives Sprach-Bild-Vortraining), um den Inhalt deiner Fotos zu verstehen.</string>
     <string name="ai_models_privacy_description">Die gesamte intelligente Verarbeitung wird vollständig auf deinem Gerät durchgeführt. Keine Bilder, Suchanfragen oder Analysedaten verlassen jemals dein Telefon. Die Modelle laufen lokal innerhalb der Programmumgebung und benötigen nach dem Herunterladen keine Internetverbindung mehr. Deine Medien bleiben absolut privat.</string>
     <string name="ai_models_source">Quelle</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">Modelldateien</string>
-    <string name="ai_models_feature_search">Nach Beschreibung suchen</string>
-    <string name="ai_models_feature_categories">Automatische Kategorien</string>
+
     <!-- New Category System -->
-    <string name="add_category">Kategorie hinzufügen</string>
-    <string name="edit_category">Kategorie bearbeiten</string>
-    <string name="delete_category_title">Kategorie löschen?</string>
-    <string name="delete_category_confirmation">Bist du sicher, dass du diese Kategorie löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.</string>
-    <string name="category_name">Kategoriename</string>
-    <string name="category_name_hint">z. B. Natur, Essen, Reisen</string>
-    <string name="search_terms">Suchbegriffe</string>
-    <string name="search_terms_hint">Durch Kommas getrennte Suchbegriffe zum Auffinden von Bildern</string>
-    <string name="search_terms_example">Sonnenuntergang, Sonnenaufgang, goldene Stunde, Himmel</string>
-    <string name="accuracy_threshold">Genauigkeitsschwelle</string>
-    <string name="more_results">Weitere Ergebnisse</string>
-    <string name="more_accurate">Genauer</string>
+
     <string name="preview">Vorschau</string>
-    <string name="matching_photos">Passende Fotos</string>
-    <string name="best_match">Beste Treffer</string>
-    <string name="matching_photos_count">%1$d passend</string>
-    <string name="recommended">empfohlen</string>
-    <string name="no_matching_photos">Keine passenden Fotos gefunden</string>
-    <string name="category_helper_text">Gib Sie einen Namen und Suchbegriffe ein und passe die Genauigkeit an, um deine Kategorie zu erstellen</string>
-    <string name="reset_categories">Kategorien zurücksetzen</string>
-    <string name="reset_categories_summary">Alle Kategorien löschen und mit den Standardeinstellungen neu initialisieren</string>
+
     <string name="create">Erstellen</string>
     <string name="save">Speichern</string>
-    <string name="browse_categories">Kategorien durchsuchen</string>
-    <string name="category_media_count">%1$d Elemente</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">Neue Kategorie</string>
-    <string name="describe_content">Beschreiben, was enthalten soll</string>
-    <string name="describe_content_hint">Beschreiben, welche Fotos diese Kategorie enthalten soll</string>
-    <string name="describe_content_example">z. B. Fotos von meinem Hund am Strand</string>
-    <string name="quick_start">Schnellstart</string>
-    <string name="quick_start_subtitle">Auf einen Vorschlag tippen, um loszulegen</string>
-    <string name="matching_preview">Vorschau</string>
-    <string name="see_all_matches">Alle %1$d Übereinstimmungen ansehen</string>
-    <string name="sensitivity">Empfindlichkeit</string>
-    <string name="sensitivity_broad">Breit</string>
-    <string name="sensitivity_broad_desc">Fotos mit lockerem Bezug einschließen</string>
-    <string name="sensitivity_balanced">Ausgewogen</string>
-    <string name="sensitivity_balanced_desc">Eine gute Mischung aus Relevanz</string>
-    <string name="sensitivity_strict">Strikt</string>
-    <string name="sensitivity_strict_desc">Nur starke Übereinstimmungen</string>
-    <string name="sensitivity_exact">Genau</string>
-    <string name="sensitivity_exact_desc">Nur nahezu perfekte Übereinstimmungen</string>
-    <string name="fine_tune">Feinabstimmen</string>
-    <string name="category_created">Kategorie erstellt – Fotos klassifizieren…</string>
-    <string name="category_updated">Kategorie aktualisiert — Neuklassifizierung…</string>
-    <string name="category_deleted">Kategorie gelöscht</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">Referenzfotos</string>
-    <string name="reference_images_hint">Füge Fotos hinzu, um visuell ähnliche Bilder zu finden</string>
-    <string name="add_reference_photos">Fotos hinzufügen</string>
-    <string name="reference_images_count">%1$d ausgewählt</string>
+
     <string name="restore">Wiederherstellen</string>
     <string name="encrypted">Verschlüsselt</string>
     <string name="date_format_settings">Datumsformat</string>
     <string name="date_header">Datumsformate</string>
     <string name="date_header_summary">Lege deine eigenen Datumsformate fest</string>
     <string name="launch_on_library">In der Bibliothek starten</string>
-    <string name="categories">Kategorien</string>
-    <string name="classified_media">%1$s klassifizierte Medien</string>
-    <string name="scan_for_new_categories">Nach neuen Kategorien suchen</string>
-    <string name="ai_models_not_available">KI-Modelle werden nicht heruntergeladen. Laden Sie sie unter Einstellungen → Smart Features.</string>
-    <string name="scanning_media">Scanne Medien...</string>
+
     <string name="date_header_title">Datum in der Kopfzeile</string>
     <string name="media_view">Medienansicht</string>
     <string name="exif_date">Exif-Datum</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" bei %1$s"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">Sammle Metadaten...</string>
@@ -928,7 +879,7 @@
     <string name="backup_encrypt_header">Verschlüsselung</string>
     <string name="backup_restore_header">Wähle aus, was wiederhergestellt werden soll</string>
     <string name="backup_restore">Wiederherstellen</string>
-    <string name="backup_made_with_version">Erstellt mit ReFra %1$s</string>
+    <string name="backup_made_with_version">Erstellt mit Theoria %1$s</string>
     <string name="backup_empty">Diese Sicherung enthält keine wiederherstellbaren Daten.</string>
     <string name="backup_items_count">%1$d Elemente</string>
     <string name="backup_pick_file_prompt">Wähle eine Sicherungsdatei zum Wiederherstellen aus.</string>

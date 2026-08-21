@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.offline
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -216,7 +216,9 @@ class OfflineModeViewModel @Inject constructor(
         _accountSheet.value = AccountCacheSheetState(configId = configId, label = label, loading = true)
         sheetJob = viewModelScope.launch {
             val provider = registry.getByConfigId(configId) as? RemoteMediaProvider
-            val assets = withContext(Dispatchers.IO) { cloudMediaDao.getByServerConfig(configId).first() }
+            val assets = withContext(Dispatchers.IO) {
+                cloudMediaDao.getByServerConfig(configId).firstOrNull().orEmpty()
+            }
             val totalBytes = withContext(Dispatchers.IO) { cache.sizeForAssets(assets.map { it.toRef() }) }
             _accountSheet.updateIf(configId) { it.copy(totalBytes = totalBytes) }
 
@@ -227,15 +229,16 @@ class OfflineModeViewModel @Inject constructor(
                 return@launch
             }
 
-            val albums = runCatching { provider.getRemoteAlbums().first() }.getOrNull()?.data ?: emptyList()
+            val albums = runCatching { provider.getRemoteAlbums().firstOrNull() }
+                .getOrNull()?.data.orEmpty()
             if (albums.isEmpty()) {
                 _accountSheet.updateIf(configId) { it.copy(loading = false) }
                 return@launch
             }
             val entries = mutableListOf<AlbumCacheEntry>()
             for (album in albums) {
-                val media = runCatching { provider.getRemoteAlbumMedia(album.remoteId).first() }
-                    .getOrNull()?.data ?: emptyList()
+                val media = runCatching { provider.getRemoteAlbumMedia(album.remoteId).firstOrNull() }
+                    .getOrNull()?.data.orEmpty()
                 val refs = media.map { it.toRef() }
                 val bytes = withContext(Dispatchers.IO) { cache.sizeForAssets(refs) }
                 entries += AlbumCacheEntry(album.remoteId, album.name, bytes, refs)
@@ -255,7 +258,7 @@ class OfflineModeViewModel @Inject constructor(
     /** Clear all cached data for one account (offline; enumerates the account's local rows). */
     fun clearAccountCache(configId: Long) = viewModelScope.launch {
         val refs = withContext(Dispatchers.IO) {
-            cloudMediaDao.getByServerConfig(configId).first().map { it.toRef() }
+            cloudMediaDao.getByServerConfig(configId).firstOrNull().orEmpty().map { it.toRef() }
         }
         withContext(Dispatchers.IO) { cache.clearForAssets(refs) }
         refreshSizes()
@@ -274,7 +277,9 @@ class OfflineModeViewModel @Inject constructor(
         }
         withContext(Dispatchers.IO) { cache.clearForAssets(entry.refs) }
         val newTotal = withContext(Dispatchers.IO) {
-            cache.sizeForAssets(cloudMediaDao.getByServerConfig(configId).first().map { it.toRef() })
+            cache.sizeForAssets(
+                cloudMediaDao.getByServerConfig(configId).firstOrNull().orEmpty().map { it.toRef() }
+            )
         }
         _accountSheet.updateIf(configId) {
             it.copy(

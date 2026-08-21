@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decryption
 
 import android.content.Context
@@ -8,6 +13,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,7 +38,7 @@ class DecryptManager @Inject constructor(
     private val lru = object : LruCache<String, DecryptResult>(32) {
         override fun sizeOf(key: String, value: DecryptResult): Int = value.bytes.size
     }
-    private val inFlight = ConcurrentHashMap<String, MutableList<(DecryptResult) -> Unit>>()
+    private val inFlight = ConcurrentHashMap<String, CompletableFuture<DecryptResult>>()
     private val keychainHolder by lazy { KeychainHolder(context) }
 
     fun decrypt(file: File): DecryptResult {
@@ -41,38 +48,33 @@ class DecryptManager @Inject constructor(
             return it
         }
         metrics.incLruMiss()
-        // Single-flight: if already decrypting, wait via callback list
-        val callbacks = inFlight.computeIfAbsent(key) { mutableListOf() }
-        if (callbacks.isNotEmpty()) {
-            var result: DecryptResult? = null
-            val latch = java.util.concurrent.CountDownLatch(1)
-            synchronized(callbacks) {
-                callbacks += {
-                    result = it
-                    latch.countDown()
-                }
-            }
+        // Single-flight: all callers share the owner's result, including failures.
+        val future = CompletableFuture<DecryptResult>()
+        val owner = inFlight.putIfAbsent(key, future)
+        if (owner != null) {
             metrics.incDecryptWaiters(1)
-            latch.await()
-            return result!!
+            return try {
+                owner.get()
+            } catch (error: ExecutionException) {
+                throw (error.cause ?: error)
+            }
         }
-        // We are first owner
-        var result: DecryptResult? = null
         try {
             metrics.incDecryptInvocation()
             val decrypted = keychainHolder.decryptVaultMedia(file)
-            result = DecryptResult(decrypted.readBytes(), decrypted.mimeType)
+            val result = DecryptResult(decrypted.readBytes(), decrypted.mimeType)
             decrypted.cleanup()
             // Only cache small results (< 2MB) to keep memory bounded
             if (result.bytes.size <= 2 * 1024 * 1024) {
                 lru.put(key, result)
             }
+            future.complete(result)
             return result
+        } catch (error: Throwable) {
+            future.completeExceptionally(error)
+            throw error
         } finally {
-            val list = inFlight.remove(key)
-            if (list != null && result != null) {
-                list.forEach { cb -> cb(result) }
-            }
+            inFlight.remove(key, future)
         }
     }
 

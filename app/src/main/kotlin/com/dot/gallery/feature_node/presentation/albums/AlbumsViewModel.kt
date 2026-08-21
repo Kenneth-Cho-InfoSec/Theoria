@@ -95,7 +95,7 @@ class AlbumsViewModel @Inject constructor(
                 val albumMedia = cloudMedia.filter { it.relativePath.contains(album.label) }
                 albumMedia.forEach { entity ->
                     provider.deleteAsset(entity.remoteId)
-                    cloudMediaDao.delete(entity.remoteId, providerType)
+                    cloudMediaDao.deleteForConfig(entity.remoteId, providerType, entity.serverConfigId)
                 }
             } else {
                 val response = repository.getMediaByAlbumId(album.id, skipBatching = true).firstOrNull()

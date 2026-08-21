@@ -2,7 +2,7 @@ package com.smarttoolfactory.cropper.settings
 
 import androidx.compose.ui.graphics.Path
 
-// TODO Find VectorDrawables as paths(or library to convert to) to add more
+// Paths are kept as Compose paths so callers can use them without Android resource access.
 object Paths {
     val Favorite
         get() = Path().apply {
@@ -49,4 +49,3 @@ object Paths {
         close()
     }
 }
-

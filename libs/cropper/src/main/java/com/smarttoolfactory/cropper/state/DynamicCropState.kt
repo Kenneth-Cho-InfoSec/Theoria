@@ -421,44 +421,6 @@ class DynamicCropState internal constructor(
         }
         onAnimationEnd()
     }
-
-
-//    //TODO Change pan when zoom is bigger than 1f and touchRegion is inside overlay rect
-//    private suspend fun moveOverlayToBounds(change: PointerInputChange, newRect: Rect) {
-//        val bounds = drawAreaRect
-//
-//        val positionChange = change.positionChangeIgnoreConsumed()
-//
-//        // When zoom is bigger than 100% and dynamic overlay is not at any edge of
-//        // image we can pan in the same direction motion goes towards when touch region
-//        // of rectangle is not one of the handles but region inside
-//        val isPanRequired = touchRegion == TouchRegion.Inside && zoom > 1f
-//
-//        // Overlay moving right
-//        if (isPanRequired && newRect.right < bounds.right) {
-//            println("Moving right newRect $newRect, bounds: $bounds")
-//            snapOverlayRectTo(newRect.translate(-positionChange.x, 0f))
-//            snapPanXto(pan.x - positionChange.x * zoom)
-//            // Overlay moving left
-//        } else if (isPanRequired && pan.x < bounds.left && newRect.left <= 0f) {
-//            snapOverlayRectTo(newRect.translate(-positionChange.x, 0f))
-//            snapPanXto(pan.x - positionChange.x * zoom)
-//        } else if (isPanRequired && pan.y < bounds.top && newRect.top <= 0f) {
-//            // Overlay moving top
-//            snapOverlayRectTo(newRect.translate(0f, -positionChange.y))
-//            snapPanYto(pan.y - positionChange.y * zoom)
-//        } else if (isPanRequired && -pan.y < bounds.bottom && newRect.bottom >= containerSize.height) {
-//            // Overlay moving bottom
-//            snapOverlayRectTo(newRect.translate(0f, -positionChange.y))
-//            snapPanYto(pan.y - positionChange.y * zoom)
-//        } else {
-//            snapOverlayRectTo(newRect)
-//        }
-//        if (touchRegion != TouchRegion.None) {
-//            change.consume()
-//        }
-//    }
-
     /**
      * When pointer is up calculate valid position and size overlay can be updated to inside
      * a virtual rect between `topLeft = (0,0)` to `bottomRight=(containerWidth, containerHeight)`

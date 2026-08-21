@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.privatefolder
@@ -149,9 +149,11 @@ fun PrivateFolderScreen(
                 },
                 onSubmit = { secret ->
                     scope.launch {
-                        val result = VaultPasswordManager.verifyPassword(
-                            context, VaultPasswordManager.PRIVATE_FOLDER_UUID, secret
-                        )
+                        val result = runCatching {
+                            VaultPasswordManager.verifyPassword(
+                                context, VaultPasswordManager.PRIVATE_FOLDER_UUID, secret
+                            )
+                        }.getOrElse { VerifyResult.Failed(0) }
                         when (result) {
                             is VerifyResult.Success -> {
                                 showPasswordDialog = false

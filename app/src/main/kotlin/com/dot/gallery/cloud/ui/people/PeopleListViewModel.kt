@@ -1,30 +1,22 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.people
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.WorkQuery
 import com.dot.gallery.cloud.core.PersonInfo
-import com.dot.gallery.cloud.core.ProviderRegistry
-import com.dot.gallery.cloud.core.ProviderType
 import com.dot.gallery.cloud.data.repository.CloudRepository
 import com.dot.gallery.core.Resource
-import com.dot.gallery.core.workers.FaceIndexerWorker
-import com.dot.gallery.core.workers.forceFaceIndex
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 data class PeopleListUiState(
@@ -35,39 +27,13 @@ data class PeopleListUiState(
 
 @HiltViewModel
 class PeopleListViewModel @Inject constructor(
-    private val repository: CloudRepository,
-    private val registry: ProviderRegistry,
-    private val workManager: WorkManager
+    private val repository: CloudRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PeopleListUiState())
     val uiState: StateFlow<PeopleListUiState> = _uiState.asStateFlow()
 
-    /** Whether an on-device face scan can be started (face detector model installed). */
-    val localScanAvailable: Boolean
-        get() = registry.getPeopleProviders().any {
-            it.providerType == ProviderType.LOCAL_PEOPLE && it.isAvailable
-        }
-
-    private val faceIndexInfos = workManager.getWorkInfosFlow(
-        WorkQuery.fromUniqueWorkNames(FaceIndexerWorker.WORK_NAME)
-    )
-
-    /** True while an on-device face indexing pass is running or enqueued. */
-    val isScanning: StateFlow<Boolean> = faceIndexInfos.map { infos ->
-        infos.any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    /** Scan progress in 0..100, or -1 when indeterminate / idle. */
-    val scanProgress: StateFlow<Float> = faceIndexInfos.map { infos ->
-        infos.firstOrNull { it.state == WorkInfo.State.RUNNING }
-            ?.progress?.getFloat(FaceIndexerWorker.KEY_PROGRESS, -1f) ?: -1f
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1f)
-
-    /** Manually (re)start on-device face indexing. */
-    fun scanForPeople() {
-        workManager.forceFaceIndex()
-    }
+    private var loadJob: Job? = null
 
     init {
         loadPeople()
@@ -80,13 +46,24 @@ class PeopleListViewModel @Inject constructor(
 
     fun loadPeople() {
         _uiState.value = _uiState.value.copy(isLoading = true)
-        viewModelScope.launch {
-            repository.getAllPeople().collect { resource ->
-                when (resource) {
-                    is Resource.Success -> _uiState.value = PeopleListUiState(
-                        people = resource.data ?: emptyList()
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            repository.getAllPeople()
+                .catch { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Unable to load people"
                     )
-                    is Resource.Error -> _uiState.value = PeopleListUiState(
+                }
+                .collect { resource ->
+                when (resource) {
+                    is Resource.Success -> _uiState.value = _uiState.value.copy(
+                        people = resource.data ?: emptyList(),
+                        isLoading = false,
+                        error = null
+                    )
+                    is Resource.Error -> _uiState.value = _uiState.value.copy(
+                        isLoading = false,
                         error = resource.message
                     )
                 }

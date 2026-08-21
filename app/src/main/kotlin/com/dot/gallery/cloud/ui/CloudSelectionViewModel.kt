@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui
@@ -17,6 +17,7 @@ import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.util.getUri
 import com.dot.gallery.feature_node.domain.util.isCloud
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -60,10 +61,15 @@ class CloudSelectionViewModel @Inject constructor(
     /** Resolve the account-specific provider for a cloud media item (by `cfg`, else by type). */
     private fun providerFor(media: Media): MediaCapabilityProvider? {
         val uri = media.getUri()
-        val type = runCatching { ProviderType.valueOf(uri.authority ?: "") }.getOrNull()
+        val type = runCatching {
+            ProviderType.valueOf((uri.authority ?: "").uppercase(Locale.ROOT))
+        }.getOrNull()
         val configId = uri.getQueryParameter("cfg")?.toLongOrNull() ?: -1L
-        return (if (configId > 0L) registry.getByConfigId(configId) else null)
-            ?: type?.let { registry.get(it) }
+        return if (configId > 0L) {
+            registry.getByConfigId(configId)
+        } else {
+            type?.let { registry.get(it) }
+        }
     }
 
     // === Actions (thin delegations to the shared MediaHandler) ===

@@ -1,4 +1,7 @@
-/**
+/*
+ * SPDX-FileCopyrightText: 2026 kennethcho
+ * SPDX-License-Identifier: MPL-2.0
+ *
  * Original from
  * https://stackoverflow.com/a/70853761/12978728
  */
@@ -250,9 +253,20 @@ fun SecureWindow(content: @Composable () -> Unit) {
     ProvideWindowContext {
         val window = LocalWindowContext.current
         DisposableEffect(Unit) {
+            val wasSecure = window?.let {
+                it.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0
+            } == true
             window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
             onDispose {
-                window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                // Restore the state owned by the surrounding activity instead of clearing a
+                // global Secure Mode flag when the vault leaves composition.
+                window?.let {
+                    if (wasSecure) {
+                        it.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    } else {
+                        it.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    }
+                }
             }
         }
         content()
@@ -476,7 +490,7 @@ fun Context.restartApplication() {
 
 /**
  * Resolve the launcher [activity-alias] short name for a given app-name + app-logo
- * combination. The two legacy aliases (ReFra-logo) keep their original names so existing
+ * combination. The two legacy aliases (Theoria-logo) keep their original names so existing
  * installs are not disrupted; the Gallery-logo combinations use dedicated aliases.
  */
 fun launcherAliasFor(nameAlias: String, logoAlias: String): String {
@@ -484,22 +498,22 @@ fun launcherAliasFor(nameAlias: String, logoAlias: String): String {
     return when {
         nameAlias == "Gallery" && galleryLogo -> "Launcher_Gallery_GalleryLogo"
         nameAlias == "Gallery" -> "Launcher_Gallery"
-        galleryLogo -> "Launcher_ReFra_GalleryLogo"
-        else -> "Launcher_ReFra"
+        galleryLogo -> "Launcher_Theoria_GalleryLogo"
+        else -> "Launcher_Theoria"
     }
 }
 
 /**
  * Enable the launcher alias matching the given app-name + app-logo combination and disable
- * all others. [logoAlias] defaults to the ReFra logo for backward compatibility with callers
+ * all others. [logoAlias] defaults to the Theoria logo for backward compatibility with callers
  * that only toggle the app name.
  */
-fun Context.changeAppAlias(nameAlias: String, logoAlias: String = "ReFra") {
+fun Context.changeAppAlias(nameAlias: String, logoAlias: String = "Theoria") {
     val namespace = "com.dot.gallery"
     val aliases = listOf(
-        "Launcher_ReFra",
+        "Launcher_Theoria",
         "Launcher_Gallery",
-        "Launcher_ReFra_GalleryLogo",
+        "Launcher_Theoria_GalleryLogo",
         "Launcher_Gallery_GalleryLogo"
     )
     val targetAlias = launcherAliasFor(nameAlias, logoAlias)
@@ -520,14 +534,14 @@ fun Context.changeAppAlias(nameAlias: String, logoAlias: String = "ReFra") {
 
 /**
  * Returns the launcher [activity-alias] short name that is currently enabled, falling back to
- * the default manifest alias ("Launcher_ReFra") when none has been explicitly toggled.
+ * the default manifest alias ("Launcher_Theoria") when none has been explicitly toggled.
  */
 fun Context.currentLauncherAlias(): String {
     val namespace = "com.dot.gallery"
     val aliases = listOf(
-        "Launcher_ReFra",
+        "Launcher_Theoria",
         "Launcher_Gallery",
-        "Launcher_ReFra_GalleryLogo",
+        "Launcher_Theoria_GalleryLogo",
         "Launcher_Gallery_GalleryLogo"
     )
     for (alias in aliases) {
@@ -538,5 +552,5 @@ fun Context.currentLauncherAlias(): String {
             return alias
         }
     }
-    return "Launcher_ReFra"
+    return "Launcher_Theoria"
 }

@@ -32,7 +32,7 @@ fun MetadataCollectionStatus(
                 horizontal = 16.dp,
                 vertical = 8.dp
             ),
-            headlineContent = {
+            content = {
                 Text(stringResource(R.string.collecting_metadata))
             },
             supportingContent = {

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.ignored.setup.components
 
 import android.net.Uri
@@ -66,7 +71,7 @@ fun EditAlbumsStep(
     }
 
     val regexMatchedAlbums = remember(regex, albums) {
-        if (isWildcard && regex.isNotEmpty()) {
+        if (isWildcard && regex.isNotEmpty() && regex.length <= MAX_WILDCARD_LENGTH) {
             try {
                 val regexPattern = regex.toRegex()
                 albums.filter(regexPattern::matchesAlbum)
@@ -185,6 +190,8 @@ fun EditAlbumsStep(
         }
     }
 }
+
+private const val MAX_WILDCARD_LENGTH = 512
 
 private val previewAlbums = listOf(
     Album(

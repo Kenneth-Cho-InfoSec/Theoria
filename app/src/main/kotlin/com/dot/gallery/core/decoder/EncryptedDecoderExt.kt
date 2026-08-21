@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decoder
 
 import android.graphics.Bitmap
@@ -25,7 +30,9 @@ import java.io.IOException
 
 fun <T : DataSource> T.getFile(): File {
     return when (this) {
-        is ContentDataSource -> contentUri.toFile()
+        is ContentDataSource -> contentUri.takeIf { it.scheme == "file" }
+            ?.toFile()
+            ?: throw IllegalArgumentException("Encrypted content source must reference a file URI")
         is FileDataSource -> path.toFile()
         else -> throw IllegalArgumentException("Unsupported DataSource type")
     }
@@ -51,7 +58,7 @@ fun DataSource.decodeEncryptedBitmap(
         0,
         bytes.size,
         options.apply { this?.outMimeType = mimeType }
-    ) ?: throw ImageInvalidException("decode return null at decodeEncryptedBitmap")
+    ) ?: throw ImageInvalidException("Unable to decode encrypted bitmap")
     val exifOrientationHelper1 =
         exifOrientationHelper ?: ExifOrientationHelper(readEncryptedExifOrientation(keychainHolder))
     return exifOrientationHelper1.applyToBitmap(bitmap) ?: bitmap
@@ -99,7 +106,7 @@ fun DataSource.decodeEncryptedRegionBitmap(
     val bitmapOptions = config?.toBitmapOptions()
     val regionBitmap = try {
         regionDecoder.decodeRegion(originalRegion.toAndroidRect(), bitmapOptions)
-            ?: throw ImageInvalidException("decode return null at decodeEncryptedRegionBitmap")
+            ?: throw ImageInvalidException("Unable to decode encrypted bitmap region")
     } finally {
         regionDecoder.recycle()
     }

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.dot.gallery.scrollbar
@@ -82,7 +82,16 @@ fun InternalLazyVerticalGridScrollbar(
             .filterNotNull()
             .distinctUntilChanged()
             .collectLatest { target ->
-                state.scrollToItem(target.index, target.scrollOffset)
+                // The grid can change while a drag target is waiting to be consumed (media
+                // refreshes, filtering, or album changes). Clamp against the current layout at
+                // the last possible moment so a stale target cannot crash LazyGridState.
+                val itemCount = state.layoutInfo.totalItemsCount
+                if (itemCount > 0) {
+                    state.scrollToItem(
+                        index = target.index.coerceIn(0, itemCount - 1),
+                        scrollOffset = target.scrollOffset
+                    )
+                }
             }
     }
 

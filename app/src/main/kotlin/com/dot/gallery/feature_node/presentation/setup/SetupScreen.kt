@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.setup
@@ -37,7 +37,6 @@ import com.dot.gallery.core.Settings.Misc.rememberSetupCompletedVersion
 import com.dot.gallery.feature_node.presentation.setup.components.LocalSetupAnimatedVisibilityScope
 import com.dot.gallery.feature_node.presentation.setup.components.LocalSetupSharedTransitionScope
 import com.dot.gallery.feature_node.presentation.setup.components.SetupAnimatedBackground
-import com.dot.gallery.feature_node.presentation.setup.pages.SetupAiModelsPage
 import com.dot.gallery.feature_node.presentation.setup.pages.SetupCloudPage
 import com.dot.gallery.feature_node.presentation.setup.pages.SetupLooksFeelPage
 import com.dot.gallery.feature_node.presentation.setup.pages.SetupPermissionsPage
@@ -50,7 +49,7 @@ import com.dot.gallery.feature_node.presentation.util.restartApplication
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private enum class SetupPage { WELCOME, PERMISSIONS, LOOKS, CLOUD, AI_MODELS, TIPS }
+private enum class SetupPage { WELCOME, PERMISSIONS, LOOKS, CLOUD, TIPS }
 
 /**
  * First-launch / out-of-the-box setup wizard. Pages adapt to the build variant:
@@ -75,7 +74,6 @@ fun SetupScreen(onComplete: () -> Unit = {}) {
             add(SetupPage.PERMISSIONS)
             add(SetupPage.LOOKS)
             if (!BuildConfig.OFFLINE_MODE && ProviderType.hasAnyRemoteProvider()) add(SetupPage.CLOUD)
-            if (!BuildConfig.OFFLINE_MODE || BuildConfig.ML_MODELS_BUNDLED) add(SetupPage.AI_MODELS)
             add(SetupPage.TIPS)
         }
     }
@@ -87,7 +85,6 @@ fun SetupScreen(onComplete: () -> Unit = {}) {
     val goNext: () -> Unit = { if (safeIndex < pages.lastIndex) index = safeIndex + 1 }
     val goBack: () -> Unit = {
         if (safeIndex > 0) index = safeIndex - 1 else activity?.finish()
-        Unit
     }
     val finish: () -> Unit = {
         setupCompletedVersion = Settings.Misc.CURRENT_SETUP_VERSION
@@ -139,7 +136,6 @@ fun SetupScreen(onComplete: () -> Unit = {}) {
                     SetupPage.PERMISSIONS -> SetupPermissionsPage(stepNumber, totalSteps, goBack, goNext)
                     SetupPage.LOOKS -> SetupLooksFeelPage(stepNumber, totalSteps, goBack, goNext)
                     SetupPage.CLOUD -> SetupCloudPage(stepNumber, totalSteps, goBack, goNext, onSkip = goNext)
-                    SetupPage.AI_MODELS -> SetupAiModelsPage(stepNumber, totalSteps, goBack, goNext, onSkip = goNext)
                     SetupPage.TIPS -> SetupTipsPage(stepNumber, totalSteps, goBack, onFinish = finish)
                 }
             }

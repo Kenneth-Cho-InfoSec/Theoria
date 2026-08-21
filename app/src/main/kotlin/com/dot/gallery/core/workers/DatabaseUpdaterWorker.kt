@@ -33,16 +33,6 @@ fun WorkManager.updateDatabase() {
         .setRequiresStorageNotLow(true)
         .build()
 
-    val searchIndexerWork = OneTimeWorkRequestBuilder<SearchIndexerUpdaterWorker>()
-        .setConstraints(constraints)
-        .apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            }
-        }
-        .addTag("SearchIndexerUpdater")
-        .build()
-
     val databaseUpdaterWork = OneTimeWorkRequestBuilder<DatabaseUpdaterWorker>()
         .setConstraints(constraints)
         .build()
@@ -57,21 +47,8 @@ fun WorkManager.updateDatabase() {
         .addTag("MetadataCollection")
         .build()
 
-    // Always-on on-device face indexing (no-ops unless the face detector model is installed).
-    val faceIndexerWork = OneTimeWorkRequestBuilder<FaceIndexerWorker>()
-        .setConstraints(constraints)
-        .apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            }
-        }
-        .addTag(FaceIndexerWorker.WORK_NAME)
-        .build()
-
-    enqueueUniqueWork("SearchIndexerUpdater", workPolicy, searchIndexerWork)
     enqueueUniqueWork("DatabaseUpdaterWorker", workPolicy, databaseUpdaterWork)
     enqueueUniqueWork("MetadataCollection", workPolicy, metadataWork)
-    enqueueUniqueWork(FaceIndexerWorker.WORK_NAME, workPolicy, faceIndexerWork)
 }
 
 @HiltWorker

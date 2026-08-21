@@ -20,7 +20,6 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.dot.gallery.core.decoder.format.SpecialFormatProbe
 import com.dot.gallery.core.util.SafeExif
 import com.dot.gallery.core.sandbox.IsolatedMetadataParser
 import com.dot.gallery.core.sandbox.IsolatedMetadataService.Companion as Keys
@@ -311,14 +310,6 @@ private suspend fun mediaMetadataFromImageBundle(
                 }
             }
         }
-        // BitmapFactory can't decode JXL/JP2/PSD/SVG — recover dimensions via native probes so
-        // even EXIF-carrying special formats report their resolution.
-        if (imgW == 0 || imgH == 0) {
-            SpecialFormatProbe.getSize(context, uri)?.let {
-                imgW = it.width
-                imgH = it.height
-            }
-        }
     }
 
     return MediaMetadata(
@@ -416,16 +407,6 @@ private suspend fun buildFallbackImageMetadata(
                 imgW = options.outWidth
                 imgH = options.outHeight
             }
-        }
-    }
-
-    // BitmapFactory can't decode JXL/JP2/PSD/SVG (and some HEIF/AVIF/TIFF), so recover the
-    // intrinsic dimensions from the same native decoders used for rendering. This guarantees the
-    // properties sheet shows resolution + size instead of nothing for those formats (#1002).
-    if (imgW == 0 || imgH == 0) {
-        SpecialFormatProbe.getSize(context, uri)?.let {
-            imgW = it.width
-            imgH = it.height
         }
     }
 

@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.sandbox
@@ -10,6 +10,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
+import androidx.core.database.getLongOrNull
 import androidx.core.net.toUri
 import com.dot.gallery.core.util.ext.saveRawStream
 import com.dot.gallery.core.util.ext.saveVideoStream
@@ -137,12 +138,14 @@ class PrivateFolderRepository(private val context: Context) {
         )
 
         val queue = ArrayDeque<String>()
+        val visited = mutableSetOf<String>()
         queue.add(rootDocId)
         var lastEmit = System.currentTimeMillis()
         var pending = 0
 
         while (queue.isNotEmpty()) {
             val docId = queue.removeFirst()
+            if (!visited.add(docId)) continue
             val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
             var cursor: Cursor? = null
             try {
@@ -152,8 +155,8 @@ class PrivateFolderRepository(private val context: Context) {
                         val childDocId = it.getString(0) ?: continue
                         val name = it.getString(1) ?: "unknown"
                         val mime = it.getString(2) ?: continue
-                        val size = it.getLong(3)
-                        val modified = it.getLong(4)
+                        val size = it.getLongOrNull(3) ?: 0L
+                        val modified = it.getLongOrNull(4) ?: 0L
 
                         if (mime == DocumentsContract.Document.MIME_TYPE_DIR) {
                             queue.add(childDocId)

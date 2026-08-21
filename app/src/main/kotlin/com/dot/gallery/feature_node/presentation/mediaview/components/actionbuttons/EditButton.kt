@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons
 
 import androidx.compose.material.icons.Icons
@@ -35,7 +40,7 @@ fun <T : Media> EditButton(
         if (it.isImage && defaultEditor != Settings.Misc.EDITOR_BUILTIN) {
             try {
                 context.launchEditImageIntent(defaultEditor, it.getUri())
-            } catch (_: Exception) {
+            } catch (_: SecurityException) {
                 scope.launch { context.launchEditIntent(it) }
             }
         } else {

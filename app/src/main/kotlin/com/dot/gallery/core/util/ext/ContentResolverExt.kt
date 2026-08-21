@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2023 The LineageOS Project
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.util.ext
@@ -269,9 +269,6 @@ suspend fun ContentResolver.overrideImageStreaming(
         }.getOrDefault(false)
         if (!encoded || stagingFile.length() == 0L) return@withContext false
 
-        runCatching {
-            update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 1) }, null, null)
-        }
         val replaced = runCatching {
             FileInputStream(stagingFile).use { input ->
                 openOutputStream(uri, "rwt")?.use { output ->
@@ -286,7 +283,6 @@ suspend fun ContentResolver.overrideImageStreaming(
         }
         runCatching {
             update(uri, ContentValues().apply {
-                put(MediaStore.MediaColumns.IS_PENDING, 0)
                 originalDates?.let { (dateTaken, dateAdded) ->
                     dateTaken?.let { put(MediaStore.Images.Media.DATE_TAKEN, it) }
                     dateAdded?.let { put(MediaStore.MediaColumns.DATE_ADDED, it) }
@@ -324,12 +320,6 @@ suspend fun ContentResolver.overrideImageEncoded(
                 }
             } else null
 
-        runCatching {
-            update(uri, ContentValues().apply {
-                put(MediaStore.MediaColumns.IS_PENDING, 1)
-            }, null, null)
-        }
-
         // Encode fully into memory first so we fail before truncating the original file.
         val encoded = ImageReencoder.encodeToBytes(bitmap, writeFormat, config)
 
@@ -349,21 +339,24 @@ suspend fun ContentResolver.overrideImageEncoded(
         if (exifData != null) {
             try {
                 val tmp = File.createTempFile("exif_tmp", ".jpg")
-                tmp.outputStream().use { it.write(encoded) }
-                val exif = ExifInterface(tmp.absolutePath)
-                exifData.forEach { (k, v) -> exif.setAttribute(k, v) }
-                exif.setAttribute(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL.toString()
-                )
-                exif.saveAttributes()
-                FileInputStream(tmp).use { updated ->
-                    openOutputStream(uri, "rwt")?.use { finalOut ->
-                        updated.copyTo(finalOut)
-                        finalOut.flush()
+                try {
+                    tmp.outputStream().use { it.write(encoded) }
+                    val exif = ExifInterface(tmp.absolutePath)
+                    exifData.forEach { (k, v) -> exif.setAttribute(k, v) }
+                    exif.setAttribute(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL.toString()
+                    )
+                    exif.saveAttributes()
+                    FileInputStream(tmp).use { updated ->
+                        openOutputStream(uri, "rwt")?.use { finalOut ->
+                            updated.copyTo(finalOut)
+                            finalOut.flush()
+                        }
                     }
+                } finally {
+                    tmp.delete()
                 }
-                tmp.delete()
             } catch (_: Exception) {
                 // Keep the pixels even if EXIF rewrite fails.
             }
@@ -371,7 +364,6 @@ suspend fun ContentResolver.overrideImageEncoded(
 
         runCatching {
             update(uri, ContentValues().apply {
-                put(MediaStore.MediaColumns.IS_PENDING, 0)
                 originalDates?.let { (dateTaken, dateAdded) ->
                     dateTaken?.let { put(MediaStore.Images.Media.DATE_TAKEN, it) }
                     dateAdded?.let { put(MediaStore.MediaColumns.DATE_ADDED, it) }
@@ -550,11 +542,23 @@ suspend fun <T : Media> Context.renameMedia(media: T, newName: String): Boolean 
                 null,
                 null
             ) > 0
-        }.onSuccess {
-            MediaScannerConnection.scanFile(
-                this@renameMedia, arrayOf(media.path.removeSuffix(media.label)),
-                arrayOf(media.mimeType), null
-            )
+        }.onSuccess { updated ->
+            if (updated) {
+                val parentPath = media.path.removeSuffix(media.label)
+                val renamedPath = parentPath + newName
+                MediaScannerConnection.scanFile(
+                    this@renameMedia,
+                    arrayOf(media.path, renamedPath),
+                    arrayOf(media.mimeType, media.mimeType),
+                    null
+                )
+                // The row's DISPLAY_NAME changed in-place, so invalidate the collection as well
+                // as scanning the filesystem. This makes MediaDistributor re-query immediately.
+                contentResolver.notifyChange(
+                    MediaStore.Files.getContentUri("external"),
+                    null
+                )
+            }
         }.getOrElse {
             printWarning(it.message.toString())
             false
@@ -699,29 +703,33 @@ suspend fun ContentResolver.overrideImage(
             try {
                 // Re-open and rewrite selected tags
                 openFileDescriptor(uri, "rw")?.use { pfd ->
-                    FileInputStream(pfd.fileDescriptor).use { fis ->
-                        // Need temp file because ExifInterface rewrite requires random access
-                        val tmp = File.createTempFile("exif_tmp", ".jpg")
-                        tmp.outputStream().use { it.write(encoded) }
-                        val exif = ExifInterface(tmp.absolutePath)
-                        exifData.forEach { (k, v) -> exif.setAttribute(k, v) }
-                        // After physical rotation, orientation must be normal
-                        exif.setAttribute(
-                            ExifInterface.TAG_ORIENTATION,
-                            ExifInterface.ORIENTATION_NORMAL.toString()
-                        )
-                        exif.saveAttributes()
-                        // Write back
-                        FileInputStream(tmp).use { updated ->
-                            openOutputStream(uri, "rwt")?.use { finalOut ->
-                                updated.copyTo(finalOut)
-                                finalOut.flush()
+                        FileInputStream(pfd.fileDescriptor).use { fis ->
+                            // Need temp file because ExifInterface rewrite requires random access
+                            val tmp = File.createTempFile("exif_tmp", ".jpg")
+                            try {
+                                tmp.outputStream().use { it.write(encoded) }
+                                val exif = ExifInterface(tmp.absolutePath)
+                                exifData.forEach { (k, v) -> exif.setAttribute(k, v) }
+                                // After physical rotation, orientation must be normal
+                                exif.setAttribute(
+                                    ExifInterface.TAG_ORIENTATION,
+                                    ExifInterface.ORIENTATION_NORMAL.toString()
+                                )
+                                exif.saveAttributes()
+                                // Write back
+                                FileInputStream(tmp).use { updated ->
+                                    openOutputStream(uri, "rwt")?.use { finalOut ->
+                                        updated.copyTo(finalOut)
+                                        finalOut.flush()
+                                    }
+                                }
+                            } finally {
+                                tmp.delete()
                             }
                         }
-                        tmp.delete()
                     }
                 }
-            } catch (_: Exception) {
+            catch (_: Exception) {
                 // Silent; keep at least the pixels
             }
         }

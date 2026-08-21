@@ -1,5 +1,10 @@
 package com.dot.gallery.core.workers
 
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -47,7 +52,10 @@ class VaultOperationWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val op = inputData.getString(KEY_OPERATION) ?: return@withContext Result.failure()
         val mediaJson = inputData.getString(KEY_MEDIA_URIS) ?: return@withContext Result.failure()
-        val inputUris = Json.decodeFromString<List<String>>(mediaJson).map { it.toUri() }
+        val inputUris = runCatching {
+            Json.decodeFromString<List<String>>(mediaJson)
+                .mapNotNull { value -> value.toUri().takeIf { it.scheme != null } }
+        }.getOrElse { return@withContext Result.failure() }
         val requestDelete = inputData.getBoolean(KEY_DELETE_ORIGINALS, false)
         val resolver = appContext.contentResolver
         var skipped = 0
@@ -81,7 +89,8 @@ class VaultOperationWorker @AssistedInject constructor(
             OP_ENCRYPT, OP_HIDE -> {
                 val vaultJson =
                     inputData.getString(KEY_VAULT) ?: return@withContext Result.failure()
-                val vault = Json.decodeFromString<Vault>(vaultJson)
+                val vault = runCatching { Json.decodeFromString<Vault>(vaultJson) }
+                    .getOrElse { return@withContext Result.failure() }
                 val mediaList =
                     repository.getMediaListByUris(mediaUris, reviewMode = false, onlyMatching = true).firstOrNull()?.data
                         ?: return@withContext Result.failure()
@@ -99,7 +108,8 @@ class VaultOperationWorker @AssistedInject constructor(
             OP_DECRYPT -> {
                 val vaultJson =
                     inputData.getString(KEY_VAULT) ?: return@withContext Result.failure()
-                val vault = Json.decodeFromString<Vault>(vaultJson)
+                val vault = runCatching { Json.decodeFromString<Vault>(vaultJson) }
+                    .getOrElse { return@withContext Result.failure() }
                 
                 val allVaultMedia = repository.getEncryptedMedia(vault).firstOrNull()?.data 
                     ?: return@withContext Result.failure()

@@ -11,6 +11,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.Tracks
@@ -73,6 +74,7 @@ class VideoPlayerViewModel @AssistedInject constructor(
     data class PlaybackState(
         val isDecrypting: Boolean = false,
         val decryptFailed: Boolean = false,
+        val playbackFailed: Boolean = false,
         val ready: Boolean = false,
         val durationMs: Long = 0L,
         val positionMs: Long = 0L,
@@ -124,6 +126,20 @@ class VideoPlayerViewModel @AssistedInject constructor(
                 .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
                 .build()
             addListener(object : Player.Listener {
+                override fun onPlayerError(error: PlaybackException) {
+                    // Media3 reports decoder/source failures through the listener. Keep the
+                    // failure in state instead of allowing a bad stream or unsupported codec to
+                    // leave the viewer in an unhandled playback path.
+                    _state.update {
+                        it.copy(
+                            playbackFailed = true,
+                            ready = false,
+                            isPlaying = false
+                        )
+                    }
+                    player.playWhenReady = false
+                }
+
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     if (playbackState == Player.STATE_READY) {
                         markReady()
@@ -300,6 +316,12 @@ class VideoPlayerViewModel @AssistedInject constructor(
     fun retryDecryption() {
         if (!_state.value.decryptFailed) return
         decryptAndPrepare()
+    }
+
+    fun retryPlayback() {
+        if (player.isReleased) return
+        _state.update { it.copy(playbackFailed = false, ready = false) }
+        player.prepare()
     }
 
     @OptIn(UnstableApi::class)

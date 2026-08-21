@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.sync
@@ -26,7 +26,8 @@ import com.dot.gallery.cloud.data.entity.SyncStateEntity
 import com.dot.gallery.feature_node.presentation.util.printDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -42,7 +43,7 @@ class CloudSyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         printDebug("CloudSyncWorker: Starting sync...")
         try {
-            val configs = configDao.getAll().first()
+            val configs = configDao.getAll().firstOrNull().orEmpty()
             for (config in configs) {
                 if (!config.isActive || !config.syncEnabled) continue
 
@@ -54,6 +55,7 @@ class CloudSyncWorker @AssistedInject constructor(
 
                 printDebug("CloudSyncWorker: Syncing ${config.providerType.displayName} #${config.id}...")
 
+                var syncSucceeded = true
                 val syncProvider = provider as? SyncCapableProvider
                 if (syncProvider != null) {
                     val lastSync = syncStateDao.get(
@@ -61,17 +63,22 @@ class CloudSyncWorker @AssistedInject constructor(
                     )?.lastSyncTimestamp ?: 0L
 
                     val changedResult = syncProvider.getChangedSince(lastSync)
-                    changedResult.onSuccess { changed ->
-                        printDebug("CloudSyncWorker: ${changed.size} changes for ${config.providerType.displayName} #${config.id}")
-                        // Persist the delta into Room so the unified timeline reflects remote
-                        // changes. Previously the changed set was fetched then discarded, which
-                        // made the periodic worker a no-op beyond advancing the timestamp.
-                        if (changed.isNotEmpty()) {
-                            cloudMediaDao.insertAll(changed)
+                    changedResult.fold(
+                        onSuccess = { changed ->
+                            printDebug("CloudSyncWorker: ${changed.size} changes for ${config.providerType.displayName} #${config.id}")
+                            // Persist the delta into Room so the unified timeline reflects remote
+                            // changes. Advance the timestamp only after this succeeds.
+                            if (changed.isNotEmpty()) cloudMediaDao.insertAll(changed)
+                        },
+                        onFailure = { error ->
+                            syncSucceeded = false
+                            printDebug("CloudSyncWorker: Sync failed for ${config.providerType.displayName} #${config.id}: ${error.message}")
                         }
-                    }.onFailure { e ->
-                        printDebug("CloudSyncWorker: Sync failed for ${config.providerType.displayName} #${config.id}: ${e.message}")
-                    }
+                    )
+                }
+
+                if (!syncSucceeded) {
+                    continue
                 }
 
                 // Update last sync timestamp
@@ -86,6 +93,8 @@ class CloudSyncWorker @AssistedInject constructor(
                 printDebug("CloudSyncWorker: Done syncing ${config.providerType.displayName}")
             }
             return Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             printDebug("CloudSyncWorker: Failed: ${e.message}")
             return Result.retry()

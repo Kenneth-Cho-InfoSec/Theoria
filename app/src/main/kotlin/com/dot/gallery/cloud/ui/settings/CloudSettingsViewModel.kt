@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.settings
@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -49,7 +49,7 @@ class CloudSettingsViewModel @Inject constructor(
 
     private fun loadActiveConfig() {
         viewModelScope.launch {
-            val configs = configDao.getAll().first()
+            val configs = configDao.getAll().firstOrNull().orEmpty()
             val active = configs.firstOrNull { it.isActive }
             _config.value = active
             CloudRuntimeSettings.apply(active?.toCloudServerConfig())

@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.mediaview
@@ -131,8 +131,6 @@ import com.dot.gallery.feature_node.presentation.mediaview.components.GroupMembe
 import com.dot.gallery.feature_node.presentation.mediaview.components.MediaViewAppBar
 import com.dot.gallery.feature_node.presentation.mediaview.components.MediaViewQuickBottomBar
 import com.dot.gallery.feature_node.presentation.mediaview.components.MediaViewSheetDetails
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.CutoutControlsBar
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.CutoutController
 import com.dot.gallery.feature_node.presentation.mediaview.components.media.MediaPreviewComponent
 import com.dot.gallery.feature_node.presentation.mediaview.components.media.MotionPhotoFilmstrip
 import com.dot.gallery.feature_node.presentation.mediaview.components.media.MotionPhotoState
@@ -473,10 +471,6 @@ fun <T : Media> MediaViewScreen(
     // True while the current cloud/remote page is downloading its full-size original for
     // subsampling; drives the subtle horizontal loading indicator under the top-center date.
     var subsamplingLoading by remember { mutableStateOf(false) }
-    var isCutoutActive by rememberSaveable { mutableStateOf(false) }
-    // Controller published by the current page while a cutout session is active; drives the bottom
-    // cutout controls bar that replaces the quick-actions bar.
-    var cutoutController by remember { mutableStateOf<CutoutController?>(null) }
     var isTopDark by remember { mutableStateOf(false) }
     var isBottomDark by remember { mutableStateOf(false) }
     val autoContrast by rememberAutoContrast()
@@ -846,10 +840,11 @@ fun <T : Media> MediaViewScreen(
     FullBrightnessWindow {
         val isDarkTheme = isDarkTheme()
         val allowBlur by rememberAllowBlur()
+        // The media canvas stays black in both themes. A white canvas changes the perceived
+        // colors of photos and videos and makes letterboxed content difficult to view (#1035).
         val backgroundColor by animateColorAsState(
-            if (allowBlur) Color.Black else {
-                if (isDarkTheme) Color.Black else Color.White
-            }
+            targetValue = Color.Black,
+            label = "MediaViewerBackground"
         )
         Box(
             modifier = Modifier
@@ -858,7 +853,7 @@ fun <T : Media> MediaViewScreen(
         ) {
             HorizontalPager(
                 modifier = Modifier.fillMaxSize(),
-                userScrollEnabled = if (isLocked || isVideoZoomed || isCutoutActive || (slideshowActive && !slideshowPaused)) false else userScrollEnabled,
+                userScrollEnabled = if (isLocked || isVideoZoomed || (slideshowActive && !slideshowPaused)) false else userScrollEnabled,
                 state = pagerState,
                 flingBehavior = PagerDefaults.flingBehavior(
                     state = pagerState,
@@ -914,7 +909,7 @@ fun <T : Media> MediaViewScreen(
                         kenBurnsScale.animateTo(
                             targetValue = 1.12f,
                             animationSpec = tween(
-                                durationMillis = (slideshowConfig?.intervalMillis ?: 5000L).toInt(),
+                                durationMillis = slideshowConfig.intervalMillis.toInt(),
                                 easing = LinearEasing
                             )
                         )
@@ -1012,27 +1007,6 @@ fun <T : Media> MediaViewScreen(
                                 // fling must not toggle it.
                                 onSubsamplingLoadingChange = if (index == currentPage) {
                                     { loading -> subsamplingLoading = loading }
-                                } else {
-                                    {}
-                                },
-                                onCutoutStateChanged = { active ->
-                                    // Only react to a genuine cutout transition. The selected page
-                                    // re-emits `false` on every swipe (its cutout is inactive), so
-                                    // without this guard each page change would force `showUI = true`
-                                    // and bring the controls back after the user hid them (#1033).
-                                    if (active != isCutoutActive) {
-                                        isCutoutActive = active
-                                        if (active) {
-                                            showUI = false
-                                            windowInsetsController.toggleSystemBars(show = false)
-                                        } else {
-                                            showUI = true
-                                            windowInsetsController.toggleSystemBars(show = true)
-                                        }
-                                    }
-                                },
-                                onCutoutController = if (index == currentPage) {
-                                    { controller -> cutoutController = controller }
                                 } else {
                                     {}
                                 }
@@ -1274,11 +1248,12 @@ fun <T : Media> MediaViewScreen(
                 rotationInProgress = rotationInProgress,
                 rotationStageLabel = rotationStageLabel,
                 rotateImage = {
-                    val media = currentMedia!!
-                    if (ImageReencoder.isReencodable(media.mimeType, media.label)) {
-                        rotateImage(media, newRotationValue.intValue, false)
-                    } else {
-                        rotateFallback = media to newRotationValue.intValue
+                    currentMedia?.let { media ->
+                        if (ImageReencoder.isReencodable(media.mimeType, media.label)) {
+                            rotateImage(media, newRotationValue.intValue, false)
+                        } else {
+                            rotateFallback = media to newRotationValue.intValue
+                        }
                     }
                 },
                 onShowInfo = {
@@ -1507,143 +1482,125 @@ fun <T : Media> MediaViewScreen(
                 animationSpec = tween(DEFAULT_TOP_BAR_ANIMATION_DURATION),
                 label = "MediaViewActionsAlpha"
             )
-            if (!isCutoutActive) {
-                BottomSheet(
-                    state = sheetState,
-                    enabled = showUI && target != TARGET_TRASH && showInfo,
-                    modifier = Modifier
-                        .graphicsLayer {
-                            alpha = bottomSheetAlpha
-                        }
-                        .fillMaxWidth()
+            BottomSheet(
+                state = sheetState,
+                enabled = showUI && target != TARGET_TRASH && showInfo,
+                modifier = Modifier
+                    .graphicsLayer {
+                        alpha = bottomSheetAlpha
+                    }
+                    .fillMaxWidth()
+            ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AnimatedVisibility(
+                    visible = currentMedia != null,
+                    enter = enterAnimation,
+                    exit = exitAnimation
                 ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    AnimatedVisibility(
-                        visible = currentMedia != null,
-                        enter = enterAnimation,
-                        exit = exitAnimation
-                    ) {
-                        val bottomBarFollowTheme = if (autoContrast) {
-                            !isBottomDark
-                        } else {
-                            !allowBlur
-                        }
-                        val surfaceContainer by animateColorAsState(
-                            targetValue = when {
-                                autoContrast && !isBottomDark -> Color.White.copy(0.5f)
-                                autoContrast -> Color.Black.copy(0.5f)
-                                bottomBarFollowTheme -> MaterialTheme.colorScheme.surfaceContainer.copy(
-                                    if (isDarkTheme) 0.5f else 0.8f
-                                )
-                                else -> Color.Black.copy(0.5f)
-                            },
-                            label = "BottomBarSurfaceContainer"
-                        )
-                        val backgroundModifier = if (!allowBlur) {
-                            Modifier.background(
-                                color = surfaceContainer,
-                                shape = RoundedCornerShape(100)
+                    val bottomBarFollowTheme = if (autoContrast) {
+                        !isBottomDark
+                    } else {
+                        !allowBlur
+                    }
+                    val surfaceContainer by animateColorAsState(
+                        targetValue = when {
+                            autoContrast && !isBottomDark -> Color.White.copy(0.5f)
+                            autoContrast -> Color.Black.copy(0.5f)
+                            bottomBarFollowTheme -> MaterialTheme.colorScheme.surfaceContainer.copy(
+                                if (isDarkTheme) 0.5f else 0.8f
                             )
-                        } else Modifier
-                        Box(
+                            else -> Color.Black.copy(0.5f)
+                        },
+                        label = "BottomBarSurfaceContainer"
+                    )
+                    val backgroundModifier = if (!allowBlur) {
+                        Modifier.background(
+                            color = surfaceContainer,
+                            shape = RoundedCornerShape(100)
+                        )
+                    } else Modifier
+                    Box(
+                        modifier = Modifier
+                            .graphicsLayer {
+                                val progress = sheetState.progress(imageOnlyDetent, expandedDetent)
+                                alpha = 1f - progress
+                                translationY =
+                                    bottomBarHeightDefault.toPx() * progress
+                            }
+                            .padding(
+                                bottom = bottomPadding + extraPaddingWithNavButtons + 16.dp
+                            )
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
                             modifier = Modifier
-                                .graphicsLayer {
-                                    val progress = sheetState.progress(imageOnlyDetent, expandedDetent)
-                                    alpha = 1f - progress
-                                    translationY =
-                                        bottomBarHeightDefault.toPx() * progress
-                                }
-                                .padding(
-                                    bottom = bottomPadding + extraPaddingWithNavButtons + 16.dp
-                                )
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(100))
-                                    .then(backgroundModifier)
-                                    .hazeEffectScaled(
-                                        state = LocalHazeState.current,
-                                        style = HazeMaterials.ultraThin(
-                                            containerColor = surfaceContainer
-                                        )
+                                .clip(RoundedCornerShape(100))
+                                .then(backgroundModifier)
+                                .hazeEffectScaled(
+                                    state = LocalHazeState.current,
+                                    style = HazeMaterials.ultraThin(
+                                        containerColor = surfaceContainer
                                     )
-                                    .padding(horizontal = 8.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                MediaViewQuickBottomBar(
-                                    currentMedia = currentMedia,
-                                    showDeleteButton = !isReadOnly,
-                                    // Only interactive while the action bar is actually visible
-                                    // (collapsed sheet). When the info panel is expanded the bar is
-                                    // faded out (alpha = 0) but would otherwise still be tappable,
-                                    // letting taps near the drag handle trigger hidden buttons.
-                                    enabled = showUI && sheetState.currentDetent == imageOnlyDetent,
-                                    deleteMedia = deleteMedia,
-                                    restoreMedia = restoreMedia,
-                                    currentVault = currentVault,
-                                    isImageDark = isBottomDark,
-                                    autoContrast = autoContrast,
-                                    onTrashConfirmed = {
-                                        val trashedId = currentMedia?.id
-                                        if (trashedId != null) {
-                                            val newPending = pendingTrashIds + trashedId
-                                            pendingTrashIds = newPending
-                                            // If all items are now filtered out, navigate up
-                                            val state = mediaState.value
-                                            val allItems = state.pagerMedia.ifEmpty { state.media }
-                                            val remaining = allItems.count { it.id !in newPending }
-                                            if (remaining <= 0 && !isStandalone) {
-                                                windowInsetsController.toggleSystemBars(show = true)
-                                                eventHandler.navigateUp()
-                                            }
+                                )
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            MediaViewQuickBottomBar(
+                                currentMedia = currentMedia,
+                                showDeleteButton = !isReadOnly,
+                                // Only interactive while the action bar is actually visible
+                                // (collapsed sheet). When the info panel is expanded the bar is
+                                // faded out (alpha = 0) but would otherwise still be tappable,
+                                // letting taps near the drag handle trigger hidden buttons.
+                                enabled = showUI && sheetState.currentDetent == imageOnlyDetent,
+                                deleteMedia = deleteMedia,
+                                restoreMedia = restoreMedia,
+                                currentVault = currentVault,
+                                isImageDark = isBottomDark,
+                                autoContrast = autoContrast,
+                                onTrashConfirmed = {
+                                    val trashedId = currentMedia?.id
+                                    if (trashedId != null) {
+                                        val newPending = pendingTrashIds + trashedId
+                                        pendingTrashIds = newPending
+                                        // If all items are now filtered out, navigate up
+                                        val state = mediaState.value
+                                        val allItems = state.pagerMedia.ifEmpty { state.media }
+                                        val remaining = allItems.count { it.id !in newPending }
+                                        if (remaining <= 0 && !isStandalone) {
+                                            windowInsetsController.toggleSystemBars(show = true)
+                                            eventHandler.navigateUp()
                                         }
                                     }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
-
-                    val currentCloudBackups by rememberedDerivedState(mediaState.value, currentMedia) {
-                        currentMedia?.let { mediaState.value.cloudBackups[it.id] } ?: emptyList()
-                    }
-                    MediaViewSheetDetails(
-                        albumsState = albumsState,
-                        vaultState = vaultState,
-                        metadataState = metadataState,
-                        currentMedia = currentMedia,
-                        restoreMedia = restoreMedia,
-                        currentVault = currentVault,
-                        motionPhotoState = motionPhotoState,
-                        cloudBackups = currentCloudBackups,
-                        metadataSanitizationState = metadataSanitizationUiState,
-                        probeMetadataSanitization = probeMetadataSanitization,
-                        sanitizeMetadata = sanitizeMetadata,
-                        resetMetadataSanitization = resetMetadataSanitization,
-                    )
                 }
-            }
-            }
 
-            // Cutout controls: replaces the quick-actions bar in the same bottom slot while a
-            // subject-cutout session is active on the current page.
-            AnimatedVisibility(
-                visible = isCutoutActive && cutoutController != null,
-                enter = enterAnimation(DEFAULT_TOP_BAR_ANIMATION_DURATION),
-                exit = exitAnimation(DEFAULT_TOP_BAR_ANIMATION_DURATION),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = bottomPadding + extraPaddingWithNavButtons + 16.dp)
-                    .padding(horizontal = 16.dp)
-            ) {
-                cutoutController?.let { controller ->
-                    CutoutControlsBar(controller = controller)
+                val currentCloudBackups by rememberedDerivedState(mediaState.value, currentMedia) {
+                    currentMedia?.let { mediaState.value.cloudBackups[it.id] } ?: emptyList()
                 }
+                MediaViewSheetDetails(
+                    albumsState = albumsState,
+                    vaultState = vaultState,
+                    metadataState = metadataState,
+                    currentMedia = currentMedia,
+                    restoreMedia = restoreMedia,
+                    currentVault = currentVault,
+                    motionPhotoState = motionPhotoState,
+                    cloudBackups = currentCloudBackups,
+                    metadataSanitizationState = metadataSanitizationUiState,
+                    probeMetadataSanitization = probeMetadataSanitization,
+                    sanitizeMetadata = sanitizeMetadata,
+                    resetMetadataSanitization = resetMetadataSanitization,
+                )
+            }
             }
 
             // Slideshow controls: minimal transport bar shown when the user taps during a

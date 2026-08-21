@@ -31,9 +31,7 @@ manifestConfig {
 
 val abiVersionCodes = mapOf(
     "arm64-v8a" to 4,
-    "armeabi-v7a" to 3,
     "x86_64" to 2,
-    "x86" to 1,
     "universal" to 0
 )
 
@@ -41,17 +39,9 @@ apkVersioning {
     flavorVersionCodes.set(abiVersionCodes)
     versionCodeMultiplier.set(10)
     outputFileName.set("{appName}-{versionName}-{versionCode}{suffix}-{ml}-{abi}-{buildType}")
-    variables.put("appName", "ReFra")
+    variables.put("appName", "Theoria")
     val offlineSuffix = if (isOffline) "-offline" else ""
     variables.put("suffix", offlineSuffix)
-}
-
-val copySegmentModelsTask = tasks.register<Copy>("copySegmentModels") {
-    from(file("../ml-models/segment")) {
-        include("mobile_sam_image_encoder.onnx")
-        include("sam_mask_decoder_single.onnx")
-    }
-    into(layout.buildDirectory.dir("generated/assets/ml-models"))
 }
 
 tasks.configureEach {
@@ -59,11 +49,10 @@ tasks.configureEach {
         name.contains("Assets", ignoreCase = true)
     // The WithML flavor registers the generated ml-models dir as an asset source
     // set. Lint model/report tasks read that directory too, so they must also
-    // depend on copySegmentModels to avoid Gradle implicit-dependency failures.
+    // depend on assembleModels to avoid Gradle implicit-dependency failures.
     val readsMlAssets = name.contains("WithML", ignoreCase = true) &&
         name.contains("Lint", ignoreCase = true)
     if (mergesAssets || readsMlAssets) {
-        dependsOn(copySegmentModelsTask)
         // Reassemble any split large models (e.g. arcface.onnx) into the ml-models
         // asset dir before the APK asset merge reads it.
         dependsOn(":ml-models:assembleModels")
@@ -78,32 +67,21 @@ android {
     namespace = "com.dot.gallery"
     compileSdk = 37
 
-    // Native HEIC tiled decoder (libheif + libde265, built via CMake/NDK). Pinned to the latest
-    // stable NDK r29 line and CMake 3.31.x. CMake 4.x is intentionally avoided because it drops
-    // support for `cmake_minimum_required(VERSION < 3.5)`, which breaks libde265/libheif scripts.
     ndkVersion = "29.0.14033849"
 
     defaultConfig {
         applicationId = "com.dot.gallery"
         minSdk = 29
         targetSdk = 37
-        versionCode = 51006
-        versionName = "5.1.0"
+        versionCode = 1
+        versionName = "0.0.1-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
         val offlinePrefix = if (isOffline) "-offline" else ""
-        base.archivesName.set("ReFra-${versionName}-$versionCode$offlinePrefix")
-
-        externalNativeBuild {
-            cmake {
-                // Only the tiny JNI is compiled here; libheif/libde265 are linked as prebuilt
-                // static libs, so this stays fast.
-                cppFlags += "-std=c++17"
-            }
-        }
+        base.archivesName.set("Theoria-${versionName}-$versionCode$offlinePrefix")
     }
 
     externalNativeBuild {
@@ -112,8 +90,6 @@ android {
             version = "3.31.6"
         }
     }
-
-    lint.baseline = file("lint-baseline.xml")
 
     signingConfigs {
         create("release") {
@@ -158,7 +134,7 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
             buildConfigField("Boolean", "ALLOW_ALL_FILES_ACCESS", "$allowAllFilesAccess")
             buildConfigField("Boolean", "OFFLINE_MODE", "$isOffline")
             buildConfigField("Boolean", "MAPS_ENABLED", "$includeMaps")
@@ -243,57 +219,57 @@ android {
     sourceSets {
         getByName("main") {
             // Conditional maps/offline source set
-            if (!isOffline) {
-                kotlin.srcDir("src/maps/kotlin")
+            if (includeMaps) {
+                kotlin.directories.add("src/maps/kotlin")
             } else {
-                kotlin.srcDir("src/offline/kotlin")
+                kotlin.directories.add("src/offline/kotlin")
             }
             // Conditional cloud networking source set
             if (!isOffline) {
-                kotlin.srcDir("src/cloud/kotlin")
+                kotlin.directories.add("src/cloud/kotlin")
             } else {
-                kotlin.srcDir("src/nocloud/kotlin")
+                kotlin.directories.add("src/nocloud/kotlin")
             }
             // Conditional cloud provider source sets
             if (includeImmich) {
-                kotlin.srcDir("src/immich/kotlin")
+                kotlin.directories.add("src/immich/kotlin")
             } else {
-                kotlin.srcDir("src/noimmich/kotlin")
+                kotlin.directories.add("src/noimmich/kotlin")
             }
             if (includeOwncloud) {
-                kotlin.srcDir("src/owncloud/kotlin")
+                kotlin.directories.add("src/owncloud/kotlin")
             } else {
-                kotlin.srcDir("src/noowncloud/kotlin")
+                kotlin.directories.add("src/noowncloud/kotlin")
             }
             if (includeNextcloud) {
-                kotlin.srcDir("src/nextcloud/kotlin")
+                kotlin.directories.add("src/nextcloud/kotlin")
             } else {
-                kotlin.srcDir("src/nonextcloud/kotlin")
+                kotlin.directories.add("src/nonextcloud/kotlin")
             }
             // Shared WebDAV base + capability framework, compiled when any
             // WebDAV-family provider (ownCloud / Nextcloud / generic) is enabled.
             if (includeOwncloud || includeNextcloud || includeWebdav) {
-                kotlin.srcDir("src/webdav/kotlin")
+                kotlin.directories.add("src/webdav/kotlin")
             }
             if (includeWebdav) {
-                kotlin.srcDir("src/genericwebdav/kotlin")
+                kotlin.directories.add("src/genericwebdav/kotlin")
             } else {
-                kotlin.srcDir("src/nogenericwebdav/kotlin")
+                kotlin.directories.add("src/nogenericwebdav/kotlin")
             }
             // Shared network-filesystem base (loopback bridge + scanner + thumbnailer),
             // compiled when any net-fs provider (SMB / NFS) is enabled.
             if (includeSmb || includeNfs) {
-                kotlin.srcDir("src/netfs/kotlin")
+                kotlin.directories.add("src/netfs/kotlin")
             }
             if (includeSmb) {
-                kotlin.srcDir("src/smb/kotlin")
+                kotlin.directories.add("src/smb/kotlin")
             } else {
-                kotlin.srcDir("src/nosmb/kotlin")
+                kotlin.directories.add("src/nosmb/kotlin")
             }
             if (includeNfs) {
-                kotlin.srcDir("src/nfs/kotlin")
+                kotlin.directories.add("src/nfs/kotlin")
             } else {
-                kotlin.srcDir("src/nonfs/kotlin")
+                kotlin.directories.add("src/nonfs/kotlin")
             }
         }
         // For withML APK builds, include ML model assets directly
@@ -303,10 +279,7 @@ android {
         }
         if (!isBundleBuild) {
             maybeCreate("WithML").apply {
-                assets.srcDirs(
-                    "../ml-models/src/main/assets",
-                    "${layout.buildDirectory.get().asFile}/generated/assets/ml-models"
-                )
+                assets.directories.add("../ml-models/src/main/assets")
             }
         }
     }
@@ -349,7 +322,6 @@ composeCompiler {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.add("-Xcontext-parameters")
     }
 }
 
@@ -403,6 +375,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.mlkit.text.recognition)
 
     // Dagger - Hilt
     implementation(libs.androidx.hilt.navigation.compose)
@@ -422,13 +395,6 @@ dependencies {
     // SQLCipher for encrypted Room database
     implementation(libs.sqlcipher.android)
     implementation(libs.sqlite.ktx)
-
-    // Coders
-    implementation(libs.jxl.coder.coil)
-    implementation(libs.avif.coder.coil)
-    implementation(libs.jp2forandroid)
-    implementation(libs.androidsvg)
-    implementation(libs.nga.tiff)
 
     // Sketch
     implementation(libs.sketch.compose)
@@ -466,9 +432,6 @@ dependencies {
     // Fuzzy Search
     implementation(libs.fuzzywuzzy.kotlin)
 
-    // Aire
-    implementation(libs.aire)
-
     // Subsampling
     implementation(libs.zoomimage.compose.glide)
     implementation(libs.zoomimage.compose.sketch)
@@ -488,9 +451,6 @@ dependencies {
 
     // Composable - Scrollbar
     implementation(project(":libs:scrollbar"))
-
-    // ONNX Runtime (CPU + NNAPI)
-    implementation(libs.onnxruntime.android)
 
     // Haze
     implementation(libs.haze)
@@ -544,7 +504,16 @@ val isOffline: Boolean
     }
 
 val includeMaps: Boolean
-    get() = !isOffline
+    get() {
+        val fl = rootProject.file("app.properties")
+        return try {
+            val properties = Properties()
+            properties.load(FileInputStream(fl))
+            properties.getProperty("INCLUDE_MAPS", "false").toBoolean()
+        } catch (_: Exception) {
+            false
+        }
+    }
 
 val allowAllFilesAccess: Boolean
     get() {

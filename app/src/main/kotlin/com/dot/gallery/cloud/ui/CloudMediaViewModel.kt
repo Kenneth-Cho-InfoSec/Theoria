@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui
@@ -15,6 +15,9 @@ import com.dot.gallery.cloud.data.entity.CloudAlbumSyncEntity
 import com.dot.gallery.cloud.data.entity.CloudMediaEntity
 import com.dot.gallery.cloud.data.repository.CloudRepository
 import com.dot.gallery.core.Resource
+import com.dot.gallery.core.error.ErrorReporter
+import com.dot.gallery.core.error.toAppError
+import com.dot.gallery.core.error.userMessage
 import com.dot.gallery.feature_node.domain.model.Album
 import com.dot.gallery.feature_node.domain.model.Media
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,9 +25,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -62,6 +67,10 @@ class CloudMediaViewModel @Inject constructor(
 
     private val albumsLoadMutex = Mutex()
     private var albumsLoaded = false
+    private var remoteMediaJob: Job? = null
+    private var remoteAlbumsJob: Job? = null
+    private var albumMediaJob: Job? = null
+    private var cloudAlbumMediaJob: Job? = null
 
     init {
         if (hasConfiguredProviders) {
@@ -73,15 +82,25 @@ class CloudMediaViewModel @Inject constructor(
         albumsLoadMutex.withLock {
             if (!albumsLoaded && _uiState.value.albums.isEmpty()) {
                 try {
-                    val resource = repository.getAllRemoteAlbums().first()
-                    if (resource is Resource.Success) {
-                        _uiState.value = _uiState.value.copy(
-                            albums = resource.data ?: emptyList()
-                        )
+                    val resource = repository.getAllRemoteAlbums().firstOrNull()
+                    when (resource) {
+                        is Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                albums = resource.data ?: emptyList()
+                            )
+                            albumsLoaded = true
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = resource.error?.userMessage() ?: resource.message
+                            )
+                        }
+                        null -> albumsLoaded = true
                     }
-                    albumsLoaded = true
-                } catch (_: Exception) {
-                    // Network error — albums remain empty
+                } catch (e: Exception) {
+                    val error = e.toAppError("load cloud albums")
+                    ErrorReporter.report(error)
+                    _uiState.value = _uiState.value.copy(error = error.userMessage())
                 }
             }
         }
@@ -89,70 +108,97 @@ class CloudMediaViewModel @Inject constructor(
 
     fun loadRemoteMedia(page: Int = 0, pageSize: Int = 100) {
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        viewModelScope.launch {
-            repository.getAllRemoteAssets(page, pageSize).collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            media = resource.data ?: emptyList()
-                        )
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            media = resource.data ?: _uiState.value.media,
-                            error = resource.message
-                        )
-                    }
+        remoteMediaJob?.cancel()
+        remoteMediaJob = viewModelScope.launch {
+            repository.getAllRemoteAssets(page, pageSize)
+                .catch { throwable ->
+                    val error = throwable.toAppError("load remote media")
+                    ErrorReporter.report(error)
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.userMessage()
+                    )
                 }
-            }
-        }
-    }
-
-    fun loadRemoteAlbums() {
-        viewModelScope.launch {
-            repository.getAllRemoteAlbums().collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            albums = resource.data ?: emptyList()
-                        )
-                        albumsLoaded = true
-                    }
-                    is Resource.Error -> {
-                        if (resource.data != null) {
+                .collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
                             _uiState.value = _uiState.value.copy(
-                                albums = resource.data ?: emptyList()
+                                isLoading = false,
+                                media = resource.data ?: emptyList()
+                            )
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                media = resource.data ?: _uiState.value.media,
+                                error = resource.error?.userMessage() ?: resource.message
                             )
                         }
                     }
                 }
             }
         }
-    }
 
-    fun loadAlbumMedia(type: ProviderType, albumId: String) {
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        viewModelScope.launch {
-            repository.getAlbumMedia(type, albumId).collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            media = resource.data ?: emptyList()
-                        )
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = resource.message
-                        )
+    fun loadRemoteAlbums() {
+        remoteAlbumsJob?.cancel()
+        remoteAlbumsJob = viewModelScope.launch {
+            repository.getAllRemoteAlbums()
+                .catch { throwable ->
+                    val error = throwable.toAppError("load remote albums")
+                    ErrorReporter.report(error)
+                    _uiState.value = _uiState.value.copy(error = error.userMessage())
+                }
+                .collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                albums = resource.data ?: emptyList()
+                            )
+                            albumsLoaded = true
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                albums = resource.data ?: _uiState.value.albums,
+                                error = resource.error?.userMessage() ?: resource.message
+                            )
+                        }
                     }
                 }
             }
         }
-    }
+
+    fun loadAlbumMedia(type: ProviderType, albumId: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        _uiState.value = _uiState.value.copy(media = emptyList())
+        albumMediaJob?.cancel()
+        albumMediaJob = viewModelScope.launch {
+            repository.getAlbumMedia(type, albumId)
+                .catch { throwable ->
+                    val error = throwable.toAppError("load cloud album media")
+                    ErrorReporter.report(error)
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.userMessage()
+                    )
+                }
+                .collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                media = resource.data ?: emptyList()
+                            )
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                error = resource.error?.userMessage() ?: resource.message
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
     private val _cloudAlbumMedia = MutableStateFlow<List<Media.UriMedia>>(emptyList())
     val cloudAlbumMedia: StateFlow<List<Media.UriMedia>> = _cloudAlbumMedia.asStateFlow()
@@ -170,30 +216,46 @@ class CloudMediaViewModel @Inject constructor(
 
     fun loadCloudAlbumMedia(computedAlbumId: Long) {
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        viewModelScope.launch {
+        _cloudAlbumMedia.value = emptyList()
+        cloudAlbumMediaJob?.cancel()
+        cloudAlbumMediaJob = viewModelScope.launch {
             ensureAlbumsLoaded()
             val cloudAlbum = findCloudAlbumByComputedId(computedAlbumId)
             if (cloudAlbum == null) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
+                    media = emptyList(),
                     error = "Cloud album not found"
                 )
                 return@launch
             }
-            repository.getAlbumMedia(cloudAlbum.providerType, cloudAlbum.remoteId).collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        val media = resource.data?.map { it.toUriMedia() } ?: emptyList()
-                        _cloudAlbumMedia.value = media
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false, error = resource.message)
+            repository.getAlbumMedia(cloudAlbum.providerType, cloudAlbum.remoteId)
+                .catch { throwable ->
+                    val error = throwable.toAppError("load cloud album media")
+                    ErrorReporter.report(error)
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.userMessage()
+                    )
+                }
+                .collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            val media = resource.data?.map { it.toUriMedia() } ?: emptyList()
+                            _cloudAlbumMedia.value = media
+                            _uiState.value = _uiState.value.copy(isLoading = false)
+                        }
+                        is Resource.Error -> {
+                            _cloudAlbumMedia.value = emptyList()
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                error = resource.error?.userMessage() ?: resource.message
+                            )
+                        }
                     }
                 }
             }
         }
-    }
 
     suspend fun search(query: String): List<CloudMediaEntity> {
         return repository.search(query).getOrDefault(emptyList())

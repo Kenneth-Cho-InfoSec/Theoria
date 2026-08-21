@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2023 The LineageOS Project
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.util.ext
@@ -18,32 +18,24 @@ import kotlinx.coroutines.flow.map
 fun <T> Cursor?.mapEachRow(
     projection: Array<String>,
     mapping: (Cursor, Array<Int>) -> T,
-) = this?.use { cursor ->
-    if (!cursor.moveToFirst()) {
-        return@use emptyList<T>()
-    }
-
-    val rowCount = cursor.count
-    val mapSpan = StartupTracer.begin("Cursor.mapEachRow($rowCount rows)")
-
-    val indexCache = projection.map { column ->
-        cursor.getColumnIndexOrThrow(column)
-    }.toTypedArray()
-
-    val data = try {
-        buildList {
-            do {
-                add(mapping(cursor, indexCache))
-            } while (cursor.moveToNext())
+): List<T> {
+    return this?.use { cursor ->
+        if (!cursor.moveToFirst()) return@use emptyList<T>()
+        val mapSpan = StartupTracer.begin("Cursor.mapEachRow(${cursor.count} rows)")
+        try {
+            val indexCache = projection.map { column ->
+                cursor.getColumnIndexOrThrow(column)
+            }.toTypedArray()
+            runCatching {
+                buildList {
+                    do add(mapping(cursor, indexCache)) while (cursor.moveToNext())
+                }
+            }.getOrElse { emptyList() }
+        } finally {
+            StartupTracer.end(mapSpan)
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        emptyList()
-    }
-
-    StartupTracer.end(mapSpan)
-    data.toList()
-} ?: emptyList()
+    } ?: emptyList()
+}
 
 fun Cursor?.tryGetString(columnIndex: Int, fallback: String? = null): String? {
     return this?.getStringOrNull(columnIndex) ?: fallback

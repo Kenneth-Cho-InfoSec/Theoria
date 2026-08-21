@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -64,7 +64,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 /**
- * Handles the legacy `com.android.camera.action.CROP` intent so ReFra can serve as a crop provider
+ * Handles the legacy `com.android.camera.action.CROP` intent so Theoria can serve as a crop provider
  * for callers such as the Settings AvatarPicker (Settings → System → Users → profile picture),
  * matching Gallery2/Google Photos (#997).
  *

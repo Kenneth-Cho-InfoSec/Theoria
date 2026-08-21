@@ -226,7 +226,6 @@ class MediaCopyWorker @AssistedInject constructor(
         val client = CloudFetcherRegistryHolder.okHttpClient ?: return null
         val response = client.newCall(requestBuilder.build()).execute()
         if (!response.isSuccessful) return null
-        return response.body?.byteStream()
+        return response.body.byteStream()
     }
 }
-

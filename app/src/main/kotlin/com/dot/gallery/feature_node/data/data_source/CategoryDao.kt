@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.data.data_source
@@ -95,31 +95,47 @@ interface CategoryDao {
 
     // Get all media IDs in a category, ordered by similarity score
     @Query("""
-        SELECT mediaId FROM media_category 
-        WHERE categoryId = :categoryId 
-        ORDER BY similarityScore DESC
+        SELECT mc.mediaId FROM media_category mc
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.categoryId = :categoryId AND locked.id IS NULL
+        ORDER BY mc.similarityScore DESC
     """)
     fun getMediaIdsInCategory(categoryId: Long): Flow<List<Long>>
 
     @Query("""
-        SELECT mediaId FROM media_category 
-        WHERE categoryId = :categoryId 
-        ORDER BY similarityScore DESC
+        SELECT mc.mediaId FROM media_category mc
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.categoryId = :categoryId AND locked.id IS NULL
+        ORDER BY mc.similarityScore DESC
     """)
     suspend fun getMediaIdsInCategoryAsync(categoryId: Long): List<Long>
 
     // Get media count for a category
-    @Query("SELECT COUNT(*) FROM media_category WHERE categoryId = :categoryId")
+    @Query("""
+        SELECT COUNT(*) FROM media_category mc
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.categoryId = :categoryId AND locked.id IS NULL
+    """)
     fun getMediaCountInCategory(categoryId: Long): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM media_category WHERE categoryId = :categoryId")
+    @Query("""
+        SELECT COUNT(*) FROM media_category mc
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.categoryId = :categoryId AND locked.id IS NULL
+    """)
     suspend fun getMediaCountInCategoryAsync(categoryId: Long): Int
 
     // Get all categories for a media item
     @Query("""
         SELECT c.* FROM categories c
         INNER JOIN media_category mc ON c.id = mc.categoryId
-        WHERE mc.mediaId = :mediaId
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.mediaId = :mediaId AND locked.id IS NULL
         ORDER BY mc.similarityScore DESC
     """)
     fun getCategoriesForMedia(mediaId: Long): Flow<List<Category>>
@@ -127,24 +143,30 @@ interface CategoryDao {
     @Query("""
         SELECT c.* FROM categories c
         INNER JOIN media_category mc ON c.id = mc.categoryId
-        WHERE mc.mediaId = :mediaId
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.mediaId = :mediaId AND locked.id IS NULL
         ORDER BY mc.similarityScore DESC
     """)
     suspend fun getCategoriesForMediaAsync(mediaId: Long): List<Category>
 
     // Get thumbnail media ID for a category (highest similarity score)
     @Query("""
-        SELECT mediaId FROM media_category 
-        WHERE categoryId = :categoryId 
-        ORDER BY similarityScore DESC 
+        SELECT mc.mediaId FROM media_category mc
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.categoryId = :categoryId AND locked.id IS NULL
+        ORDER BY mc.similarityScore DESC
         LIMIT 1
     """)
     fun getThumbnailMediaIdForCategory(categoryId: Long): Flow<Long?>
 
     @Query("""
-        SELECT mediaId FROM media_category 
-        WHERE categoryId = :categoryId 
-        ORDER BY similarityScore DESC 
+        SELECT mc.mediaId FROM media_category mc
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE mc.categoryId = :categoryId AND locked.id IS NULL
+        ORDER BY mc.similarityScore DESC
         LIMIT 1
     """)
     suspend fun getThumbnailMediaIdForCategoryAsync(categoryId: Long): Long?
@@ -163,14 +185,18 @@ interface CategoryDao {
 
     // Get categories with media count - for displaying in the grid
     @Query("""
-        SELECT c.*, COUNT(mc.mediaId) as mediaCount, 
+        SELECT c.*, COUNT(m.id) as mediaCount,
                (SELECT mc2.mediaId FROM media_category mc2 
-                WHERE mc2.categoryId = c.id 
+                INNER JOIN media m2 ON m2.id = mc2.mediaId
+                LEFT JOIN locked_table locked2 ON locked2.id = m2.albumID
+                WHERE mc2.categoryId = c.id AND locked2.id IS NULL
                 ORDER BY mc2.similarityScore DESC LIMIT 1) as thumbnailMediaId
         FROM categories c
         LEFT JOIN media_category mc ON c.id = mc.categoryId
+        LEFT JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
         GROUP BY c.id
-        HAVING mediaCount > 0
+        HAVING COUNT(CASE WHEN locked.id IS NULL THEN m.id END) > 0
         ORDER BY c.isPinned DESC, c.name ASC
     """)
     fun getCategoriesWithMediaCount(): Flow<List<CategoryWithMediaCount>>
@@ -197,12 +223,17 @@ interface CategoryDao {
 
     // Get the top N categories by media count for carousel display
     @Query("""
-        SELECT c.*, COUNT(mc.mediaId) as mediaCount,
+        SELECT c.*, COUNT(m.id) as mediaCount,
                (SELECT mc2.mediaId FROM media_category mc2 
-                WHERE mc2.categoryId = c.id 
+                INNER JOIN media m2 ON m2.id = mc2.mediaId
+                LEFT JOIN locked_table locked2 ON locked2.id = m2.albumID
+                WHERE mc2.categoryId = c.id AND locked2.id IS NULL
                 ORDER BY mc2.similarityScore DESC LIMIT 1) as thumbnailMediaId
         FROM categories c
         INNER JOIN media_category mc ON c.id = mc.categoryId
+        INNER JOIN media m ON m.id = mc.mediaId
+        LEFT JOIN locked_table locked ON locked.id = m.albumID
+        WHERE locked.id IS NULL
         GROUP BY c.id
         ORDER BY mediaCount DESC
         LIMIT :limit

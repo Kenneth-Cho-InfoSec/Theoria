@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.help.data
@@ -110,11 +110,9 @@ object HelpSearchIndex {
             Entry("settings_timeline_albums", R.string.help_cat_timeline_albums, Screen.SettingsTimelineAlbumsScreen(), HelpCategory.TIMELINE_ALBUMS),
             Entry("settings_media_viewer", R.string.help_cat_viewer_settings, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
             Entry("settings_navigation", R.string.help_cat_settings_navigation, Screen.SettingsNavigationScreen(), HelpCategory.SETTINGS_NAVIGATION),
-            Entry("settings_smart", R.string.help_cat_settings_smart, Screen.SettingsSmartFeaturesScreen(), HelpCategory.SETTINGS_SMART),
             Entry("settings_security", R.string.help_cat_settings_security, Screen.SettingsSecurityScreen(), HelpCategory.SETTINGS_SECURITY),
             Entry("settings_selection_actions", R.string.help_cat_selection_actions, Screen.SettingsSelectionActionsScreen(), HelpCategory.SELECTION_ACTIONS),
             Entry("settings_color_palette", R.string.help_cat_personalization, Screen.ColorPaletteScreen(), HelpCategory.SETTINGS_APPEARANCE),
-            Entry("settings_ai_models", R.string.ai_models_manager, Screen.AIModelsManagerScreen(), HelpCategory.SETTINGS_SMART),
         )
         return entries.map { e ->
             HelpSearchItem(
@@ -159,7 +157,6 @@ object HelpSearchIndex {
             Toggle(R.string.show_favorite_button, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
             Toggle(R.string.default_image_editor, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
             Toggle(R.string.disable_smoothing_title, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
-            Toggle(R.string.long_press_cutout_title, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
             Toggle(R.string.auto_hide_on_video_play, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
             Toggle(R.string.auto_play_video, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
             Toggle(R.string.video_surface_rebind, Screen.SettingsMediaViewerScreen(), HelpCategory.VIEWER_SETTINGS),
@@ -186,9 +183,6 @@ object HelpSearchIndex {
             Toggle(R.string.slideshow_loop, Screen.SlideshowSettingsScreen(), HelpCategory.SETTINGS_GENERAL),
             Toggle(R.string.slideshow_include_gifs, Screen.SlideshowSettingsScreen(), HelpCategory.SETTINGS_GENERAL),
             Toggle(R.string.slideshow_include_videos, Screen.SlideshowSettingsScreen(), HelpCategory.SETTINGS_GENERAL),
-            // Smart features
-            Toggle(R.string.refresh_metadata, Screen.SettingsSmartFeaturesScreen(), HelpCategory.SETTINGS_SMART),
-            Toggle(R.string.edit_backups, Screen.SettingsSmartFeaturesScreen(), HelpCategory.SETTINGS_SMART),
             // Backup
             Toggle(R.string.backup_export, Screen.SettingsBackupScreen(), HelpCategory.SETTINGS_GENERAL),
             Toggle(R.string.backup_import, Screen.SettingsBackupScreen(), HelpCategory.SETTINGS_GENERAL),

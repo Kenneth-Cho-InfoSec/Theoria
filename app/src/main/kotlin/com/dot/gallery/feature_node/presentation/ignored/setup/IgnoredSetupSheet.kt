@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.ignored.setup
 
 import android.net.Uri
@@ -615,6 +620,7 @@ private fun RegexInputContent(
 
     LaunchedEffect(localRegex) {
         val validRegex = try {
+            if (localRegex.length > MAX_WILDCARD_LENGTH) throw IllegalArgumentException("Regex too long")
             localRegex.toRegex()
             true
         } catch (e: Exception) {
@@ -764,6 +770,8 @@ private fun RegexInputContent(
         }
     }
 }
+
+private const val MAX_WILDCARD_LENGTH = 512
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

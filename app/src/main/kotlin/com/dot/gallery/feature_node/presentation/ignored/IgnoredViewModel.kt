@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.ignored
 
 import androidx.lifecycle.ViewModel
@@ -27,6 +32,7 @@ class IgnoredViewModel @Inject constructor(
         val updatedIgnoredAlbums = ignoredAlbums.map { ignored ->
             if (ignored.wildcard != null) {
                 try {
+                    if (ignored.wildcard.length > MAX_WILDCARD_LENGTH) return@map ignored
                     val regex = ignored.wildcard.toRegex()
                     val matchedAlbums = allAlbums.filter(regex::matchesAlbum)
                     ignored.copy(matchedAlbums = matchedAlbums.map { it.label })
@@ -52,3 +58,5 @@ class IgnoredViewModel @Inject constructor(
         }
     }
 }
+
+private const val MAX_WILDCARD_LENGTH = 512

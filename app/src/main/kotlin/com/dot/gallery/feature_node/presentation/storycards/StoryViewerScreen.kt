@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.storycards
@@ -242,7 +242,12 @@ private fun StoryCardViewer(
     val fallbackContainerColor = remember {
         Color.Black.copy(alpha = 0.4f)
     }
-    val playWhenReady = remember { mutableStateOf(true) }
+    // HorizontalPager may keep a page composed briefly while changing pages. Tie playback to
+    // both visibility and the story pause gesture so an inactive card cannot keep its player (or
+    // audio) running behind the current card.
+    val playWhenReady = remember(isCurrentPage, isPaused) {
+        mutableStateOf(isCurrentPage && !isPaused)
+    }
 
     // Look up metadata for the current media and trigger collection if needed
     val mediaMetadata by rememberedDerivedState(metadataMap, currentMedia) {

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decoder
 
 import android.graphics.BitmapFactory
@@ -16,7 +21,8 @@ import java.io.IOException
 
 @Throws(IOException::class)
 fun ImageSource.readEncryptedExifOrientation(keychainHolder: KeychainHolder): Int {
-    return with(this as ContentImageSource) {
+    return with(this as? ContentImageSource
+        ?: throw IllegalArgumentException("Encrypted image source must be content-backed")) {
         val encryptedFile = uri.toFile()
         val decrypted = keychainHolder.decryptVaultMedia(encryptedFile)
         val bytes = decrypted.readBytes()
@@ -32,7 +38,8 @@ fun ImageSource.readEncryptedExifOrientation(keychainHolder: KeychainHolder): In
 
 @Throws(IOException::class)
 fun ImageSource.readEncryptedImageInfoWithIgnoreExifOrientation(keychainHolder: KeychainHolder): ImageInfo {
-    with(this as ContentImageSource) {
+    with(this as? ContentImageSource
+        ?: throw IllegalArgumentException("Encrypted image source must be content-backed")) {
         val boundOptions = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
         }

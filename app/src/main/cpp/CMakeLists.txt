@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+# SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
 # SPDX-License-Identifier: Apache-2.0
 #
 # Builds the `heiftiles` JNI shared library. It links the prebuilt static libheif + libde265
@@ -79,7 +79,7 @@ endif()
 # heifenc: tiled HEIC/AVIF encoder. Links prebuilt static libheif (WITH encoders) + x265 + aom +
 # libde265 (produced by scripts/native/build-heif-encode.sh into heifenc/<ABI>/). Encodes a large
 # edited image as a libheif grid — one tile at a time — so the whole decoded image is never held.
-# Missing prebuilt => stub, and Kotlin falls back to the whole-bitmap HeifCoder encode.
+# Missing prebuilt => stub, and Kotlin falls back to a whole-bitmap encode.
 set(HEIFENC_PREBUILT "${CMAKE_CURRENT_SOURCE_DIR}/heifenc/${ANDROID_ABI}")
 
 add_library(heifenc SHARED heif_encode_jni.cpp)

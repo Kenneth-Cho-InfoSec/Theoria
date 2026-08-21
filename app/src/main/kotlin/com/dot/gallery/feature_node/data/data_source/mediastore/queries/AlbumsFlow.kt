@@ -19,6 +19,7 @@ import com.dot.gallery.core.util.join
 import com.dot.gallery.feature_node.data.data_source.mediastore.MediaQuery
 import com.dot.gallery.feature_node.domain.model.Album
 import com.dot.gallery.feature_node.domain.model.MediaType
+import com.dot.gallery.feature_node.presentation.util.printWarning
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -166,13 +167,10 @@ class AlbumsFlow(
                             this.size += size
                         }
                     }
-                    try {
-                        it.moveToNext()
-                    } catch (e: Exception) {
-                        // Handle any exceptions that may occur while moving to the next row
-                        e.printStackTrace()
-                        break
-                    }
+                    if (!runCatching { it.moveToNext() }.getOrElse { error ->
+                            printWarning("AlbumsFlow: cursor iteration failed: ${error.message}")
+                            false
+                        }) break
                 }
             }
         }.values.toList()

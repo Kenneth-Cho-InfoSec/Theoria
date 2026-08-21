@@ -27,7 +27,6 @@ import com.dot.gallery.feature_node.domain.model.Vault
 import com.dot.gallery.feature_node.domain.util.canMakeActions
 import com.dot.gallery.feature_node.domain.util.isCloud
 import com.dot.gallery.feature_node.domain.util.isEncrypted
-import com.dot.gallery.feature_node.domain.util.isRaw
 import com.dot.gallery.feature_node.domain.util.isTrashed
 import com.dot.gallery.feature_node.domain.util.isVideo
 import com.dot.gallery.feature_node.domain.util.readUriOnly
@@ -39,6 +38,7 @@ import com.dot.gallery.feature_node.presentation.mediaview.components.actionbutt
 import com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons.OpenAsButton
 import com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons.PrivateFolderDeleteButton
 import com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons.RestoreButton
+import com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons.RenameButton
 import com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons.ShareButton
 import com.dot.gallery.feature_node.presentation.mediaview.components.actionbuttons.TrashButton
 import com.dot.gallery.feature_node.presentation.mediaview.rememberedDerivedState
@@ -161,19 +161,17 @@ fun <T : Media> MediaViewQuickBottomBar(
                     followTheme = followTheme
                 )
             }
-            // Develop RAW (native LibRaw): only for RAW media when the native lib is available.
-            if (currentMedia.isRaw && !currentMedia.isEncrypted && !readOnly &&
-                com.dot.gallery.core.decoder.NativeRawDecoder.isAvailable
-            ) {
-                com.dot.gallery.feature_node.presentation.mediaview.components.rawdevelop.RawDevelopButton(
+            // Edit
+            if (!currentMedia.isEncrypted && !readOnly) {
+                EditButton(
                     media = currentMedia,
                     enabled = enabled,
                     followTheme = followTheme
                 )
             }
-            // Edit
-            if (!currentMedia.isEncrypted && !readOnly) {
-                EditButton(
+            // Rename is a primary viewer action rather than a hidden metadata-field edit.
+            if (!currentMedia.isEncrypted && !readOnly && currentMedia.canMakeActions && !currentMedia.readUriOnly) {
+                RenameButton(
                     media = currentMedia,
                     enabled = enabled,
                     followTheme = followTheme

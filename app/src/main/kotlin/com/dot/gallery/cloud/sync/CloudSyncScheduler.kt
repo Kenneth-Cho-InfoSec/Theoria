@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.sync
@@ -8,7 +8,7 @@ package com.dot.gallery.cloud.sync
 import androidx.work.WorkManager
 import com.dot.gallery.cloud.data.dao.CloudServerConfigDao
 import com.dot.gallery.feature_node.presentation.util.printDebug
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,7 +19,7 @@ class CloudSyncScheduler @Inject constructor(
 ) {
 
     suspend fun scheduleIfNeeded() {
-        val configs = configDao.getAll().first()
+        val configs = configDao.getAll().firstOrNull().orEmpty()
         val syncConfigs = configs.filter { it.isActive && it.syncEnabled }
 
         if (syncConfigs.isEmpty()) {

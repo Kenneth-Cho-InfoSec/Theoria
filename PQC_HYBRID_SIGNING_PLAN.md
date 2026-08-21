@@ -53,7 +53,9 @@ APKSIGNER=$ANDROID_HOME/build-tools/37.0.0/apksigner \
 OLD_KEYSTORE=app/release_key.jks OLD_ALIAS=<OLD_ALIAS> \
   scripts/signing/generate-pqc-keys.sh
 ```
-The ML-DSA key generation/pairing step inside the script is a marked TODO
+The signing helper now accepts an ML-DSA PKCS#8/X.509 pair or a keystore entry
+and passes it to Android 37 `apksigner` using the V3.2 hybrid signer flags. Key
+generation still requires a JDK/provider that implements ML-DSA.
 (pending public tooling). Store the outputs as new GitHub secrets (base64):
 `SIGNING_KEY_NEW`, `SIGNING_LINEAGE`, plus `ALIAS_NEW`, `KEY_PASSWORD_NEW`,
 `KEY_STORE_PASSWORD_NEW`. **Never commit the keystore or lineage.**
@@ -84,10 +86,10 @@ presence of the new secret so current releases keep working until you opt in:
           NEW_ALIAS: ${{ secrets.ALIAS_NEW }}
           NEW_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD_NEW }}
           NEW_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD_NEW }}
-          LINEAGE: refra.lineage
+          LINEAGE: theoria.lineage
         run: |
           echo "${{ secrets.SIGNING_KEY_NEW }}" | base64 -d > new_release.jks
-          echo "${{ secrets.SIGNING_LINEAGE }}" | base64 -d > refra.lineage
+          echo "${{ secrets.SIGNING_LINEAGE }}" | base64 -d > theoria.lineage
           scripts/signing/pqc-hybrid-sign.sh
 ```
 
@@ -100,7 +102,7 @@ presence of the new secret so current releases keep working until you opt in:
 ## Rollout checklist
 - [ ] Confirm Android 17 SDK `build-tools` version that supports ML-DSA in `apksigner`.
 - [ ] Generate new classical key + ML-DSA key on a secure, offline-ish machine.
-- [ ] Generate and **back up** the `refra.lineage` file (losing it breaks updates).
+- [ ] Generate and **back up** the `theoria.lineage` file (losing it breaks updates).
 - [ ] Add new secrets to GitHub (do not delete the old `SIGNING_KEY` until verified).
 - [ ] Add the re-sign + `apksigner verify` step to `offline`/`maps`/`withml` jobs only.
 - [ ] Leave `build_gplay` untouched (Play handles its own PQC upgrade).

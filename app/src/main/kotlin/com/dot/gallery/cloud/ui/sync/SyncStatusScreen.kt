@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.sync
@@ -87,28 +87,28 @@ fun SyncStatusScreen() {
         ) {
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.cloud_sync_total_cached)) },
+                    content = { Text(stringResource(R.string.cloud_sync_total_cached)) },
                     supportingContent = { Text(stringResource(R.string.cloud_sync_items_count, state.totalCached)) },
                     leadingContent = { Icon(Icons.Outlined.CloudDone, contentDescription = null) }
                 )
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.cloud_sync_synced)) },
+                    content = { Text(stringResource(R.string.cloud_sync_synced)) },
                     supportingContent = { Text(stringResource(R.string.cloud_sync_synced_count, synced.size)) },
                     leadingContent = { Icon(Icons.Outlined.CloudDone, contentDescription = null) }
                 )
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.cloud_sync_remote_only)) },
+                    content = { Text(stringResource(R.string.cloud_sync_remote_only)) },
                     supportingContent = { Text(stringResource(R.string.cloud_sync_remote_count, remoteOnly.size)) },
                     leadingContent = { Icon(Icons.Outlined.CloudOff, contentDescription = null) }
                 )
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.cloud_sync_pending_upload)) },
+                    content = { Text(stringResource(R.string.cloud_sync_pending_upload)) },
                     supportingContent = { Text(stringResource(R.string.cloud_sync_pending_count, pendingUpload.size)) },
                     leadingContent = { Icon(Icons.Outlined.CloudUpload, contentDescription = null) }
                 )

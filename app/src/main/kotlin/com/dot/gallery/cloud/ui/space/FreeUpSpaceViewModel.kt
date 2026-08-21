@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.space
@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
@@ -83,12 +83,18 @@ class FreeUpSpaceViewModel @Inject constructor(
             return
         }
 
-        _uiState.value = _uiState.value.copy(isScanning = true, message = "Loading local media…", backedUpItems = emptyList())
+        _uiState.value = _uiState.value.copy(
+            isScanning = true,
+            scannedCount = 0,
+            error = null,
+            message = "Loading local media…",
+            backedUpItems = emptyList()
+        )
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     val allMedia = repository.getMediaByType(AllowedMedia.BOTH)
-                        .first().data ?: emptyList()
+                        .firstOrNull()?.data.orEmpty()
                     val localMedia = allMedia.filter { it.uri.scheme != "cloud" }
 
                     val cutoffMs = System.currentTimeMillis() - (_uiState.value.cutoffDays.toLong() * 86400000L)
@@ -105,12 +111,15 @@ class FreeUpSpaceViewModel @Inject constructor(
 
                     val backedUp = mutableListOf<Media.UriMedia>()
                     candidates.chunked(500).forEach { chunk ->
-                        val hashes = chunk.mapNotNull { computeSha1(it) }
+                        val hashedMedia = chunk.mapNotNull { media ->
+                            computeSha1(media)?.let { hash -> media to hash }
+                        }
                         try {
-                            val result = syncProvider.bulkUploadCheck(hashes).getOrDefault(emptyMap())
-                            chunk.forEachIndexed { idx, media ->
+                            val result = syncProvider.bulkUploadCheck(hashedMedia.map { it.second })
+                                .getOrDefault(emptyMap())
+                            hashedMedia.forEachIndexed { idx, (media, _) ->
                                 if (result[idx.toString()] == true) {
-                                    backedUp.add(media)
+                                    backedUp += media
                                 }
                             }
                         } catch (_: Exception) { }

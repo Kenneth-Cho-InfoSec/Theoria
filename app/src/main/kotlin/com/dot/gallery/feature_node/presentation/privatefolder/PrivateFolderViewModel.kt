@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.privatefolder
@@ -8,6 +8,7 @@ package com.dot.gallery.feature_node.presentation.privatefolder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dot.gallery.core.MediaDistributor
+import com.dot.gallery.cloud.core.stableIdHash
 import com.dot.gallery.core.sandbox.PrivateFolderRepository
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.model.MediaState
@@ -44,7 +45,7 @@ class PrivateFolderViewModel @Inject constructor(
     private val uriMediaFlow = scanState.map { state ->
         state.isLoading to state.media.map { pm ->
             Media.UriMedia(
-                id = pm.uri.hashCode().toLong() or (1L shl 62),
+                id = -1L - stableIdHash("private-folder/${pm.uri}"),
                 label = pm.displayName,
                 uri = pm.uri,
                 path = pm.uri.toString(),

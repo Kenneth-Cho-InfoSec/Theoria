@@ -16,6 +16,10 @@ import com.smarttoolfactory.cropper.TouchRegion
 import com.smarttoolfactory.cropper.model.AspectRatio
 import com.smarttoolfactory.cropper.model.CropData
 import com.smarttoolfactory.cropper.settings.CropProperties
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.sin
 
 val CropState.cropData: CropData
     get() = CropData(
@@ -283,7 +287,6 @@ abstract class CropState internal constructor(
         )
     }
 
-    // TODO Add resetting back to bounds for rotated state as well
     /**
      * Resets to bounds with animation and resets tracking for fling animation.
      * Changes pan, zoom and rotation to valid bounds based on [drawAreaRect] and [overlayRect]
@@ -296,8 +299,27 @@ abstract class CropState internal constructor(
 
         val zoom = zoom.coerceAtLeast(1f)
 
-        // Calculate new pan based on overlay
-        val newDrawAreaRect = calculateValidImageDrawRect(overlayRect, drawAreaRect)
+        // Calculate the axis-aligned bounds of the rotated image. A rotated image can
+        // expose corners outside its unrotated rectangle, so the unrotated bounds must
+        // be enlarged before calculating the pan correction.
+        val rotationRadians = Math.toRadians(rotation.toDouble())
+        val cosine = abs(cos(rotationRadians)).toFloat()
+        val sine = abs(sin(rotationRadians)).toFloat()
+        val rotatedWidth = drawAreaRect.width * cosine + drawAreaRect.height * sine
+        val rotatedHeight = drawAreaRect.width * sine + drawAreaRect.height * cosine
+        val rotationScale = max(
+            max(overlayRect.width / rotatedWidth.coerceAtLeast(1f),
+                overlayRect.height / rotatedHeight.coerceAtLeast(1f)),
+            1f
+        )
+        val rotatedSafeRect = if (rotationScale > 1f) {
+            val center = drawAreaRect.center
+            val size = Size(drawAreaRect.width * rotationScale, drawAreaRect.height * rotationScale)
+            Rect(center - Offset(size.width / 2f, size.height / 2f), size)
+        } else {
+            drawAreaRect
+        }
+        val newDrawAreaRect = calculateValidImageDrawRect(overlayRect, rotatedSafeRect)
 
         val newZoom =
             calculateNewZoom(oldRect = drawAreaRect, newRect = newDrawAreaRect, zoom = zoom)

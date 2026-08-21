@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.settings.components
 
 import androidx.compose.animation.core.animateDpAsState
@@ -306,19 +311,21 @@ fun SettingsItem(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 8.dp)
         ) {
-            require(item.currentValue != null) { "Current value must not be null" }
-            require(item.minValue != null) { "Min value must not be null" }
-            require(item.maxValue != null) { "Max value must not be null" }
-            require(item.onSeek != null) { "onSeek must not be null" }
-            Slider(
-                value = currentSeekValue!!,
-                onValueChange = { currentSeekValue = it },
-                valueRange = item.minValue!!..item.maxValue!!,
-                onValueChangeFinished = {
-                    item.onSeek!!.invoke(currentSeekValue!! * item.valueMultiplier)
-                },
-                steps = item.step
-            )
+            val current = currentSeekValue
+            val min = item.minValue
+            val max = item.maxValue
+            val onSeek = item.onSeek
+            if (current != null && min != null && max != null && onSeek != null) {
+                Slider(
+                    value = current,
+                    onValueChange = { currentSeekValue = it },
+                    valueRange = min..max,
+                    onValueChangeFinished = {
+                        currentSeekValue?.let { onSeek(it * item.valueMultiplier) }
+                    },
+                    steps = item.step
+                )
+            }
         }
     }
     val supportingContent: (@Composable () -> Unit)? = when (item.type) {
@@ -394,6 +401,7 @@ fun SettingsItem(
             contentAlignment = Alignment.Center
         ) {
             if (item.isHeader) {
+                val annotatedTitle = item.titleAnnotated
                 Column(
                     modifier = modifier
                         .then(paddingModifier)
@@ -407,9 +415,9 @@ fun SettingsItem(
                         .widthIn(max = 600.dp)
                         .fillMaxWidth()
                 ) {
-                    if (item.titleAnnotated != null) {
+                    if (annotatedTitle != null) {
                         Text(
-                            text = item.titleAnnotated!!,
+                        text = annotatedTitle,
                             color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(start = 8.dp)

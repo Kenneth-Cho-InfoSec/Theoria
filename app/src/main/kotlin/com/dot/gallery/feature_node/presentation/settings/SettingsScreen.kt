@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.settings
@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.Shield
-import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -119,15 +118,6 @@ fun SettingsScreen() {
             },
             screenPosition = Position.Middle
         ) else null
-        val smartPref = rememberPreference(
-            icon = Icons.Outlined.SettingsSuggest,
-            title = stringResource(R.string.ai_category),
-            summary = stringResource(R.string.ai_category_summary),
-            onClick = {
-                eventHandler.navigate(Screen.SettingsSmartFeaturesScreen())
-            },
-            screenPosition = Position.Middle
-        )
         val helpPref = rememberPreference(
             icon = Icons.AutoMirrored.Outlined.HelpOutline,
             title = stringResource(R.string.help_title),
@@ -139,14 +129,14 @@ fun SettingsScreen() {
         )
         return remember(
             appearancePref, timelineAlbumsPref, mediaViewerPref,
-            navigationPref, generalPref, securityPref, backupPref, cloudPref, smartPref, helpPref
+            navigationPref, generalPref, securityPref, backupPref, cloudPref, helpPref
         ) {
             mutableStateListOf<SettingsEntity>(
                 appearancePref, timelineAlbumsPref, mediaViewerPref,
                 navigationPref, generalPref, securityPref, backupPref,
             ).apply {
                 if (cloudPref != null) add(cloudPref)
-                addAll(listOf(smartPref, helpPref))
+                add(helpPref)
             }
         }
     }

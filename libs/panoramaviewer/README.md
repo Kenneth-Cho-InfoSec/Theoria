@@ -183,6 +183,6 @@ Tuning constants are defined in the companion objects of `PanoramaRenderer` and 
 ## License
 
 ```
-Copyright 2026 IacobIacob01
+Copyright 2026 kennethcho
 SPDX-License-Identifier: Apache-2.0
 ```

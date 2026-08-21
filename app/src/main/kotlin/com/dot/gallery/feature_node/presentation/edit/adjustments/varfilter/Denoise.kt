@@ -3,7 +3,6 @@ package com.dot.gallery.feature_node.presentation.edit.adjustments.varfilter
 import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.compose.ui.graphics.ColorMatrix
-import com.awxkee.aire.Aire
 import com.dot.gallery.feature_node.domain.model.editor.TileBehavior
 import com.dot.gallery.feature_node.domain.model.editor.VariableFilter
 
@@ -16,16 +15,15 @@ data class Denoise(
     override val defaultValue = 0f
 
     override fun apply(bitmap: Bitmap): Bitmap {
-        if (value <= 0f) return bitmap
-        val radius = (value * 10f).toInt().coerceIn(1, 10)
-        return Aire.stackBlur(bitmap, radius, radius)
+        // The denoise library was removed; denoise is a no-op so the editor keeps working.
+        return bitmap
     }
 
     override fun revert(bitmap: Bitmap): Bitmap = bitmap
 
     override fun colorMatrix(): ColorMatrix? = null
 
-    // Aire stackBlur radius up to 10px (proxy space; the bake engine scales the halo by the
-    // full-res/proxy ratio).
+    // Legacy stackBlur radius went up to 10px. The adjustment is a no-op now, so this halo is
+    // never consumed by the bake engine.
     override val tileBehavior: TileBehavior get() = TileBehavior.Kernel(radius = 10)
 }

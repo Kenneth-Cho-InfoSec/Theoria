@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.privatefolder
@@ -112,14 +112,15 @@ fun PrivateFolderSecuritySetupScreen(
         state = customSetupSheetState,
         onSecretSet = { type, secret ->
             scope.launch {
-                VaultPasswordManager.setPrivateFolderMode(context, GateMode.CUSTOM)
-                VaultPasswordManager.setPassword(
-                    context,
-                    VaultPasswordManager.PRIVATE_FOLDER_UUID,
-                    secret,
-                    type
-                )
-                onCustomComplete()
+                runCatching {
+                    VaultPasswordManager.setPrivateFolderMode(context, GateMode.CUSTOM)
+                    VaultPasswordManager.setPassword(
+                        context,
+                        VaultPasswordManager.PRIVATE_FOLDER_UUID,
+                        secret,
+                        type
+                    )
+                }.onSuccess { onCustomComplete() }
             }
         }
     )

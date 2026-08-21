@@ -1,5 +1,10 @@
 @file:Suppress("DEPRECATION")
 
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.data.data_source
 
 import android.content.Context
@@ -173,7 +178,7 @@ class KeychainHolder @Inject constructor(
             file,
             masterKey,
             AES256_GCM_HKDF_4KB
-        ).build().openFileInput().use { it.readBytes() }
+        ).build().openFileInput().use { it.readBytes() }.takeIf { it.size == DATA_KEY_LENGTH }
     }
 
     /** Export base64 DK for user backup (only if transferable). */
@@ -188,6 +193,9 @@ class KeychainHolder @Inject constructor(
     private val MAGIC_V2 = "VLTv2".toByteArray()
     private val MAGIC_PAD = 6 // ensure fixed length (add 1 padding byte)
     private val STREAM_CHUNK_SIZE = 1 * 1024 * 1024 // 1 MiB per GCM chunk
+    private val DATA_KEY_LENGTH = 32
+    private val NONCE_LENGTH = 12
+    private val GCM_TAG_LENGTH = 16
 
     fun encryptPortableContent(vault: Vault, plaintext: ByteArray): ByteArray {
         val dk = loadDataKey(vault) ?: error("Data key missing for portable vault")
@@ -236,6 +244,7 @@ class KeychainHolder @Inject constructor(
     }
 
     fun decryptPortableContent(vault: Vault, bytes: ByteArray): ByteArray {
+        require(bytes.size >= MAGIC_PAD + NONCE_LENGTH + GCM_TAG_LENGTH) { "Portable content is truncated" }
         if (!startsWithMagic(bytes)) error("Not portable content")
         val dk = loadDataKey(vault) ?: error("Data key missing")
         val nonce = bytes.copyOfRange(MAGIC_PAD, MAGIC_PAD + 12)
@@ -260,11 +269,15 @@ class KeychainHolder @Inject constructor(
                 // VLTv2 chunked decryption
                 val baseNonce = ByteArray(12)
                 dis.readFully(baseNonce)
-                val chunkSize = dis.readInt() // stored but not strictly needed for read
+                val chunkSize = dis.readInt()
+                require(chunkSize in 1..STREAM_CHUNK_SIZE) { "Invalid portable chunk size" }
 
                 var chunkIndex = 0L
                 while (dis.available() > 0 || input.available() > 0) {
                     val ctLen = try { dis.readInt() } catch (_: EOFException) { break }
+                    require(ctLen in GCM_TAG_LENGTH + 1..chunkSize + GCM_TAG_LENGTH) {
+                        "Invalid portable chunk length"
+                    }
                     val ct = ByteArray(ctLen)
                     dis.readFully(ct)
                     val chunkNonce = deriveChunkNonce(baseNonce, chunkIndex++)
@@ -296,7 +309,14 @@ class KeychainHolder @Inject constructor(
     fun isPortableFile(file: File): Boolean {
         if (!file.exists() || file.length() < MAGIC_PAD) return false
         val header = ByteArray(MAGIC_PAD)
-        file.inputStream().use { it.read(header) }
+        file.inputStream().use { input ->
+            var offset = 0
+            while (offset < header.size) {
+                val read = input.read(header, offset, header.size - offset)
+                if (read < 0) return false
+                offset += read
+            }
+        }
         return startsWithMagic(header) || startsWithMagicV2(header)
     }
 
@@ -384,7 +404,14 @@ class KeychainHolder @Inject constructor(
     fun isPortableV2File(file: File): Boolean {
         if (!file.exists() || file.length() < MAGIC_PAD) return false
         val header = ByteArray(MAGIC_PAD)
-        file.inputStream().use { it.read(header) }
+        file.inputStream().use { input ->
+            var offset = 0
+            while (offset < header.size) {
+                val read = input.read(header, offset, header.size - offset)
+                if (read < 0) return false
+                offset += read
+            }
+        }
         return startsWithMagicV2(header)
     }
 

@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.help.data
@@ -49,7 +49,7 @@ object HelpRepository {
     fun getAllTips(): List<HelpTip> = ALL_TIPS
     fun getTipsByCategory(category: HelpCategory): List<HelpTip> = ALL_TIPS.filter { it.category == category }
     fun getTip(id: String): HelpTip? = ALL_TIPS.find { it.id == id }
-    fun getFeaturedTips(): List<HelpTip> = listOf("search_ai", "ai_categories").mapNotNull { getTip(it) }
+    fun getFeaturedTips(): List<HelpTip> = listOf("search_text", "search_metadata").mapNotNull { getTip(it) }
 
     /** Changelog is loaded from the assets/changelog markdown files via [ChangelogRepository]. */
     fun getCurrentRelease(context: Context): ReleaseNotes? = ChangelogRepository.getCurrent(context)
@@ -61,7 +61,7 @@ object HelpRepository {
     fun getMakeMostCategories() = listOf(
         HelpCategory.TIMELINE_ALBUMS, HelpCategory.VIEWING, HelpCategory.VIEWER_ACTIONS,
         HelpCategory.VIEWER_SETTINGS, HelpCategory.EDITING, HelpCategory.SEARCH,
-        HelpCategory.AI_FEATURES, HelpCategory.ALBUMS, HelpCategory.VAULT,
+        HelpCategory.ALBUMS, HelpCategory.VAULT,
         HelpCategory.CLOUD_SYNC
     )
     fun getExploreMoreCategories() = listOf(
@@ -355,11 +355,6 @@ object HelpRepository {
             pages = listOf(
                 TutorialPage(title = R.string.help_tip_video_zoom_p1_title, description = R.string.help_tip_video_zoom_p1_desc, previewType = PreviewType.MEDIA_VIEWER)
             ), sinceVersion = "4.2.3"),
-        HelpTip(id = "view_cutout", title = R.string.help_tip_view_cutout_title, subtitle = R.string.help_tip_view_cutout_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.AutoFixHigh), category = HelpCategory.VIEWING,
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_view_cutout_p1_title, description = R.string.help_tip_view_cutout_p1_desc, steps = listOf(R.string.help_tip_view_cutout_p1_s1, R.string.help_tip_view_cutout_p1_s2, R.string.help_tip_view_cutout_p1_s3, R.string.help_tip_view_cutout_p1_s4), previewType = PreviewType.SUBJECT_CUTOUT)
-            ), sinceVersion = "5.1.0"),
         HelpTip(id = "slideshow_play", title = R.string.help_tip_slideshow_play_title, subtitle = R.string.help_tip_slideshow_play_subtitle,
             icon = HelpIcon.ofVector(Icons.Outlined.Slideshow), category = HelpCategory.VIEWING,
             deepLink = Screen.SlideshowSettingsScreen(),
@@ -517,63 +512,14 @@ object HelpRepository {
                 TutorialPage(title = R.string.help_tip_search_text_p1_title, description = R.string.help_tip_search_text_p1_desc, previewType = PreviewType.SEARCH_BAR),
                 TutorialPage(title = R.string.help_tip_search_text_p2_title, description = R.string.help_tip_search_text_p2_desc, previewType = PreviewType.SEARCH_BAR)
             ), sinceVersion = "4.0.0"),
-        HelpTip(id = "search_ai", title = R.string.help_tip_search_ai_title, subtitle = R.string.help_tip_search_ai_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.ImageSearch), category = HelpCategory.SEARCH,
-            deepLink = Screen.AIModelsManagerScreen(),
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_search_ai_p1_title, description = R.string.help_tip_search_ai_p1_desc, previewType = PreviewType.AI_SEARCH),
-                TutorialPage(title = R.string.help_tip_search_ai_p2_title, description = R.string.help_tip_search_ai_p2_desc, previewType = PreviewType.AI_SEARCH),
-                TutorialPage(title = R.string.help_tip_search_ai_p3_title, description = R.string.help_tip_search_ai_p3_desc, steps = listOf(R.string.help_tip_search_ai_p3_s1, R.string.help_tip_search_ai_p3_s2, R.string.help_tip_search_ai_p3_s3, R.string.help_tip_search_ai_p3_s4), actionLabel = R.string.help_action_open_settings, previewType = PreviewType.AI_SEARCH)
-            ), sinceVersion = "4.1.0"),
         HelpTip(id = "search_history", title = R.string.help_tip_search_history_title, subtitle = R.string.help_tip_search_history_subtitle,
             icon = HelpIcon.ofVector(Icons.Outlined.ImageSearch), category = HelpCategory.SEARCH,
             pages = listOf(TutorialPage(title = R.string.help_tip_search_history_p1_title, description = R.string.help_tip_search_history_p1_desc, previewType = PreviewType.SEARCH_BAR)), sinceVersion = "4.0.0"),
-        HelpTip(id = "search_indexing", title = R.string.help_tip_search_indexing_title, subtitle = R.string.help_tip_search_indexing_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.ImageSearch), category = HelpCategory.SEARCH,
-            pages = listOf(TutorialPage(title = R.string.help_tip_search_indexing_p1_title, description = R.string.help_tip_search_indexing_p1_desc)), sinceVersion = "4.1.0"),
         HelpTip(id = "search_metadata", title = R.string.help_tip_search_metadata_title, subtitle = R.string.help_tip_search_metadata_subtitle,
             icon = HelpIcon.ofVector(Icons.Outlined.ImageSearch), category = HelpCategory.SEARCH,
             pages = listOf(
                 TutorialPage(title = R.string.help_tip_search_metadata_p1_title, description = R.string.help_tip_search_metadata_p1_desc, previewType = PreviewType.SEARCH_BAR)
             ), sinceVersion = "4.2.3")
-    )
-    // endregion
-
-    // region AI Features
-    private val AI_TIPS = listOf(
-        HelpTip(id = "ai_categories", title = R.string.help_tip_ai_categories_title, subtitle = R.string.help_tip_ai_categories_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.AutoAwesome), category = HelpCategory.AI_FEATURES,
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_ai_categories_p1_title, description = R.string.help_tip_ai_categories_p1_desc, previewType = PreviewType.AI_CATEGORIES),
-                TutorialPage(title = R.string.help_tip_ai_categories_p2_title, description = R.string.help_tip_ai_categories_p2_desc, steps = listOf(R.string.help_tip_ai_categories_p2_s1, R.string.help_tip_ai_categories_p2_s2, R.string.help_tip_ai_categories_p2_s3, R.string.help_tip_ai_categories_p2_s4), previewType = PreviewType.AI_CATEGORIES),
-                TutorialPage(title = R.string.help_tip_ai_categories_p3_title, description = R.string.help_tip_ai_categories_p3_desc, previewType = PreviewType.AI_CATEGORIES)
-            ), sinceVersion = "4.1.0",
-            quickActions = listOf(QuickAction(R.string.help_qa_open_categories, Icons.Outlined.AutoAwesome, Screen.CategoriesScreen()))),
-        HelpTip(id = "ai_create_category", title = R.string.help_tip_ai_create_category_title, subtitle = R.string.help_tip_ai_create_category_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.AutoAwesome), category = HelpCategory.AI_FEATURES,
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_ai_create_category_p1_title, description = R.string.help_tip_ai_create_category_p1_desc, previewType = PreviewType.AI_CATEGORIES),
-                TutorialPage(title = R.string.help_tip_ai_create_category_p2_title, description = R.string.help_tip_ai_create_category_p2_desc, steps = listOf(R.string.help_tip_ai_create_category_p2_s1, R.string.help_tip_ai_create_category_p2_s2, R.string.help_tip_ai_create_category_p2_s3, R.string.help_tip_ai_create_category_p2_s4, R.string.help_tip_ai_create_category_p2_s5), previewType = PreviewType.AI_CATEGORIES)
-            ), sinceVersion = "4.1.0"),
-        HelpTip(id = "ai_models", title = R.string.help_tip_ai_models_title, subtitle = R.string.help_tip_ai_models_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.CloudDownload), category = HelpCategory.AI_FEATURES,
-            deepLink = Screen.AIModelsManagerScreen(),
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_ai_models_p1_title, description = R.string.help_tip_ai_models_p1_desc),
-                TutorialPage(title = R.string.help_tip_ai_models_p2_title, description = R.string.help_tip_ai_models_p2_desc, steps = listOf(R.string.help_tip_ai_models_p2_s1, R.string.help_tip_ai_models_p2_s2, R.string.help_tip_ai_models_p2_s3, R.string.help_tip_ai_models_p2_s4), actionLabel = R.string.help_action_open_settings)
-            ), sinceVersion = "4.1.0"),
-        HelpTip(id = "ai_indexing", title = R.string.help_tip_ai_indexing_title, subtitle = R.string.help_tip_ai_indexing_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.AutoAwesome), category = HelpCategory.AI_FEATURES,
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_ai_indexing_p1_title, description = R.string.help_tip_ai_indexing_p1_desc),
-                TutorialPage(title = R.string.help_tip_ai_indexing_p2_title, description = R.string.help_tip_ai_indexing_p2_desc)
-            ), sinceVersion = "4.1.0"),
-        HelpTip(id = "people_grouping", title = R.string.help_tip_people_grouping_title, subtitle = R.string.help_tip_people_grouping_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.AutoAwesome), category = HelpCategory.AI_FEATURES,
-            deepLink = Screen.PeopleListScreen(),
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_people_grouping_p1_title, description = R.string.help_tip_people_grouping_p1_desc, steps = listOf(R.string.help_tip_people_grouping_p1_s1, R.string.help_tip_people_grouping_p1_s2, R.string.help_tip_people_grouping_p1_s3, R.string.help_tip_people_grouping_p1_s4), previewType = PreviewType.AI_CATEGORIES)
-            ), sinceVersion = "5.1.0")
     )
     // endregion
 
@@ -792,7 +738,6 @@ object HelpRepository {
             pages = listOf(TutorialPage(title = R.string.help_tip_exif_delete_location_p1_title, description = R.string.help_tip_exif_delete_location_p1_desc, steps = listOf(R.string.help_tip_exif_delete_location_p1_s1, R.string.help_tip_exif_delete_location_p1_s2, R.string.help_tip_exif_delete_location_p1_s3, R.string.help_tip_exif_delete_location_p1_s4))), sinceVersion = "4.0.0"),
         HelpTip(id = "exif_refresh", title = R.string.help_tip_exif_refresh_title, subtitle = R.string.help_tip_exif_refresh_subtitle,
             icon = HelpIcon.ofVector(Icons.Outlined.EditNote), category = HelpCategory.METADATA,
-            deepLink = Screen.SettingsSmartFeaturesScreen(),
             pages = listOf(TutorialPage(title = R.string.help_tip_exif_refresh_p1_title, description = R.string.help_tip_exif_refresh_p1_desc, steps = listOf(R.string.help_tip_exif_refresh_p1_s1, R.string.help_tip_exif_refresh_p1_s2, R.string.help_tip_exif_refresh_p1_s3, R.string.help_tip_exif_refresh_p1_s4))), sinceVersion = "4.0.0"),
         HelpTip(id = "metadata_sanitize", title = R.string.help_tip_metadata_sanitize_title, subtitle = R.string.help_tip_metadata_sanitize_subtitle,
             icon = HelpIcon.ofVector(Icons.Outlined.EditNote), category = HelpCategory.METADATA,
@@ -879,13 +824,6 @@ object HelpRepository {
     )
 
     private val SETTINGS_SMART_TIPS = listOf(
-        HelpTip(id = "settings_ai_models", title = R.string.help_tip_settings_ai_models_title, subtitle = R.string.help_tip_settings_ai_models_subtitle,
-            icon = HelpIcon.ofVector(Icons.Outlined.AutoAwesome), category = HelpCategory.SETTINGS_SMART,
-            deepLink = Screen.AIModelsManagerScreen(),
-            pages = listOf(
-                TutorialPage(title = R.string.help_tip_settings_ai_models_p1_title, description = R.string.help_tip_settings_ai_models_p1_desc),
-                TutorialPage(title = R.string.help_tip_settings_ai_models_p2_title, description = R.string.help_tip_settings_ai_models_p2_desc, steps = listOf(R.string.help_tip_settings_ai_models_p2_s1, R.string.help_tip_settings_ai_models_p2_s2, R.string.help_tip_settings_ai_models_p2_s3), actionLabel = R.string.help_action_open_settings)
-            ), sinceVersion = "4.1.0"),
         HelpTip(id = "settings_edit_backups", title = R.string.help_tip_settings_edit_backups_title, subtitle = R.string.help_tip_settings_edit_backups_subtitle,
             icon = HelpIcon.ofVector(Icons.Outlined.SettingsBackupRestore), category = HelpCategory.SETTINGS_SMART,
             deepLink = Screen.EditBackupsViewerScreen(),
@@ -986,7 +924,7 @@ object HelpRepository {
     // region Aggregation
     private val ALL_TIPS: List<HelpTip> = BASICS_TIPS + NAVIGATION_TIPS + PERSONALIZATION_TIPS +
         TIMELINE_ALBUM_TIPS + VIEWING_TIPS + VIEWER_ACTION_TIPS + VIEWER_SETTINGS_TIPS +
-        EDITING_TIPS + SEARCH_TIPS + AI_TIPS + ALBUM_TIPS + VAULT_TIPS + CLOUD_TIPS +
+        EDITING_TIPS + SEARCH_TIPS + ALBUM_TIPS + VAULT_TIPS + CLOUD_TIPS +
         FAV_TRASH_TIPS + LOCATION_TIPS + METADATA_TIPS +
         SETTINGS_APPEARANCE_TIPS + SETTINGS_GENERAL_TIPS + SETTINGS_NAV_TIPS + SETTINGS_SMART_TIPS +
         SETTINGS_SECURITY_TIPS + GESTURE_TIPS + SELECTION_TIPS + ACCESSIBILITY_TIPS

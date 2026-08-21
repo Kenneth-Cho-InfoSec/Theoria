@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -71,7 +71,7 @@ class CloudCacheInterceptor(
 
         val response = chain.proceed(request)
         if (!response.isSuccessful || !manager.shouldWriteThrough()) return response
-        val body = response.body ?: return response
+        val body = response.body
 
         // Write-through: tee the streamed body into a temp file, promoted to the auto cache on EOF.
         val tmp = cache.newAutoTemp(key)

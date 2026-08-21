@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.immich.data.dto
@@ -189,13 +189,6 @@ data class ImmichUserDto(
     @SerializedName("avatarColor") val avatarColor: String = "",
     @SerializedName("quotaUsageInBytes") val quotaUsageInBytes: Long? = null,
     @SerializedName("quotaSizeInBytes") val quotaSizeInBytes: Long? = null
-)
-
-data class ImmichSearchDto(
-    val query: String = "",
-    val type: String = "smart",
-    val page: Int = 1,
-    @SerializedName("size") val pageSize: Int = 100
 )
 
 data class ImmichSearchResponseDto(

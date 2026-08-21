@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.sync
@@ -26,7 +26,8 @@ import com.dot.gallery.cloud.offline.CloudMediaCache
 import com.dot.gallery.feature_node.presentation.util.printDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.firstOrNull
 import okhttp3.Request
 
 /**
@@ -55,20 +56,24 @@ class CloudOfflineDownloadWorker @AssistedInject constructor(
         // Collect the work set up-front for an accurate total.
         val targets = pins.mapNotNull { pin ->
             val provider = registry.getByConfigId(pin.serverConfigId) as? RemoteMediaProvider ?: return@mapNotNull null
-            val assets = cloudMediaDao.getByServerConfig(pin.serverConfigId).first()
+            val assets = cloudMediaDao.getByServerConfig(pin.serverConfigId)
+                .firstOrNull().orEmpty()
             provider to assets
         }
         val total = targets.sumOf { it.second.size } * 2 // thumbnail + preview per asset
         if (total == 0) return Result.success()
 
         var done = 0
+        var failed = false
         for ((provider, assets) in targets) {
             val authHeaders = provider.getAuthHeaders()
             for (asset in assets) {
                 for (size in SIZES) {
                     val key = cache.keyFor(asset.providerType, asset.serverConfigId, asset.remoteId, size.label)
                     if (!cache.isPinned(key)) {
-                        downloadInto(provider, asset, size, key, authHeaders, client)
+                        if (!downloadInto(provider, asset, size, key, authHeaders, client)) {
+                            failed = true
+                        }
                     }
                     done++
                 }
@@ -76,7 +81,7 @@ class CloudOfflineDownloadWorker @AssistedInject constructor(
             }
         }
         printDebug("CloudOfflineDownloadWorker: pinned $done/$total variants")
-        return Result.success()
+        return if (failed) Result.retry() else Result.success()
     }
 
     private suspend fun downloadInto(
@@ -86,8 +91,8 @@ class CloudOfflineDownloadWorker @AssistedInject constructor(
         key: String,
         authHeaders: Map<String, String>,
         client: okhttp3.OkHttpClient
-    ) {
-        runCatching {
+    ): Boolean {
+        return try {
             val url = provider.getThumbnailUrl(asset.remoteId, size.thumb, asset.fileId)
             // No server preview URL (e.g. a video on a path-based store like WebDAV that has
             // no preview endpoint). Decode a poster frame locally from the original stream and
@@ -95,19 +100,31 @@ class CloudOfflineDownloadWorker @AssistedInject constructor(
             if (!url.startsWith("http", ignoreCase = true)) {
                 val frame = provider.getVideoThumbnailBytes(asset.remoteId, size.thumb)
                 if (frame != null && frame.isNotEmpty()) cache.storePinned(key, frame, "image/jpeg")
-                return
-            }
-            val builder = Request.Builder().url(url)
-            authHeaders.forEach { (k, v) -> builder.addHeader(k, v) }
-            client.newCall(builder.build()).execute().use { response ->
-                if (response.isSuccessful) {
-                    val responseBody = response.body
-                    val contentType = responseBody.contentType()?.toString()
-                    val bytes = responseBody.bytes()
-                    if (bytes.isNotEmpty()) cache.storePinned(key, bytes, contentType)
+                // A missing server preview and unavailable local poster are permanent for this
+                // variant; retrying the whole worker would only loop without making progress.
+                true
+            } else {
+                val builder = Request.Builder().url(url)
+                authHeaders.forEach { (k, v) -> builder.addHeader(k, v) }
+                client.newCall(builder.build()).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        printDebug("CloudOfflineDownloadWorker: HTTP ${response.code} for ${asset.remoteId} ${size.label}")
+                        false
+                    } else {
+                        val responseBody = response.body
+                        val contentType = responseBody.contentType()?.toString()
+                        val bytes = responseBody.bytes()
+                        if (bytes.isNotEmpty()) cache.storePinned(key, bytes, contentType)
+                        bytes.isNotEmpty()
+                    }
                 }
             }
-        }.onFailure { printDebug("CloudOfflineDownloadWorker: failed ${asset.remoteId} ${size.label}: ${it.message}") }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            printDebug("CloudOfflineDownloadWorker: failed ${asset.remoteId} ${size.label}: ${e.message}")
+            false
+        }
     }
 
     private data class Variant(val label: String, val thumb: ThumbnailSize)

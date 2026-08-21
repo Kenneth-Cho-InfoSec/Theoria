@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.settings.subsettings
@@ -71,7 +71,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dot.gallery.R
 import com.dot.gallery.cloud.core.ProviderType
@@ -166,7 +166,7 @@ fun SettingsBackupExportScreen(navigateUp: () -> Unit) {
 
     fun launchSaf() {
         val ext = if (pendingPassword != null) "rfbk" else "zip"
-        val name = "refra-backup-${SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())}.$ext"
+        val name = "theoria-backup-${SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())}.$ext"
         exportLauncher.launch(name)
     }
 

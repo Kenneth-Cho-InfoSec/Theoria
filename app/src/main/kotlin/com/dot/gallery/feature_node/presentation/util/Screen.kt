@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.util
@@ -27,15 +27,6 @@ sealed class Screen(val route: String) {
         fun idAndQuery() = "${route}_search?mediaId={mediaId}"
 
         fun idAndQuery(id: Long) = "${route}_search?mediaId=$id"
-
-        fun idAndCategory() = "$route?mediaId={mediaId}&category={category}"
-
-        fun idAndCategory(id: Long, category: String) = "$route?mediaId=$id&category=$category"
-        
-        // New ID-based category navigation
-        fun idAndCategoryId() = "$route?mediaId={mediaId}&categoryId={categoryId}"
-
-        fun idAndCategoryId(id: Long, categoryId: Long) = "$route?mediaId=$id&categoryId=$categoryId"
 
         fun idAndCollection() = "$route?mediaId={mediaId}&collectionId={collectionId}"
 
@@ -64,8 +55,6 @@ sealed class Screen(val route: String) {
     data object SettingsScreen : Screen("settings_screen")
     data object ColorPaletteScreen : Screen("color_palette_screen")
     data object SettingsGeneralScreen : Screen("settings_general_screen")
-    data object SettingsSmartFeaturesScreen : Screen("settings_smart_features_screen")
-    data object AIModelsManagerScreen : Screen("ai_models_manager_screen")
     data object EditBackupsViewerScreen : Screen("edit_backups_viewer_screen")
     data object SettingsAppearanceScreen : Screen("settings_appearance_screen")
     data object SettingsTimelineAlbumsScreen : Screen("settings_timeline_albums_screen")
@@ -88,48 +77,12 @@ sealed class Screen(val route: String) {
 
     data object LibraryScreen : Screen("library_screen")
 
-    data object CategoriesScreen : Screen("categories_screen")
-    
-    data object CategoriesSettingsScreen : Screen("categories_settings_screen")
-    
     data object LocationsScreen : Screen("locations_screen") {
 
         fun withMediaId() = "$route?mediaId={mediaId}"
 
         fun withMediaId(mediaId: Long) = "$route?mediaId=$mediaId"
 
-    }
-
-    data object CategoryViewScreen : Screen("category_view_screen") {
-
-        fun category() = "$route?category={category}"
-
-        fun category(string: String) = "$route?category=$string"
-        
-        // New ID-based routing for the new category system
-        fun categoryId() = "$route?categoryId={categoryId}"
-        
-        fun categoryId(id: Long) = "$route?categoryId=$id"
-
-    }
-    
-    data object CategoryEditScreen : Screen("category_edit_screen") {
-        fun categoryId() = "$route?categoryId={categoryId}"
-        
-        fun categoryId(id: Long) = "$route?categoryId=$id"
-    }
-
-    data object AddCategoryScreen : Screen("add_category_screen")
-    
-    data object EditCategoryScreen : Screen("edit_category_screen") {
-        fun route() = "$route?categoryId={categoryId}"
-        fun categoryId(id: Long) = "$route?categoryId=$id"
-    }
-
-    data object CategoryEditorScreen : Screen("category_editor_screen") {
-        fun create() = route
-        fun edit() = "$route?categoryId={categoryId}"
-        fun edit(categoryId: Long) = "$route?categoryId=$categoryId"
     }
 
     data object AlbumGroupViewScreen : Screen("album_group_view_screen") {

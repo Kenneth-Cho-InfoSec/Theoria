@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2023 The LineageOS Project
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.data.data_source.mediastore.queries
@@ -47,7 +47,7 @@ class MediaFlow(
     private val skipBatching: Boolean = false
 ) : QueryFlow<Media.UriMedia>() {
     init {
-        assert(buckedId != MediaStoreBuckets.MEDIA_STORE_BUCKET_PLACEHOLDER.id) {
+        require(buckedId != MediaStoreBuckets.MEDIA_STORE_BUCKET_PLACEHOLDER.id) {
             "MEDIA_STORE_BUCKET_PLACEHOLDER found"
         }
     }

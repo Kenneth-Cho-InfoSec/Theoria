@@ -3,7 +3,6 @@ package com.dot.gallery.feature_node.domain.model.editor;
 import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.AutoFixHigh
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Deblur
@@ -31,7 +30,6 @@ enum class EditorItems : Parcelable {
     Detail,
     RawColour,
     Output,
-    Smart,
     Lighting,
     Filters,
     Markup,
@@ -64,7 +62,6 @@ enum class EditorItems : Parcelable {
             Markup -> stringResource(R.string.markup)
             Colour -> stringResource(R.string.editor_colour)
             Effects -> stringResource(R.string.editor_effects)
-            Smart -> stringResource(R.string.editor_smart)
             More -> stringResource(R.string.editor_more)
         }
 
@@ -81,7 +78,6 @@ enum class EditorItems : Parcelable {
             Markup -> Icons.Outlined.Draw
             Colour -> Icons.Outlined.Palette
             Effects -> Icons.Outlined.AutoFixHigh
-            Smart -> Icons.Outlined.AutoAwesome
             More -> Icons.Outlined.MoreHoriz
         }
 
@@ -93,10 +89,10 @@ enum class EditorItems : Parcelable {
          */
         private val developItems = listOf(WhiteBalance, Tone, Detail, RawColour, Output)
 
-        fun visibleItems(isRaw: Boolean, cutoutAvailable: Boolean = true): List<EditorItems> {
-            val base = if (isRaw) listOf(Smart) + developItems + listOf(Filters, Markup, More)
+        fun visibleItems(isRaw: Boolean): List<EditorItems> {
+            val base = if (isRaw) developItems + listOf(Filters, Markup, More)
             else entries.filterNot { it in developItems }
-            return if (cutoutAvailable) base else base.filterNot { it == Smart }
+            return base
         }
     }
 }

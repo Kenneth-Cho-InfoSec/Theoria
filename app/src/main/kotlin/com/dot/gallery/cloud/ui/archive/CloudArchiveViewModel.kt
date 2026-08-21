@@ -1,13 +1,16 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.archive
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dot.gallery.cloud.core.ProviderRegistry
+import com.dot.gallery.cloud.core.ProviderType
+import com.dot.gallery.cloud.core.capabilities.RemoteMediaProvider
 import com.dot.gallery.cloud.data.repository.CloudRepository
 import com.dot.gallery.core.Resource
 import com.dot.gallery.feature_node.domain.model.Media
@@ -47,26 +50,29 @@ class CloudArchiveViewModel @Inject constructor(
                 }
                 val providers = registry.getRemoteProviders().filter { it.isAvailable }
                 if (providers.isEmpty()) {
-                    _mediaState.value = MediaState(isLoading = false)
+                    _mediaState.value = MediaState(
+                        isLoading = false,
+                        error = "No remote media provider available"
+                    )
                     return@launch
                 }
-                repository.getRemoteArchived(providers.first().providerType).collect { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            val media = resource.data?.map { it.toUriMedia() } ?: emptyList()
-                            _mediaState.value = MediaState(
-                                media = media,
-                                isLoading = false
-                            )
-                        }
-                        is Resource.Error -> {
-                            _mediaState.value = MediaState(
-                                isLoading = false,
-                                error = resource.message ?: ""
-                            )
+                val archived = LinkedHashMap<String, Media.UriMedia>()
+                var lastError: String? = null
+                for (provider in providers) {
+                    provider.getRemoteArchived().collect { resource ->
+                        when (resource) {
+                            is Resource.Success -> resource.data.orEmpty().forEach { entity ->
+                                archived["${entity.serverConfigId}:${entity.remoteId}"] = entity.toUriMedia()
+                            }
+                            is Resource.Error -> lastError = resource.message
                         }
                     }
                 }
+                _mediaState.value = MediaState(
+                    media = archived.values.toList(),
+                    isLoading = false,
+                    error = if (archived.isEmpty()) lastError ?: "" else ""
+                )
             } catch (e: Exception) {
                 _mediaState.value = MediaState(
                     isLoading = false,
@@ -77,16 +83,32 @@ class CloudArchiveViewModel @Inject constructor(
     }
 
     fun unarchive(remoteId: String) {
-        val providers = registry.getRemoteProviders().filter { it.isAvailable }
-        if (providers.isEmpty()) return
+        val target = _mediaState.value.media.firstOrNull { media ->
+            Uri.decode(media.uri.path.orEmpty().trimStart('/')) == remoteId
+        }
+        val authority = target?.uri?.authority ?: return
+        val providerType = runCatching {
+            ProviderType.parse(authority)
+        }.getOrNull() ?: return
+        val configId = target.uri.getQueryParameter("cfg")?.toLongOrNull() ?: -1L
+        val provider = if (configId > 0L) {
+            registry.getByConfigId(configId)
+        } else {
+            registry.get(providerType)
+        } as? RemoteMediaProvider ?: return
         viewModelScope.launch {
-            repository.toggleArchive(providers.first().providerType, remoteId, false)
+            provider.toggleArchive(remoteId, false)
                 .onSuccess {
                     _mediaState.value = _mediaState.value.copy(
                         media = _mediaState.value.media.filter {
                             val cloudUri = it.uri.toString()
                             !cloudUri.contains(remoteId)
                         }
+                    )
+                }
+                .onFailure { error ->
+                    _mediaState.value = _mediaState.value.copy(
+                        error = error.message ?: "Unable to unarchive media"
                     )
                 }
         }

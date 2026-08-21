@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2023 The LineageOS Project
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.data.data_source.mediastore.queries
@@ -204,7 +204,7 @@ class MediaUriFlow(
         val id = try {
             ContentUris.parseId(firstUri)
         } catch (e: NumberFormatException) {
-            e.printStackTrace()
+            printWarning("MediaUriFlow: Failed to parse bucket URI id: ${e.message}")
             return null
         }
         val projection = arrayOf(MediaStore.Files.FileColumns.BUCKET_ID)

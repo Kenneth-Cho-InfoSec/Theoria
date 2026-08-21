@@ -1,4 +1,4 @@
-<p><strong>ReFra</strong> is a modern, open-source media gallery for Android built with Jetpack Compose. It refracts how you browse, organize, and experience your photos and videos — with AI-powered categories, panorama viewing, motion photo playback, video casting, and a fully customizable Material 3 interface.</p>
+<p><strong>Theoria</strong> is a modern, open-source media gallery for Android built with Jetpack Compose. It reimagines how you browse, organize, and experience your photos and videos — with panorama viewing, motion photo playback, video casting, and a fully customizable Material 3 interface.</p>
 
 <p>&nbsp;</p>
 
@@ -30,23 +30,10 @@
 		<li>mDNS device discovery with remote playback controls</li>
 	</ul>
 	</li>
-	<li>AI-Powered Categories &amp; Search
-	<ul>
-		<li>On-device CLIP-based image classification with customizable categories</li>
-		<li>Natural language search and image-to-image similarity search</li>
-		<li>Optional AI model downloads — not bundled, installed on demand</li>
-	</ul>
-	</li>
 	<li>Location Map Viewer
 	<ul>
 		<li>Interactive MapLibre map with clustered photo markers</li>
 		<li>Browse geotagged media by location</li>
-	</ul>
-	</li>
-	<li>Smart Search with Discovery
-	<ul>
-		<li>Carousels for categories, locations, media types, camera models</li>
-		<li>Special mode filters: night shots, long exposures, panoramas</li>
 	</ul>
 	</li>
 	<li>Custom Color Palettes

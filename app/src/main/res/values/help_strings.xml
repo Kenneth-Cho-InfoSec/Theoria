@@ -29,7 +29,7 @@
     <string name="help_tip_basics_select_media_p1_s3">Or drag across photos for quick multi-select</string>
     <string name="help_tip_basics_select_media_p1_s4">Use the action bar to share, delete, or manage</string>
     <string name="help_tip_basics_select_media_p2_title">Batch actions</string>
-    <string name="help_tip_basics_select_media_p2_desc">Once you\'ve selected items, a bottom action sheet slides up with all available actions: Share, Delete, Copy to album, Move to album, Hide in vault, and more. You can customize which actions appear and their order in Settings > Navigation > Customize selection actions. Tip: to select all photos in a date group, tap the date header.</string>
+    <string name="help_tip_basics_select_media_p2_desc">Once you\'ve selected items, a bottom action sheet slides up with all available actions: Share, Delete, Copy to album, Move to album, Hide in vault, and more. You can customize actions appear and their order in Settings > Navigation > Customize selection actions. Tip: to select all photos in a date group, tap the date header.</string>
     <string name="help_tip_basics_share_title">Share photos and videos</string>
     <string name="help_tip_basics_share_subtitle">Share media with other apps and people</string>
     <string name="help_tip_basics_share_p1_title">Share your media</string>
@@ -41,7 +41,7 @@
     <string name="help_tip_basics_copy_clipboard_title">Copy media to clipboard</string>
     <string name="help_tip_basics_copy_clipboard_subtitle">Copy a photo to paste it into other apps</string>
     <string name="help_tip_basics_copy_clipboard_p1_title">Copy to clipboard</string>
-    <string name="help_tip_basics_copy_clipboard_p1_desc">Copy a photo directly to your clipboard, then paste it into messaging apps, document editors, email, or any app that accepts images. This is faster than sharing when you just need to quickly drop an image into a conversation or document. The copied image stays on your clipboard until you copy something else.</string>
+    <string name="help_tip_basics_copy_clipboard_p1_desc">Copy a photo directly to your clipboard, then paste it into messaging apps, document editors, email, or any app accepts images. This is faster than sharing when you just need to quickly drop an image into a conversation or document. The copied image stays on your clipboard until you copy something else.</string>
     <string name="help_tip_basics_copy_clipboard_p1_s1">Open a photo</string>
     <string name="help_tip_basics_copy_clipboard_p1_s2">Tap the copy icon in the action bar</string>
     <string name="help_tip_basics_copy_clipboard_p1_s3">Switch to any app and paste</string>
@@ -73,25 +73,25 @@
     <string name="help_tip_nav_old_navbar_title">Classic navigation bar</string>
     <string name="help_tip_nav_old_navbar_subtitle">Switch between modern and classic navigation styles</string>
     <string name="help_tip_nav_old_navbar_p1_title">Navigation bar styles</string>
-    <string name="help_tip_nav_old_navbar_p1_desc">Gallery offers two navigation bar styles. The modern style shows labeled icons for Timeline, Albums, and Library. The classic compact style uses smaller icons without labels, giving you more screen space for your photos. Try both to see which you prefer.</string>
-    <string name="help_tip_nav_old_navbar_p1_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_nav_old_navbar_p1_desc">Gallery offers two navigation bar styles. The modern style shows labeled icons for Timeline, Albums, and Library. The classic compact style uses smaller icons without labels, giving you more screen space for your photos. Try both to see you prefer.</string>
+    <string name="help_tip_nav_old_navbar_p1_s1">Settings > Navigation</string>
     <string name="help_tip_nav_old_navbar_p1_s2">Toggle \'Old navigation bar style\'</string>
     <string name="help_tip_nav_library_title">Use the library</string>
     <string name="help_tip_nav_library_subtitle">Quick access to favorites, trash, vault, and more</string>
     <string name="help_tip_nav_library_p1_title">The Library</string>
-    <string name="help_tip_nav_library_p1_desc">The Library is your hub for everything beyond the main timeline and albums. From here you can access: Favorites (your starred photos), Trash (recently deleted items, recoverable for 30 days), Vault (encrypted private photos), Locations (photos organized by where they were taken), and Categories (AI-sorted photo groups). Think of it as your gallery\'s control center.</string>
+    <string name="help_tip_nav_library_p1_desc">The Library is your hub for everything beyond the main timeline and albums. From here access: Favorites (your starred photos), Trash (recently deleted items, recoverable for 30 days), Vault (encrypted private photos), Locations (photos organized by where they were taken), and Categories (AI-sorted photo groups). Think of it as your gallery\'s control center.</string>
     <string name="help_tip_nav_launch_screen_title">Set your default launch screen</string>
-    <string name="help_tip_nav_launch_screen_subtitle">Choose which screen appears when you open Gallery</string>
+    <string name="help_tip_nav_launch_screen_subtitle">Choose screen appears when you open Gallery</string>
     <string name="help_tip_nav_launch_screen_p1_title">Default launch screen</string>
-    <string name="help_tip_nav_launch_screen_p1_desc">Choose which screen greets you when you open Gallery. Timeline is great if you mostly browse recent photos. Albums works well if you organize by folder. Library is ideal if you primarily use favorites or categories. There\'s also an Auto option that remembers the last screen you used.</string>
-    <string name="help_tip_nav_launch_screen_p1_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_nav_launch_screen_p1_desc">Choose screen greets you when you open Gallery. Timeline is great if you mostly browse recent photos. Albums works well if you organize by folder. Library is ideal if you primarily use favorites or categories. There\'s also an Auto option remembers the last screen you used.</string>
+    <string name="help_tip_nav_launch_screen_p1_s1">Settings > Navigation</string>
     <string name="help_tip_nav_launch_screen_p1_s2">Tap \'Default launch screen\'</string>
     <string name="help_tip_nav_launch_screen_p1_s3">Choose Auto, Timeline, Albums, or Library</string>
     <string name="help_tip_nav_auto_hide_bars_title">Auto-hide bars on scroll</string>
     <string name="help_tip_nav_auto_hide_bars_subtitle">Hide the search and navigation bars when scrolling</string>
     <string name="help_tip_nav_auto_hide_bars_p1_title">Auto-hide bars</string>
     <string name="help_tip_nav_auto_hide_bars_p1_desc">For a more immersive browsing experience, enable auto-hide for the search bar and/or navigation bar. They\'ll slide away as you scroll down through your photos and reappear when you scroll back up. This is especially useful on smaller screens where every pixel counts. You can control each bar independently.</string>
-    <string name="help_tip_nav_auto_hide_bars_p1_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_nav_auto_hide_bars_p1_s1">Settings > Navigation</string>
     <string name="help_tip_nav_auto_hide_bars_p1_s2">Toggle \'Auto-hide search bar\' and/or \'Auto-hide navigation bar\'</string>
     <string name="help_tip_nav_auto_hide_bars_p1_s3">Scroll down to see them hide, scroll up to bring them back</string>
 
@@ -101,8 +101,8 @@
     <string name="help_tip_personalize_theme_p1_title">Choose your theme</string>
     <string name="help_tip_personalize_theme_p1_desc">Gallery supports light and dark themes, and can follow your system setting automatically. The theme affects all screens, dialogs, and menus throughout the app. Most users prefer the system default so Gallery matches the rest of their phone.</string>
     <string name="help_tip_personalize_theme_p2_title">Theme options</string>
-    <string name="help_tip_personalize_theme_p2_desc">System default follows your phone\'s current mode. Force dark mode keeps Gallery dark regardless of system settings — great for nighttime browsing. If you have an OLED display, enable AMOLED pure black for true black backgrounds that save battery and look stunning.</string>
-    <string name="help_tip_personalize_theme_p2_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_personalize_theme_p2_desc">System default follows your phone\'s current mode. Force dark mode keeps Gallery dark regardless of system settings — great for nighttime browsing. If you have an OLED display, enable AMOLED pure black for true black backgrounds save battery and look stunning.</string>
+    <string name="help_tip_personalize_theme_p2_s1">Settings > Appearance</string>
     <string name="help_tip_personalize_theme_p2_s2">Choose System, Light, or Force Dark</string>
     <string name="help_tip_personalize_theme_p2_s3">For OLED screens, also enable \'AMOLED pure black\'</string>
     <string name="help_tip_personalize_colors_title">Customize color palette</string>
@@ -110,8 +110,8 @@
     <string name="help_tip_personalize_colors_p1_title">Color palette</string>
     <string name="help_tip_personalize_colors_p1_desc">Make Gallery truly yours by customizing its color scheme. System colors match your phone\'s wallpaper-based theme (Material You). Neutral gives a clean, subtle look. Preset palettes offer curated color combinations. Or pick any custom color you like — Gallery will generate a complete theme from it.</string>
     <string name="help_tip_personalize_colors_p2_title">Make it yours</string>
-    <string name="help_tip_personalize_colors_p2_desc">The chosen color affects buttons, highlights, icons, cards, and backgrounds throughout the entire app. Experiment with different options to find what suits you — you can always change it later. Tip: System colors update automatically when you change your phone\'s wallpaper.</string>
-    <string name="help_tip_personalize_colors_p2_s1">Go to Settings > Appearance > Color palette</string>
+    <string name="help_tip_personalize_colors_p2_desc">The chosen color affects buttons, highlights, icons, cards, and backgrounds throughout the entire app. Experiment with different options to find what suits you — always change it later. Tip: System colors update automatically when you change your phone\'s wallpaper.</string>
+    <string name="help_tip_personalize_colors_p2_s1">Settings > Appearance > Color palette</string>
     <string name="help_tip_personalize_colors_p2_s2">Choose System, Neutral, a preset, or Custom</string>
     <string name="help_tip_personalize_colors_p2_s3">For custom, tap any color to pick it</string>
     <string name="help_tip_personalize_colors_p2_s4">Preview changes instantly</string>
@@ -124,8 +124,8 @@
     <string name="help_tip_personalize_amoled_title">Enable AMOLED dark mode</string>
     <string name="help_tip_personalize_amoled_subtitle">Pure black backgrounds for OLED screens</string>
     <string name="help_tip_personalize_amoled_p1_title">AMOLED mode</string>
-    <string name="help_tip_personalize_amoled_p1_desc">If your phone has an OLED or AMOLED display, this mode uses true black pixels which are actually turned off — saving battery and creating a striking visual. Combine with Force dark mode for the best results. Note: this setting only takes effect when dark mode is active.</string>
-    <string name="help_tip_personalize_amoled_p1_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_personalize_amoled_p1_desc">If your phone has an OLED or AMOLED display, this mode uses true black pixels are actually turned off — saving battery and creating a striking visual. Combine with Force dark mode for the best results. Note: this setting only takes effect when dark mode is active.</string>
+    <string name="help_tip_personalize_amoled_p1_s1">Settings > Appearance</string>
     <string name="help_tip_personalize_amoled_p1_s2">Enable Force dark mode first</string>
     <string name="help_tip_personalize_amoled_p1_s3">Toggle \'AMOLED pure black\'</string>
     <string name="help_tip_personalize_amoled_p1_s4">Enjoy true blacks on your OLED display</string>
@@ -136,25 +136,25 @@
     <string name="help_tip_personalize_blur_title">Enable fancy blur effects</string>
     <string name="help_tip_personalize_blur_subtitle">Beautiful frosted glass effects throughout the app</string>
     <string name="help_tip_personalize_blur_p1_title">Blur effects</string>
-    <string name="help_tip_personalize_blur_p1_desc">Enable blur effects for a modern frosted glass look on the navigation bar, overlays, and the selection sheet. This gives Gallery a polished, layered appearance. Requires Android 12 or later. If you notice any performance impact on older devices, you can disable this.</string>
-    <string name="help_tip_personalize_blur_p1_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_personalize_blur_p1_desc">Enable blur effects for a modern frosted glass look on the navigation bar, overlays, and the selection sheet. This gives Gallery a polished, layered appearance. Requires Android 12 or later. If you notice any performance impact on older devices, disable this.</string>
+    <string name="help_tip_personalize_blur_p1_s1">Settings > Appearance</string>
     <string name="help_tip_personalize_blur_p1_s2">Toggle \'Allow fancy blur\'</string>
     <string name="help_tip_personalize_blur_p1_s3">Note: requires Android 12+</string>
     <string name="help_tip_personalize_shared_elements_title">Shared element transitions</string>
     <string name="help_tip_personalize_shared_elements_subtitle">Smooth animations when opening photos</string>
     <string name="help_tip_personalize_shared_elements_p1_title">Smooth transitions</string>
-    <string name="help_tip_personalize_shared_elements_p1_desc">When enabled, tapping a photo in the grid creates a seamless animation where the thumbnail expands into the full-screen viewer, and shrinks back when you close it. This makes navigation feel fluid and natural. If you prefer instant transitions or experience any animation glitches, you can disable this.</string>
-    <string name="help_tip_personalize_shared_elements_p1_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_personalize_shared_elements_p1_desc">When enabled, tapping a photo in the grid creates a seamless animation where the thumbnail expands into the full-screen viewer, and shrinks back when you close it. This makes navigation feel fluid and natural. If you prefer instant transitions or experience any animation glitches, disable this.</string>
+    <string name="help_tip_personalize_shared_elements_p1_s1">Settings > Appearance</string>
     <string name="help_tip_personalize_shared_elements_p1_s2">Toggle \'Shared element transitions\'</string>
     <string name="help_tip_personalize_shared_elements_p1_s3">Tap any photo to see the effect</string>
     <string name="help_tip_personalize_app_name_title">Change the app name</string>
-    <string name="help_tip_personalize_app_name_subtitle">Display as \'Gallery\' or \'Refra\' on your home screen</string>
+    <string name="help_tip_personalize_app_name_subtitle">Display as \'Gallery\' or \'Theoria\' on your home screen</string>
     <string name="help_tip_personalize_app_name_p1_title">App name</string>
-    <string name="help_tip_personalize_app_name_p1_desc">Choose whether the app shows as \'Gallery\' or \'Refra\' on your home screen and in the app drawer. \'Refra\' is the app\'s alternative name. This changes the icon label only — the app itself stays the same. You may need to restart your launcher or wait a moment for the change to appear on your home screen.</string>
-    <string name="help_tip_personalize_app_name_p1_s1">Go to Settings > General</string>
+    <string name="help_tip_personalize_app_name_p1_desc">Choose whether the app shows as \'Theoria\' or \'Gallery\' on your home screen and in the app drawer. \'Gallery\' is the app\'s alternative name. This changes the icon label only — the app itself stays the same. You may need to restart your launcher or wait a moment for the change to appear on your home screen.</string>
+    <string name="help_tip_personalize_app_name_p1_s1">Settings > General</string>
     <string name="help_tip_personalize_app_name_p1_s2">Tap \'App name\'</string>
-    <string name="help_tip_personalize_app_name_p1_s3">Choose Gallery or Refra</string>
-    <string name="help_tip_personalize_app_name_p1_s4">The home screen icon label will update</string>
+    <string name="help_tip_personalize_app_name_p1_s3">Choose "Theoria" or "Gallery"</string>
+    <string name="help_tip_personalize_app_name_p1_s4">Your home screen label updates</string>
 
     <!-- TIMELINE &amp; ALBUMS -->
     <string name="help_tip_timeline_group_month_title">Group media by month</string>
@@ -166,7 +166,7 @@
     <string name="help_tip_timeline_layout_type_p1_title">Choose your layout</string>
     <string name="help_tip_timeline_layout_type_p1_desc">The Timeline offers two distinct layouts. Grid shows uniform-sized thumbnails in neat rows — clean and predictable. Mosaic creates a dynamic layout with varied tile sizes based on photo aspect ratios — more visually interesting and gives you a better sense of each photo\'s composition at a glance.</string>
     <string name="help_tip_timeline_layout_type_p2_title">Switch layouts</string>
-    <string name="help_tip_timeline_layout_type_p2_desc">Try both layouts to see which you prefer. Grid works best with the pinch-to-zoom feature. Mosaic creates a magazine-like feel. Note: mosaic layout currently doesn\'t support pinch-to-zoom but has its own optimized scrolling.</string>
+    <string name="help_tip_timeline_layout_type_p2_desc">Try both layouts to see you prefer. Grid works best with the pinch-to-zoom feature. Mosaic creates a magazine-like feel. Note: mosaic layout currently doesn\'t support pinch-to-zoom but has its own optimized scrolling.</string>
     <string name="help_tip_timeline_layout_type_p2_s1">Go to Settings > Timeline &amp; Albums</string>
     <string name="help_tip_timeline_layout_type_p2_s2">Tap \'Layout type\'</string>
     <string name="help_tip_timeline_layout_type_p2_s3">Choose Grid or Mosaic</string>
@@ -174,9 +174,9 @@
     <string name="help_tip_timeline_group_similar_title">Group similar media</string>
     <string name="help_tip_timeline_group_similar_subtitle">Stack RAW+JPG pairs, edited copies, and burst shots</string>
     <string name="help_tip_timeline_group_similar_p1_title">Smart grouping</string>
-    <string name="help_tip_timeline_group_similar_p1_desc">If you shoot in RAW+JPG, take burst photos, or edit photos frequently, your timeline can get cluttered with duplicates. Gallery intelligently groups these related images together — they appear as a single item with a small stack indicator, and you can tap to see all group members.</string>
+    <string name="help_tip_timeline_group_similar_p1_desc">If you shoot in RAW+JPG, take burst photos, or edit photos frequently, your timeline can get cluttered with duplicates. Gallery intelligently groups these related images together — they appear as a single item with a small stack indicator, and tap to see all group members.</string>
     <string name="help_tip_timeline_group_similar_p2_title">Configure grouping</string>
-    <string name="help_tip_timeline_group_similar_p2_desc">Control which types of photos get grouped. RAW+JPG pairing is great for photographers. Edited copy grouping keeps originals and edits together. Burst grouping stacks rapid-fire shots. Enable only the ones that match your shooting style.</string>
+    <string name="help_tip_timeline_group_similar_p2_desc">Control types of photos get grouped. RAW+JPG pairing is great for photographers. Edited copy grouping keeps originals and edits together. Burst grouping stacks rapid-fire shots. Enable only the ones match your shooting style.</string>
     <string name="help_tip_timeline_group_similar_p2_s1">Go to Settings > Timeline &amp; Albums</string>
     <string name="help_tip_timeline_group_similar_p2_s2">Find the grouping options</string>
     <string name="help_tip_timeline_group_similar_p2_s3">Toggle RAW+JPG, edited copies, or burst grouping</string>
@@ -223,7 +223,7 @@
     <string name="help_tip_view_zoom_p1_title">Zoom into details</string>
     <string name="help_tip_view_zoom_p1_desc">Use two-finger pinch gestures to zoom into any photo for a closer look at fine details. Double-tap anywhere on the photo to instantly toggle between a zoomed-in view and the original size — great for quickly checking focus or reading small text in photos.</string>
     <string name="help_tip_view_zoom_p2_title">Pan around</string>
-    <string name="help_tip_view_zoom_p2_desc">While zoomed in, drag with one finger to explore different parts of the photo. Gallery supports high-resolution zoom so you can see every detail. If you find yourself accidentally swiping to the next photo while zoomed, use the Lock Image feature (long press the date header) to prevent swipes.</string>
+    <string name="help_tip_view_zoom_p2_desc">While zoomed in, drag with one finger to explore different parts of the photo. Gallery supports high-resolution zoom so see every detail. If you find yourself accidentally swiping to the next photo while zoomed, use the Lock Image feature (long press the date header) to prevent swipes.</string>
     <string name="help_tip_view_video_title">Video playback</string>
     <string name="help_tip_view_video_subtitle">Watch videos with full playback controls</string>
     <string name="help_tip_view_video_p1_title">Video player</string>
@@ -237,7 +237,7 @@
     <string name="help_tip_view_details_title">View photo details</string>
     <string name="help_tip_view_details_subtitle">See EXIF data, location, and metadata</string>
     <string name="help_tip_view_details_p1_title">Photo info sheet</string>
-    <string name="help_tip_view_details_p1_desc">Swipe up on any photo in the viewer to reveal the info sheet. It shows key details at a glance: when the photo was taken, file size, resolution, camera model, and GPS location (if available). From here you can also edit metadata, copy the photo, set it as wallpaper, or view it on a map.</string>
+    <string name="help_tip_view_details_p1_desc">Swipe up on any photo in the viewer to reveal the info sheet. It shows key details at a glance: when the photo was taken, file size, resolution, camera model, and GPS location (if available). From here also edit metadata, copy the photo, set it as wallpaper, or view it on a map.</string>
     <string name="help_tip_view_details_p2_title">Detailed metadata</string>
     <string name="help_tip_view_details_p2_desc">For photographers who want the full picture, tap \'View all metadata\' to see every piece of EXIF data: lens info, aperture, shutter speed, ISO, white balance, flash, and much more. This is invaluable for understanding your camera settings and improving your photography.</string>
     <string name="help_tip_view_swipe_title">Swipe between photos</string>
@@ -251,7 +251,7 @@
     <string name="help_tip_view_motion_photo_title">View motion photos</string>
     <string name="help_tip_view_motion_photo_subtitle">Play the short video clip embedded in motion photos</string>
     <string name="help_tip_view_motion_photo_p1_title">Motion photos</string>
-    <string name="help_tip_view_motion_photo_p1_desc">Motion photos (captured by many modern phones) contain a still image plus a short video clip of the moment before and after the shot. Gallery automatically detects these and shows a special icon in the viewer — tap it to play the embedded clip. This brings your memories to life with the movement and sound from that moment.</string>
+    <string name="help_tip_view_motion_photo_p1_desc">Motion photos (captured by many modern phones) contain a still image plus a short video clip of the moment before and after the shot. Gallery automatically detects these and shows a special icon in the viewer — tap it to play the embedded clip. This brings your memories to life with the movement and sound from moment.</string>
     <string name="help_tip_view_full_brightness_title">Full brightness viewing</string>
     <string name="help_tip_view_full_brightness_subtitle">Automatically increase brightness when viewing photos</string>
     <string name="help_tip_view_full_brightness_p1_title">Full brightness</string>
@@ -262,13 +262,13 @@
     <string name="help_tip_view_group_members_title">Browse grouped media</string>
     <string name="help_tip_view_group_members_subtitle">View all members of a burst or similar group</string>
     <string name="help_tip_view_group_members_p1_title">Group member strip</string>
-    <string name="help_tip_view_group_members_p1_desc">When you open a photo that belongs to a group (RAW+JPG pair, burst shot, or original+edit), a horizontal strip of thumbnails appears showing all related images. This makes it easy to compare shots or switch between the RAW and JPG version.</string>
+    <string name="help_tip_view_group_members_p1_desc">When you open a photo belongs to a group (RAW+JPG pair, burst shot, or original+edit), a horizontal strip of thumbnails appears showing all related images. This makes it easy to compare shots or switch between the RAW and JPG version.</string>
     <string name="help_tip_view_group_members_p2_title">Navigate the group</string>
-    <string name="help_tip_view_group_members_p2_desc">Tap any thumbnail in the strip to instantly jump to that version. This is especially useful for photographers comparing a RAW file against its JPG, or for picking the best shot from a burst sequence.</string>
+    <string name="help_tip_view_group_members_p2_desc">Tap any thumbnail in the strip to instantly jump to version. This is especially useful for photographers comparing a RAW file against its JPG, or for picking the best shot from a burst sequence.</string>
     <string name="help_tip_view_lock_image_title">Lock image in viewer</string>
     <string name="help_tip_view_lock_image_subtitle">Prevent accidental swipes while viewing a photo</string>
     <string name="help_tip_view_lock_image_p1_title">Lock the current photo</string>
-    <string name="help_tip_view_lock_image_p1_desc">Long press the date header at the top of the viewer to lock the current image in place. A lock icon appears to confirm. While locked, swiping between photos is completely disabled, so you can freely zoom, pan, and explore every detail without the risk of accidentally switching to another photo.</string>
+    <string name="help_tip_view_lock_image_p1_desc">Long press the date header at the top of the viewer to lock the current image in place. A lock icon appears to confirm. While locked, swiping between photos is completely disabled, so freely zoom, pan, and explore every detail without the risk of accidentally switching to another photo.</string>
     <string name="help_tip_view_lock_image_p2_title">Unlock</string>
     <string name="help_tip_view_lock_image_p2_desc">Long press the date header again to remove the lock and resume normal swiping. This feature is invaluable when you\'re zoomed in on fine details like text in a document, checking focus on a portrait, or examining a detailed landscape.</string>
     <string name="help_tip_view_lock_image_p2_s1">Open a photo in the viewer</string>
@@ -287,7 +287,7 @@
     <string name="help_tip_action_edit_title">Edit media</string>
     <string name="help_tip_action_edit_subtitle">Open the built-in editor or use another app</string>
     <string name="help_tip_action_edit_p1_title">Edit photos</string>
-    <string name="help_tip_action_edit_p1_desc">Tap the edit button to open the built-in photo editor, which includes crop, rotate, flip, 20 preset filters, 17 fine-tune adjustments (brightness, contrast, saturation, etc.), and markup/drawing tools. You can also choose to open the photo in an external editor if you prefer. Gallery automatically backs up the original before any edits, so you can always restore it later.</string>
+    <string name="help_tip_action_edit_p1_desc">Tap the edit button to open the built-in photo editor, includes crop, rotate, flip, 20 preset filters, 17 fine-tune adjustments (brightness, contrast, saturation, etc.), and markup/drawing tools. You can also choose to open the photo in an external editor if you prefer. Gallery automatically backs up the original before any edits, so always restore it later.</string>
     <string name="help_tip_action_edit_p1_s1">Open a photo</string>
     <string name="help_tip_action_edit_p1_s2">Tap the edit icon in the bottom bar</string>
     <string name="help_tip_action_edit_p1_s3">Choose the built-in editor or an external app</string>
@@ -295,9 +295,9 @@
     <string name="help_tip_action_hide_vault_title">Hide media in vault</string>
     <string name="help_tip_action_hide_vault_subtitle">Move photos to encrypted vault storage</string>
     <string name="help_tip_action_hide_vault_p1_title">Hide in vault</string>
-    <string name="help_tip_action_hide_vault_p1_desc">Move a photo to the vault to encrypt it and hide it from your regular gallery. The original file is deleted from your device\'s storage and replaced with an encrypted copy inside the vault. Only you can see it — vault access requires biometric authentication (fingerprint or face) or your device PIN.</string>
+    <string name="help_tip_action_hide_vault_p1_desc">Move a photo to the vault to encrypt it and hide it from your regular gallery. The original file is deleted from your device\'s storage and replaced with an encrypted copy inside the vault. Only see it — vault access requires biometric authentication (fingerprint or face) or your device PIN.</string>
     <string name="help_tip_action_hide_vault_p2_title">How to hide</string>
-    <string name="help_tip_action_hide_vault_p2_desc">You can hide individual photos from the viewer, or select multiple photos in the grid and hide them all at once through the selection action sheet. If you have multiple vaults, you\'ll be asked to choose which one to use.</string>
+    <string name="help_tip_action_hide_vault_p2_desc">You can hide individual photos from the viewer, or select multiple photos in the grid and hide them all at once through the selection action sheet. If you have multiple vaults, you\'ll be asked to choose one to use.</string>
     <string name="help_tip_action_hide_vault_p2_s1">Open a photo</string>
     <string name="help_tip_action_hide_vault_p2_s2">Tap the three-dot menu</string>
     <string name="help_tip_action_hide_vault_p2_s3">Select \'Hide in vault\'</string>
@@ -305,7 +305,7 @@
     <string name="help_tip_action_copy_to_album_title">Copy to album</string>
     <string name="help_tip_action_copy_to_album_subtitle">Copy media to another album</string>
     <string name="help_tip_action_copy_to_album_p1_title">Copy to album</string>
-    <string name="help_tip_action_copy_to_album_p1_desc">Create a duplicate of the photo or video in another album folder. The original stays where it is, and a new copy is created in the destination folder. This is useful when you want the same photo to appear in multiple albums without moving the original. Note: this creates an actual file copy, which uses additional storage.</string>
+    <string name="help_tip_action_copy_to_album_p1_desc">Create a duplicate of the photo or video in another album folder. The original stays where it is, and a new copy is created in the destination folder. This is useful when you want the same photo to appear in multiple albums without moving the original. Note: this creates an actual file copy, uses additional storage.</string>
     <string name="help_tip_action_copy_to_album_p1_s1">Open a photo</string>
     <string name="help_tip_action_copy_to_album_p1_s2">Tap the three-dot menu</string>
     <string name="help_tip_action_copy_to_album_p1_s3">Select \'Copy to album\'</string>
@@ -313,7 +313,7 @@
     <string name="help_tip_action_add_collection_title">Add to collection</string>
     <string name="help_tip_action_add_collection_subtitle">Organize media into curated collections</string>
     <string name="help_tip_action_add_collection_p1_title">Add to collection</string>
-    <string name="help_tip_action_add_collection_p1_desc">Collections let you group related photos from different albums together without moving any files. Unlike albums (which are folders), collections are virtual groupings — perfect for organizing photos by project, trip, event, or any theme you like. A photo can belong to multiple collections.</string>
+    <string name="help_tip_action_add_collection_p1_desc">Collections let you group related photos from different albums together without moving any files. Unlike albums (are folders), collections are virtual groupings — perfect for organizing photos by project, trip, event, or any theme you like. A photo can belong to multiple collections.</string>
     <string name="help_tip_action_view_all_metadata_title">View full metadata</string>
     <string name="help_tip_action_view_all_metadata_subtitle">See complete EXIF data for any photo</string>
     <string name="help_tip_action_view_all_metadata_p1_title">All metadata</string>
@@ -361,9 +361,9 @@
     <string name="help_tip_edit_crop_title">Crop and resize</string>
     <string name="help_tip_edit_crop_subtitle">Crop, rotate, and adjust aspect ratio</string>
     <string name="help_tip_edit_crop_p1_title">Crop your photos</string>
-    <string name="help_tip_edit_crop_p1_desc">Use the built-in crop tool to remove unwanted edges, reframe a shot, or focus on a specific subject. Drag the corner handles to adjust the crop area freely, or select a preset aspect ratio for consistent sizing.</string>
+    <string name="help_tip_edit_crop_p1_desc">Use the built-in crop tool to remove unwanted edges, theoriame a shot, or focus on a specific subject. Drag the corner handles to adjust the crop area freely, or select a preset aspect ratio for consistent sizing.</string>
     <string name="help_tip_edit_crop_p2_title">Aspect ratios</string>
-    <string name="help_tip_edit_crop_p2_desc">Choose from free-form (any size), 1:1 (square, perfect for profile pictures), 4:3 (standard photo), 16:9 (widescreen), and other common ratios. The crop preview updates in real-time so you can see exactly what the result will look like.</string>
+    <string name="help_tip_edit_crop_p2_desc">Choose from free-form (any size), 1:1 (square, perfect for profile pictures), 4:3 (standard photo), 16:9 (widescreen), and other common ratios. The crop preview updates in real-time so see exactly what the result will look like.</string>
     <string name="help_tip_edit_crop_p3_title">How to crop</string>
     <string name="help_tip_edit_crop_p3_desc">The crop tool is the most commonly used editing feature. Tip: use the 1:1 square ratio for social media profile pictures, 16:9 for wallpapers and presentations, and free-form when you just need to trim a specific area.</string>
     <string name="help_tip_edit_crop_p3_s1">Open a photo and tap the edit button</string>
@@ -384,7 +384,7 @@
     <string name="help_tip_edit_filters_title">Apply photo filters</string>
     <string name="help_tip_edit_filters_subtitle">Preset filters, including a one-tap Negative, to transform your photos</string>
     <string name="help_tip_edit_filters_p1_title">Photo filters</string>
-    <string name="help_tip_edit_filters_p1_desc">Choose from a set of carefully crafted preset filters that transform the mood and tone of your photos. Warm filters (Honey, Desert, Palma) add golden tones, while cool filters (Isla, Clay) add blue or muted tones. The new Negative preset inverts colours in a single tap. Each filter previews instantly so you can compare the effect before applying.</string>
+    <string name="help_tip_edit_filters_p1_desc">Choose from a set of carefully crafted preset filters transform the mood and tone of your photos. Warm filters (Honey, Desert, Palma) add golden tones, while cool filters (Isla, Clay) add blue or muted tones. The new Negative preset inverts colours in a single tap. Each filter previews instantly so compare the effect before applying.</string>
     <string name="help_tip_edit_filters_p2_title">Apply a filter</string>
     <string name="help_tip_edit_filters_p2_desc">Scroll horizontally through the filter strip at the bottom to browse options. Tap any filter to see a live preview on your photo. If you don\'t like the result, simply tap another filter or tap the original to remove it. Filters can be combined with fine-tune adjustments for even more control.</string>
     <string name="help_tip_edit_filters_p2_s1">Open a photo and tap edit</string>
@@ -401,7 +401,7 @@
     <string name="help_tip_edit_markup_title">Draw and annotate</string>
     <string name="help_tip_edit_markup_subtitle">Add drawings and annotations to photos</string>
     <string name="help_tip_edit_markup_p1_title">Markup tools</string>
-    <string name="help_tip_edit_markup_p1_desc">Draw directly on your photos with customizable brushes. The markup canvas supports zoom and pan, so you can annotate with precision even on small areas. Perfect for highlighting details, adding arrows, circling important areas, or adding fun doodles to photos.</string>
+    <string name="help_tip_edit_markup_p1_desc">Draw directly on your photos with customizable brushes. The markup canvas supports zoom and pan, so annotate with precision even on small areas. Perfect for highlighting details, adding arrows, circling important areas, or adding fun doodles to photos.</string>
     <string name="help_tip_edit_markup_p2_title">Drawing modes</string>
     <string name="help_tip_edit_markup_p2_desc">Choose between Pen (solid lines), Highlighter (semi-transparent, great for emphasizing areas), and Eraser (to fix mistakes). Pick any color using the HSV color picker, and adjust the brush size with the slider. The floating toolbar keeps tools accessible while drawing.</string>
     <string name="help_tip_edit_markup_p3_title">How to draw</string>
@@ -417,7 +417,7 @@
     <string name="help_tip_edit_save_p1_title">Save formats</string>
     <string name="help_tip_edit_save_p1_desc">When saving an edited photo, choose your preferred format. JPEG is the most compatible and produces smaller files. PNG is lossless (no quality loss) but creates larger files — great when quality is critical. WebP offers a good balance of quality and file size. You can also adjust the quality slider to control the file size vs. quality tradeoff.</string>
     <string name="help_tip_edit_save_p2_title">Edit history</string>
-    <string name="help_tip_edit_save_p2_desc">Gallery automatically backs up the original photo before any edit, so you can always restore it later. You can view all your edit backups in a dedicated screen showing the original and edited versions side by side. This safety net means you can experiment freely with edits.</string>
+    <string name="help_tip_edit_save_p2_desc">Gallery automatically backs up the original photo before any edit, so always restore it later. You can view all your edit backups in a dedicated screen showing the original and edited versions side by side. This safety net means experiment freely with edits.</string>
     <string name="help_tip_edit_save_p2_s1">Go to Settings > Smart features</string>
     <string name="help_tip_edit_save_p2_s2">Tap \'Edit backups viewer\'</string>
     <string name="help_tip_edit_save_p2_s3">View originals alongside edited versions</string>
@@ -425,7 +425,7 @@
     <string name="help_tip_edit_backups_title">Manage edit backups</string>
     <string name="help_tip_edit_backups_subtitle">View and restore previous versions of edited photos</string>
     <string name="help_tip_edit_backups_p1_title">Edit backups</string>
-    <string name="help_tip_edit_backups_p1_desc">Every time you edit a photo, Gallery saves the original version automatically. This means you can always go back to the untouched photo, even after multiple rounds of editing. Backups are stored in the app\'s internal storage and don\'t clutter your gallery.</string>
+    <string name="help_tip_edit_backups_p1_desc">Every time you edit a photo, Gallery saves the original version automatically. This means always go back to the untouched photo, even after multiple rounds of editing. Backups are stored in the app\'s internal storage and don\'t clutter your gallery.</string>
     <string name="help_tip_edit_backups_p2_title">Manage backups</string>
     <string name="help_tip_edit_backups_p2_desc">The Edit Backups Viewer shows all your backed-up originals. You can compare the original with the edited version, restore an original to replace the edited photo, or delete old backups to free up storage space. If storage is a concern, periodically review and clean up backups you no longer need.</string>
     <string name="help_tip_edit_backups_p2_s1">Go to Settings > Smart features</string>
@@ -437,15 +437,15 @@
     <string name="help_tip_search_text_title">Search by text</string>
     <string name="help_tip_search_text_subtitle">Find photos by filename with fuzzy matching</string>
     <string name="help_tip_search_text_p1_title">Text search</string>
-    <string name="help_tip_search_text_p1_desc">Type in the search bar at the top of the timeline to find photos by filename. Gallery uses fuzzy matching, which means you don\'t need to type the exact name — close matches will still appear. This is great for finding files when you remember part of the name but not the exact spelling.</string>
+    <string name="help_tip_search_text_p1_desc">Type in the search bar at the top of the timeline to find photos by filename. Gallery uses fuzzy matching, means you don\'t need to type the exact name — close matches will still appear. This is great for finding files when you remember part of the name but not the exact spelling.</string>
     <string name="help_tip_search_text_p2_title">Search tips</string>
     <string name="help_tip_search_text_p2_desc">Search works across all albums simultaneously, so you\'ll find results no matter where the file is stored. Results update as you type for instant feedback. Your recent searches are saved and shown as suggestions when you tap the search bar, making it quick to repeat common searches.</string>
     <string name="help_tip_search_ai_title">AI-powered image search</string>
     <string name="help_tip_search_ai_subtitle">Describe what you\'re looking for in natural language</string>
     <string name="help_tip_search_ai_p1_title">Vision search</string>
-    <string name="help_tip_search_ai_p1_desc">Search using natural language descriptions like \"sunset at the beach\", \"birthday cake\", \"dog playing in snow\", or \"red car\". The AI understands image content, not just filenames, so you can find photos based on what\'s actually in them. All processing happens on your device — your photos are never sent to the cloud.</string>
+    <string name="help_tip_search_ai_p1_desc">Search using natural language descriptions like \"sunset at the beach\", \"birthday cake\", \"dog playing in snow\", or \"red car\". The AI understands image content, not just filenames, so find photos based on what\'s actually in them. All processing happens on your device — your photos are never sent to the cloud.</string>
     <string name="help_tip_search_ai_p2_title">How it works</string>
-    <string name="help_tip_search_ai_p2_desc">Gallery uses CLIP (Contrastive Language-Image Pretraining) models that run entirely on your phone. When indexing is enabled, Gallery analyzes each photo in the background and creates a compact \'understanding\' of its content. When you search, your text query is matched against these understandings to find the most relevant photos.</string>
+    <string name="help_tip_search_ai_p2_desc">Gallery uses CLIP (Contrastive Language-Image Pretraining) models run entirely on your phone. When indexing is enabled, Gallery analyzes each photo in the background and creates a compact \'understanding\' of its content. When you search, your text query is matched against these understandings to find the most relevant photos.</string>
     <string name="help_tip_search_ai_p3_title">Get started</string>
     <string name="help_tip_search_ai_p3_desc">AI search requires ML models to be downloaded first (about 150 MB). Once installed, Gallery automatically indexes your photos in the background when the device is idle. The initial indexing may take some time depending on how many photos you have, but subsequent updates are fast.</string>
     <string name="help_tip_search_ai_p3_s1">Go to Settings > Smart features</string>
@@ -467,7 +467,7 @@
     <string name="help_tip_ai_categories_p1_title">Smart categories</string>
     <string name="help_tip_ai_categories_p1_desc">Gallery uses on-device AI to automatically sort your photos into meaningful categories like Nature, Food, People, Architecture, Animals, Vehicles, and more. This happens in the background with no manual effort — just browse your organized library. All processing stays on your device for privacy.</string>
     <string name="help_tip_ai_categories_p2_title">Browse categories</string>
-    <string name="help_tip_ai_categories_p2_desc">Find your categories in Library > Categories. Each category shows a preview thumbnail and count of matching photos. Tap any category to see all the photos that belong to it. Categories are sorted by how many photos they contain, with your pinned favorites at the top.</string>
+    <string name="help_tip_ai_categories_p2_desc">Find your categories in Library > Categories. Each category shows a preview thumbnail and count of matching photos. Tap any category to see all the photos belong to it. Categories are sorted by how many photos they contain, with your pinned favorites at the top.</string>
     <string name="help_tip_ai_categories_p2_s1">Tap Library in the bottom bar</string>
     <string name="help_tip_ai_categories_p2_s2">Tap Categories</string>
     <string name="help_tip_ai_categories_p2_s3">Browse your auto-organized photos</string>
@@ -477,7 +477,7 @@
     <string name="help_tip_ai_create_category_title">Create custom categories</string>
     <string name="help_tip_ai_create_category_subtitle">Define your own photo categories</string>
     <string name="help_tip_ai_create_category_p1_title">Custom categories</string>
-    <string name="help_tip_ai_create_category_p1_desc">Beyond the built-in categories, you can create your own with custom names and classification criteria. For example, create a \'Pets\' category, a \'Work documents\' category, or anything specific to your photo collection. The AI will automatically sort matching photos into your custom categories.</string>
+    <string name="help_tip_ai_create_category_p1_desc">Beyond the built-in categories, create your own with custom names and classification criteria. For example, create a \'Pets\' category, a \'Work documents\' category, or anything specific to your photo collection. The AI will automatically sort matching photos into your custom categories.</string>
     <string name="help_tip_ai_create_category_p2_title">How to create</string>
     <string name="help_tip_ai_create_category_p2_desc">Give your category a descriptive name and optionally adjust the confidence threshold — a higher threshold means stricter matching (fewer but more accurate results), while a lower threshold is more lenient (more results but some may be less relevant). Start with the default and adjust based on results.</string>
     <string name="help_tip_ai_create_category_p2_s1">Go to Library > Categories</string>
@@ -488,7 +488,7 @@
     <string name="help_tip_ai_models_title">Manage AI models</string>
     <string name="help_tip_ai_models_subtitle">Download or manage on-device AI models</string>
     <string name="help_tip_ai_models_p1_title">AI models</string>
-    <string name="help_tip_ai_models_p1_desc">AI features (smart search and auto-categorization) require machine learning models that run entirely on your device — no internet connection needed after download, and your photos are never sent anywhere. The models are about 150 MB and are downloaded once.</string>
+    <string name="help_tip_ai_models_p1_desc">AI features (smart search and auto-categorization) require machine learning models run entirely on your device — no internet connection needed after download, and your photos are never sent anywhere. The models are about 150 MB and are downloaded once.</string>
     <string name="help_tip_ai_models_p2_title">Model management</string>
     <string name="help_tip_ai_models_p2_desc">Check whether models are installed, download them if needed, or remove them to free up space. After downloading, Gallery automatically starts indexing your photos in the background. You can monitor the model status at any time from this screen.</string>
     <string name="help_tip_ai_models_p2_s1">Go to Settings > Smart features</string>
@@ -498,7 +498,7 @@
     <string name="help_tip_ai_indexing_title">How indexing works</string>
     <string name="help_tip_ai_indexing_subtitle">Background processing for AI features</string>
     <string name="help_tip_ai_indexing_p1_title">AI indexing</string>
-    <string name="help_tip_ai_indexing_p1_desc">Once AI models are installed, Gallery processes your photo library in the background to build an index that powers smart search and auto-categorization. This is a one-time process for existing photos, and new photos are indexed automatically as you take them.</string>
+    <string name="help_tip_ai_indexing_p1_desc">Once AI models are installed, Gallery processes your photo library in the background to build an index powers smart search and auto-categorization. This is a one-time process for existing photos, and new photos are indexed automatically as you take them.</string>
     <string name="help_tip_ai_indexing_p2_title">Indexing details</string>
     <string name="help_tip_ai_indexing_p2_desc">Indexing is designed to be unobtrusive — it runs when your device is idle to avoid impacting performance. A small progress indicator appears in the timeline during active indexing. For large libraries (10,000+ photos), the initial index may take several hours but only needs to happen once.</string>
 
@@ -506,13 +506,13 @@
     <string name="help_tip_albums_browse_title">Browse albums</string>
     <string name="help_tip_albums_browse_subtitle">View photos organized by folder</string>
     <string name="help_tip_albums_browse_p1_title">Album grid</string>
-    <string name="help_tip_albums_browse_p1_desc">Albums correspond to the folders on your device that contain photos or videos. You\'ll see Camera, Screenshots, Downloads, WhatsApp Images, and any other folders. Each album shows a thumbnail preview and the number of photos inside. The grid gives you a visual overview of all your storage locations.</string>
+    <string name="help_tip_albums_browse_p1_desc">Albums correspond to the folders on your device contain photos or videos. You\'ll see Camera, Screenshots, Downloads, WhatsApp Images, and any other folders. Each album shows a thumbnail preview and the number of photos inside. The grid gives you a visual overview of all your storage locations.</string>
     <string name="help_tip_albums_browse_p2_title">Album features</string>
     <string name="help_tip_albums_browse_p2_desc">Long press any album to reveal its options: Pin it to the top for quick access, Ignore it to hide from both the album list and timeline, change its cover thumbnail to any photo you like, or organize it into a group or collection. Tip: pin your Camera and Favorites albums for quick access, and ignore system folders you don\'t need.</string>
     <string name="help_tip_albums_pin_title">Pin favorite albums</string>
     <string name="help_tip_albums_pin_subtitle">Keep your most-used albums at the top</string>
     <string name="help_tip_albums_pin_p1_title">Pin albums</string>
-    <string name="help_tip_albums_pin_p1_desc">Pinned albums always appear at the very top of your album grid, regardless of the sort order. This is perfect for your most-used albums like Camera or a specific project folder. You can pin multiple albums — they\'ll all appear in the top section. Unpin anytime by long pressing again.</string>
+    <string name="help_tip_albums_pin_p1_desc">Pinned albums always appear at the very top of your album grid, regardless of the sort order. your most-used albums like Camera or a specific project folder. You can pin multiple albums — they\'ll all appear in the top section. Unpin anytime by long pressing again.</string>
     <string name="help_tip_albums_pin_p1_s1">Go to Albums</string>
     <string name="help_tip_albums_pin_p1_s2">Long press an album</string>
     <string name="help_tip_albums_pin_p1_s3">Tap \'Pin\' to keep it at the top</string>
@@ -540,7 +540,7 @@
     <string name="help_tip_albums_collections_title">Create collections</string>
     <string name="help_tip_albums_collections_subtitle">Group related albums into curated collections</string>
     <string name="help_tip_albums_collections_p1_title">Collections</string>
-    <string name="help_tip_albums_collections_p1_desc">Collections are virtual groupings that let you bring together photos from different albums under a single theme — a vacation trip, a home renovation project, a recipe collection, or anything you want. Unlike albums (which are tied to folders), collections span across your entire library.</string>
+    <string name="help_tip_albums_collections_p1_desc">Collections are virtual groupings let you bring together photos from different albums under a single theme — a vacation trip, a home renovation project, a recipe collection, or anything you want. Unlike albums (are tied to folders), collections span across your entire library.</string>
     <string name="help_tip_albums_collections_p2_title">Create a collection</string>
     <string name="help_tip_albums_collections_p2_desc">Start a collection from any album or photo. Add photos from any source — they don\'t need to be in the same folder. The same photo can belong to multiple collections without creating copies, so there\'s no extra storage cost. Browse your collections from the Library screen.</string>
     <string name="help_tip_albums_collections_p2_s1">Long press an album or select photos</string>
@@ -552,7 +552,7 @@
     <string name="help_tip_albums_thumbnails_p1_title">Custom thumbnails</string>
     <string name="help_tip_albums_thumbnails_p1_desc">By default, albums show their most recent photo as the cover. You can override this with any photo from the album to create a more representative or visually appealing cover. This is great for making your album grid look organized and easy to scan at a glance.</string>
     <string name="help_tip_albums_thumbnails_p2_title">How to change</string>
-    <string name="help_tip_albums_thumbnails_p2_desc">Open the album, find the photo you want as the cover, then long press it and select \'Set as album thumbnail\'. The album grid will immediately update with your chosen cover. To reset to the default (most recent photo), you can set a different thumbnail or clear it from album options.</string>
+    <string name="help_tip_albums_thumbnails_p2_desc">Open the album, find the photo you want as the cover, then long press it and select \'Set as album thumbnail\'. The album grid will immediately update with your chosen cover. To reset to the default (most recent photo), set a different thumbnail or clear it from album options.</string>
     <string name="help_tip_albums_thumbnails_p2_s1">Open an album</string>
     <string name="help_tip_albums_thumbnails_p2_s2">Find your desired cover photo</string>
     <string name="help_tip_albums_thumbnails_p2_s3">Long press it</string>
@@ -576,7 +576,7 @@
     <string name="help_tip_vault_add_p1_title">Hide photos</string>
     <string name="help_tip_vault_add_p1_desc">Moving a photo to the vault encrypts it and removes it from your visible gallery. The encrypted file is stored in the app\'s secure storage, inaccessible to other apps or file managers. This is the safest way to keep private photos on your device.</string>
     <string name="help_tip_vault_add_p2_title">How to hide</string>
-    <string name="help_tip_vault_add_p2_desc">From the viewer: tap the three-dot menu and select \'Hide in vault\'. From the grid: select one or more photos, then use the \'Hide in vault\' action in the selection sheet. You can hide photos, videos, or a mix of both. If you have multiple vaults, you\'ll be asked which one to use.</string>
+    <string name="help_tip_vault_add_p2_desc">From the viewer: tap the three-dot menu and select \'Hide in vault\'. From the grid: select one or more photos, then use the \'Hide in vault\' action in the selection sheet. You can hide photos, videos, or a mix of both. If you have multiple vaults, you\'ll be asked one to use.</string>
     <string name="help_tip_vault_add_p2_s1">Open a photo, or select multiple in the grid</string>
     <string name="help_tip_vault_add_p2_s2">Tap the menu or selection action</string>
     <string name="help_tip_vault_add_p2_s3">Select \'Hide in vault\'</string>
@@ -588,13 +588,13 @@
     <string name="help_tip_vault_video_streaming_title">Streaming vault videos</string>
     <string name="help_tip_vault_video_streaming_subtitle">Watch encrypted videos without full decryption</string>
     <string name="help_tip_vault_video_streaming_p1_title">Streaming decryption</string>
-    <string name="help_tip_vault_video_streaming_p1_desc">Videos stored in the vault play using streaming decryption, meaning they start playing almost immediately without needing to decrypt the entire file first. This is especially important for long or large video files that would otherwise take a long time to prepare. The decryption happens on-the-fly as the video plays, with no temporary unencrypted files created on disk.</string>
+    <string name="help_tip_vault_video_streaming_p1_desc">Videos stored in the vault play using streaming decryption, meaning they start playing almost immediately without needing to decrypt the entire file first. This is especially important for long or large video files would otherwise take a long time to prepare. The decryption happens on-the-fly as the video plays, with no temporary unencrypted files created on disk.</string>
 
     <!-- FAVORITES &amp; TRASH -->
     <string name="help_tip_fav_add_title">Add to favorites</string>
     <string name="help_tip_fav_add_subtitle">Mark your best photos for quick access</string>
     <string name="help_tip_fav_add_p1_title">Favorite photos</string>
-    <string name="help_tip_fav_add_p1_desc">Tap the heart icon in the viewer toolbar to mark a photo as a favorite. Favorites are synced through Android\'s MediaStore, so they persist even if you switch gallery apps. Access all your favorited photos and videos from Library > Favorites. Tip: you can also favorite multiple photos at once by selecting them and using the selection action sheet.</string>
+    <string name="help_tip_fav_add_p1_desc">Tap the heart icon in the viewer toolbar to mark a photo as a favorite. Favorites are synced through Android\'s MediaStore, so they persist even if you switch gallery apps. Access all your favorited photos and videos from Library > Favorites. Tip: also favorite multiple photos at once by selecting them and using the selection action sheet.</string>
     <string name="help_tip_fav_browse_title">Browse favorites</string>
     <string name="help_tip_fav_browse_subtitle">See all your favorite photos in one place</string>
     <string name="help_tip_fav_browse_p1_title">Favorites</string>
@@ -604,7 +604,7 @@
     <string name="help_tip_trash_delete_p1_title">Trash can</string>
     <string name="help_tip_trash_delete_p1_desc">When you delete photos, they go to the trash first rather than being permanently removed. Items stay in the trash for 30 days, giving you a safety net to recover accidentally deleted photos. After 30 days, they\'re automatically and permanently deleted. This behavior mirrors Android\'s built-in trash system.</string>
     <string name="help_tip_trash_delete_p2_title">Manage trash</string>
-    <string name="help_tip_trash_delete_p2_desc">Go to Library > Trash to see all trashed items with their remaining days until permanent deletion. From here you can restore individual items back to their original location, permanently delete specific items immediately, or empty the entire trash at once. Tip: check the trash before performing a factory reset or clearing app data.</string>
+    <string name="help_tip_trash_delete_p2_desc">Go to Library > Trash to see all trashed items with their remaining days until permanent deletion. From here restore individual items back to their original location, permanently delete specific items immediately, or empty the entire trash at once. Tip: check the trash before performing a factory reset or clearing app data.</string>
     <string name="help_tip_trash_delete_p2_s1">Tap Library > Trash</string>
     <string name="help_tip_trash_delete_p2_s2">View items and their remaining days</string>
     <string name="help_tip_trash_delete_p2_s3">Select items to restore or permanently delete</string>
@@ -612,8 +612,8 @@
     <string name="help_tip_trash_enable_title">Enable/disable trash</string>
     <string name="help_tip_trash_enable_subtitle">Control whether deleted items go to trash</string>
     <string name="help_tip_trash_enable_p1_title">Trash setting</string>
-    <string name="help_tip_trash_enable_p1_desc">If you prefer permanent deletion without the 30-day trash period, you can disable the trash can entirely. When disabled, deleted photos are removed immediately and cannot be recovered. This saves a small amount of storage but removes the safety net. Recommendation: keep the trash enabled unless you have a specific reason to disable it.</string>
-    <string name="help_tip_trash_enable_p1_s1">Go to Settings > General</string>
+    <string name="help_tip_trash_enable_p1_desc">If you prefer permanent deletion without the 30-day trash period, disable the trash can entirely. When disabled, deleted photos are removed immediately and cannot be recovered. This saves a small amount of storage but removes the safety net. Recommendation: keep the trash enabled unless you have a specific reason to disable it.</string>
+    <string name="help_tip_trash_enable_p1_s1">Settings > General</string>
     <string name="help_tip_trash_enable_p1_s2">Toggle \'Enable trash\'</string>
     <string name="help_tip_trash_enable_p1_s3">When off: deletions are immediate and permanent</string>
     <string name="help_tip_trash_enable_p1_s4">When on: deleted items go to trash for 30 days</string>
@@ -622,7 +622,7 @@
     <string name="help_tip_location_browse_title">Browse by location</string>
     <string name="help_tip_location_browse_subtitle">See your photos on a map</string>
     <string name="help_tip_location_browse_p1_title">Location browsing</string>
-    <string name="help_tip_location_browse_p1_desc">Open Locations to explore photo thumbnail clusters on an interactive map. ReFra reads GPS coordinates from photo metadata, keeps map interactions deterministic, and lets you switch between system, light and dark map appearances.</string>
+    <string name="help_tip_location_browse_p1_desc">Open Locations to explore photo thumbnail clusters on an interactive map. Theoria reads GPS coordinates from photo metadata, keeps map interactions deterministic, and lets you switch between system, light and dark map appearances.</string>
     <string name="help_tip_location_browse_p2_title">Location timeline</string>
     <string name="help_tip_location_browse_p2_desc">Tap a cluster or place to zoom in, then open a photo or its unified location timeline. Location data depends on your camera saving GPS information.</string>
     <string name="help_tip_location_viewer_title">View location from photo</string>
@@ -650,7 +650,7 @@
     <string name="help_tip_exif_delete_location_title">Delete GPS location</string>
     <string name="help_tip_exif_delete_location_subtitle">Remove location data from photos for privacy</string>
     <string name="help_tip_exif_delete_location_p1_title">Delete location</string>
-    <string name="help_tip_exif_delete_location_p1_desc">For privacy, you can strip GPS coordinates from any photo. This is recommended before sharing photos publicly or on social media if you don\'t want to reveal where they were taken. The deletion is permanent — the GPS data is removed from the file\'s EXIF metadata and cannot be recovered.</string>
+    <string name="help_tip_exif_delete_location_p1_desc">For privacy, strip GPS coordinates from any photo. This is recommended before sharing photos publicly or on social media if you don\'t want to reveal where they were taken. The deletion is permanent — the GPS data is removed from the file\'s EXIF metadata and cannot be recovered.</string>
     <string name="help_tip_exif_delete_location_p1_s1">Open a photo and swipe up</string>
     <string name="help_tip_exif_delete_location_p1_s2">Tap the location section</string>
     <string name="help_tip_exif_delete_location_p1_s3">Tap \'Delete location\'</string>
@@ -670,22 +670,22 @@
     <string name="help_tip_settings_color_palette_p1_title">Color palette</string>
     <string name="help_tip_settings_color_palette_p1_desc">Choose how Gallery looks. System colors match your phone\'s Material You wallpaper theme. Neutral provides a clean, muted appearance. Presets offer a selection of curated color combinations, each generating a full light and dark theme.</string>
     <string name="help_tip_settings_color_palette_p2_title">Customize</string>
-    <string name="help_tip_settings_color_palette_p2_desc">The chosen color flows through the entire app — buttons, cards, icons, selections, and backgrounds all coordinate. Changes apply instantly so you can preview the result. Experiment freely to find what feels right for you.</string>
-    <string name="help_tip_settings_color_palette_p2_s1">Go to Settings > Appearance > Color palette</string>
+    <string name="help_tip_settings_color_palette_p2_desc">The chosen color flows through the entire app — buttons, cards, icons, selections, and backgrounds all coordinate. Changes apply instantly so preview the result. Experiment freely to find what feels right for you.</string>
+    <string name="help_tip_settings_color_palette_p2_s1">Settings > Appearance > Color palette</string>
     <string name="help_tip_settings_color_palette_p2_s2">Pick your preferred option</string>
     <string name="help_tip_settings_color_palette_p2_s3">Changes apply instantly for preview</string>
     <string name="help_tip_settings_dark_mode_title">Force dark mode</string>
     <string name="help_tip_settings_dark_mode_subtitle">Override system theme</string>
     <string name="help_tip_settings_dark_mode_p1_title">Force dark mode</string>
     <string name="help_tip_settings_dark_mode_p1_desc">Override your system theme to keep Gallery in dark mode at all times, regardless of your phone\'s system-wide setting. This is useful if you prefer dark mode in Gallery even when your phone is in light mode. Combine with AMOLED pure black for the ultimate dark experience on OLED screens.</string>
-    <string name="help_tip_settings_dark_mode_p1_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_settings_dark_mode_p1_s1">Settings > Appearance</string>
     <string name="help_tip_settings_dark_mode_p1_s2">Toggle \'Force dark mode\'</string>
     <string name="help_tip_settings_dark_mode_p1_s3">Gallery stays dark even when your phone is in light mode</string>
     <string name="help_tip_settings_amoled_title">AMOLED pure black</string>
     <string name="help_tip_settings_amoled_subtitle">Pure black backgrounds for OLED screens</string>
     <string name="help_tip_settings_amoled_p1_title">AMOLED mode</string>
     <string name="help_tip_settings_amoled_p1_desc">On OLED and AMOLED displays, true black pixels are completely turned off, saving battery and creating a stunning high-contrast look. This setting replaces dark gray backgrounds with pure black. Note: it only takes effect when dark mode is active (either system dark mode or Force dark mode).</string>
-    <string name="help_tip_settings_amoled_p1_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_settings_amoled_p1_s1">Settings > Appearance</string>
     <string name="help_tip_settings_amoled_p1_s2">Enable dark mode or Force dark mode</string>
     <string name="help_tip_settings_amoled_p1_s3">Toggle \'AMOLED pure black\'</string>
     <string name="help_tip_settings_amoled_p1_s4">Best results on OLED/AMOLED screens</string>
@@ -695,21 +695,21 @@
     <string name="help_tip_settings_trash_toggle_subtitle">Control whether deleted items go to trash first</string>
     <string name="help_tip_settings_trash_toggle_p1_title">Trash toggle</string>
     <string name="help_tip_settings_trash_toggle_p1_desc">Controls the safety net for deletions. When enabled (recommended), deleted items go to trash for 30 days before permanent deletion, giving you time to recover mistakes. When disabled, all deletions are instant and permanent — use with caution.</string>
-    <string name="help_tip_settings_trash_toggle_p1_s1">Go to Settings > General</string>
+    <string name="help_tip_settings_trash_toggle_p1_s1">Settings > General</string>
     <string name="help_tip_settings_trash_toggle_p1_s2">Toggle \'Enable trash\'</string>
     <string name="help_tip_settings_trash_toggle_p1_s3">Recommended: keep enabled for safety</string>
     <string name="help_tip_settings_trash_confirm_title">Trash confirmation</string>
     <string name="help_tip_settings_trash_confirm_subtitle">Ask for confirmation before trashing items</string>
     <string name="help_tip_settings_trash_confirm_p1_title">Trash confirmation</string>
     <string name="help_tip_settings_trash_confirm_p1_desc">Adds an extra confirmation dialog before moving items to trash. This prevents accidental deletions, especially useful if you sometimes hit the delete button by mistake. When disabled, items are trashed immediately without asking.</string>
-    <string name="help_tip_settings_trash_confirm_p1_s1">Go to Settings > General</string>
+    <string name="help_tip_settings_trash_confirm_p1_s1">Settings > General</string>
     <string name="help_tip_settings_trash_confirm_p1_s2">Toggle \'Trash confirmation\'</string>
     <string name="help_tip_settings_trash_confirm_p1_s3">Recommended if you accidentally delete often</string>
     <string name="help_tip_settings_secure_mode_title">Secure mode</string>
     <string name="help_tip_settings_secure_mode_subtitle">Hide from recents and block screenshots</string>
     <string name="help_tip_settings_secure_mode_p1_title">Secure mode</string>
     <string name="help_tip_settings_secure_mode_p1_desc">When activated, Gallery is hidden from the recent apps screen (the task switcher shows a blank preview) and screenshots within the app are blocked. This is an extra privacy measure if you don\'t want others to see what you were browsing when they glance at your recent apps. Ideal when combined with the vault for maximum privacy.</string>
-    <string name="help_tip_settings_secure_mode_p1_s1">Go to Settings > General</string>
+    <string name="help_tip_settings_secure_mode_p1_s1">Settings > General</string>
     <string name="help_tip_settings_secure_mode_p1_s2">Toggle \'Secure mode\'</string>
     <string name="help_tip_settings_secure_mode_p1_s3">Gallery disappears from recent apps</string>
     <string name="help_tip_settings_secure_mode_p1_s4">Screenshots are blocked within the app</string>
@@ -717,7 +717,7 @@
     <string name="help_tip_settings_vibrations_subtitle">Haptic feedback for selections and actions</string>
     <string name="help_tip_settings_vibrations_p1_title">Vibrations</string>
     <string name="help_tip_settings_vibrations_p1_desc">Controls haptic feedback (subtle vibration) for interactions like long pressing to select, toggling favorites, and other actions. Haptic feedback makes the app feel more responsive and tactile. Disable if you prefer a completely silent experience or if vibrations bother you.</string>
-    <string name="help_tip_settings_vibrations_p1_s1">Go to Settings > General</string>
+    <string name="help_tip_settings_vibrations_p1_s1">Settings > General</string>
     <string name="help_tip_settings_vibrations_p1_s2">Toggle \'Allow vibrations\'</string>
     <string name="help_tip_settings_vibrations_p1_s3">Affects long press, selection, and other interactions</string>
 
@@ -725,32 +725,32 @@
     <string name="help_tip_settings_launch_screen_title">Default launch screen</string>
     <string name="help_tip_settings_launch_screen_subtitle">Choose Auto, Timeline, Albums, or Library</string>
     <string name="help_tip_settings_launch_screen_p1_title">Launch screen</string>
-    <string name="help_tip_settings_launch_screen_p1_desc">Choose which screen greets you when you open Gallery. Auto remembers the last screen you used. Timeline is great for browsing recent photos. Albums is ideal if you organize by folder. Library works well if you primarily access favorites, vault, or categories.</string>
-    <string name="help_tip_settings_launch_screen_p1_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_settings_launch_screen_p1_desc">Choose screen greets you when you open Gallery. Auto remembers the last screen you used. Timeline is great for browsing recent photos. Albums is ideal if you organize by folder. Library works well if you primarily access favorites, vault, or categories.</string>
+    <string name="help_tip_settings_launch_screen_p1_s1">Settings > Navigation</string>
     <string name="help_tip_settings_launch_screen_p1_s2">Tap \'Default launch screen\'</string>
     <string name="help_tip_settings_launch_screen_p1_s3">Choose Auto, Timeline, Albums, or Library</string>
     <string name="help_tip_settings_old_navbar_title">Classic navigation bar</string>
     <string name="help_tip_settings_old_navbar_subtitle">Use the compact navigation bar style</string>
     <string name="help_tip_settings_old_navbar_p1_title">Navigation bar style</string>
-    <string name="help_tip_settings_old_navbar_p1_desc">The modern style shows labeled icons (Timeline, Albums, Library) for clarity. The classic compact style uses smaller icons without labels, giving you more vertical screen space for photos. Try both to see which feels more comfortable for your workflow.</string>
-    <string name="help_tip_settings_old_navbar_p1_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_settings_old_navbar_p1_desc">The modern style shows labeled icons (Timeline, Albums, Library) for clarity. The classic compact style uses smaller icons without labels, giving you more vertical screen space for photos. Try both to see feels more comfortable for your workflow.</string>
+    <string name="help_tip_settings_old_navbar_p1_s1">Settings > Navigation</string>
     <string name="help_tip_settings_old_navbar_p1_s2">Toggle \'Old navigation bar style\'</string>
     <string name="help_tip_settings_old_navbar_p1_s3">Modern: labeled icons, Classic: compact icons</string>
     <string name="help_tip_settings_selection_titles_title">Show selection titles</string>
     <string name="help_tip_settings_selection_titles_subtitle">Display titles in the selection action sheet</string>
     <string name="help_tip_settings_selection_titles_p1_title">Selection titles</string>
     <string name="help_tip_settings_selection_titles_p1_desc">When you select photos, the bottom action sheet shows icons for available actions. Enabling titles adds text labels under each icon (Share, Delete, Copy, etc.) for clarity. Disabling titles gives a cleaner, more compact look. If you already know what each icon does, hiding titles saves space.</string>
-    <string name="help_tip_settings_selection_titles_p1_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_settings_selection_titles_p1_s1">Settings > Navigation</string>
     <string name="help_tip_settings_selection_titles_p1_s2">Toggle \'Show selection titles\'</string>
     <string name="help_tip_settings_selection_titles_p1_s3">With titles: labels under each action icon</string>
     <string name="help_tip_settings_selection_titles_p1_s4">Without titles: compact icon-only view</string>
     <string name="help_tip_settings_selection_actions_title">Customize selection actions</string>
     <string name="help_tip_settings_selection_actions_subtitle">Reorder and customize the selection action sheet</string>
     <string name="help_tip_settings_selection_actions_p1_title">Selection actions</string>
-    <string name="help_tip_settings_selection_actions_p1_desc">The selection action sheet appears whenever you select photos. By default it shows Share, Delete, Copy, Move, Hide in vault, and more. You can customize which actions appear and their order to match your most common workflows.</string>
+    <string name="help_tip_settings_selection_actions_p1_desc">The selection action sheet appears whenever you select photos. By default it shows Share, Delete, Copy, Move, Hide in vault, and more. You can customize actions appear and their order to match your most common workflows.</string>
     <string name="help_tip_settings_selection_actions_p2_title">Customize</string>
     <string name="help_tip_settings_selection_actions_p2_desc">Drag actions up or down to reorder them — put your most-used actions at the top for quick access. Toggle actions on or off to show or hide them. For example, if you never use \'Copy to album\', hide it to reduce clutter. Your customization is saved automatically.</string>
-    <string name="help_tip_settings_selection_actions_p2_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_settings_selection_actions_p2_s1">Settings > Navigation</string>
     <string name="help_tip_settings_selection_actions_p2_s2">Tap \'Customize selection actions\'</string>
     <string name="help_tip_settings_selection_actions_p2_s3">Drag actions to reorder by priority</string>
     <string name="help_tip_settings_selection_actions_p2_s4">Toggle actions on/off to show/hide</string>
@@ -781,7 +781,7 @@
     <string name="help_tip_gesture_pinch_grid_p1_title">Pinch zoom</string>
     <string name="help_tip_gesture_pinch_grid_p1_desc">Place two fingers on the photo grid and pinch in or out to change the column count. Pinching out (spreading fingers) reduces columns for larger thumbnails — great for seeing details. Pinching in (squeezing fingers) adds columns for smaller thumbnails — ideal for scanning lots of photos. The transition is smooth and animated.</string>
     <string name="help_tip_gesture_pinch_grid_p2_title">Range</string>
-    <string name="help_tip_gesture_pinch_grid_p2_desc">Grid ranges from 2 columns (very large thumbnails) to 10 columns (tiny thumbnails for maximum overview). Gallery remembers your preference separately for the timeline and album views, so you can use different sizes in each. Tip: 3–4 columns is a good default for most people.</string>
+    <string name="help_tip_gesture_pinch_grid_p2_desc">Grid ranges from 2 columns (very large thumbnails) to 10 columns (tiny thumbnails for maximum overview). Gallery remembers your preference separately for the timeline and album views, so use different sizes in each. Tip: 3–4 columns is a good default for most people.</string>
     <string name="help_tip_gesture_swipe_viewer_title">Swipe to navigate</string>
     <string name="help_tip_gesture_swipe_viewer_subtitle">Swipe between photos in the viewer</string>
     <string name="help_tip_gesture_swipe_viewer_p1_title">Swipe navigation</string>
@@ -789,7 +789,7 @@
     <string name="help_tip_gesture_long_press_title">Long press to select</string>
     <string name="help_tip_gesture_long_press_subtitle">Start selection mode with a long press</string>
     <string name="help_tip_gesture_long_press_p1_title">Long press</string>
-    <string name="help_tip_gesture_long_press_p1_desc">Long press (hold your finger down for about half a second) on any photo to enter selection mode. A checkmark appears on the selected item, and you can then tap additional photos to add them. To exit selection mode, use the back button or tap the \'X\' to deselect all. If haptic feedback is enabled, you\'ll feel a subtle vibration when selection activates.</string>
+    <string name="help_tip_gesture_long_press_p1_desc">Long press (hold your finger down for about half a second) on any photo to enter selection mode. A checkmark appears on the selected item, and then tap additional photos to add them. To exit selection mode, use the back button or tap the \'X\' to deselect all. If haptic feedback is enabled, you\'ll feel a subtle vibration when selection activates.</string>
     <string name="help_tip_gesture_multi_select_title">Multi-select drag</string>
     <string name="help_tip_gesture_multi_select_subtitle">Drag across photos to select multiple</string>
     <string name="help_tip_gesture_multi_select_p1_title">Drag selection</string>
@@ -801,24 +801,24 @@
     <string name="help_tip_selection_sheet_p1_title">Action sheet</string>
     <string name="help_tip_selection_sheet_p1_desc">When you select one or more photos, a bottom action sheet slides up showing all available actions: Share, Delete, Copy to album, Move to album, Hide in vault, Favorite, and more. The number of selected items is displayed at the top. Tap any action to apply it to all selected items at once.</string>
     <string name="help_tip_selection_sheet_p2_title">Customize actions</string>
-    <string name="help_tip_selection_sheet_p2_desc">The action sheet is fully customizable. Reorder actions to put your most-used ones first, and hide actions you never use. This makes the sheet cleaner and faster to use. Your customization is saved permanently.</string>
-    <string name="help_tip_selection_sheet_p2_s1">Go to Settings > Navigation</string>
+    <string name="help_tip_selection_sheet_p2_desc">The action sheet is customizable. Reorder actions to put your most-used ones first, and hide actions you never use. The sheet cleaner and faster to use. Your customization is saved permanently.</string>
+    <string name="help_tip_selection_sheet_p2_s1">Settings > Navigation</string>
     <string name="help_tip_selection_sheet_p2_s2">Tap \'Customize selection actions\'</string>
     <string name="help_tip_selection_sheet_p2_s3">Drag to reorder, toggle to show/hide</string>
     <string name="help_tip_selection_sheet_p2_s4">Most-used actions should be at the top</string>
     <string name="help_tip_selection_batch_share_title">Batch share</string>
     <string name="help_tip_selection_batch_share_subtitle">Share multiple photos at once</string>
     <string name="help_tip_selection_batch_share_p1_title">Batch share</string>
-    <string name="help_tip_selection_batch_share_p1_desc">Select multiple photos in the grid, then tap the Share action to send them all at once to any app. This is perfect for sharing a group of vacation photos, sending multiple documents, or uploading a batch to cloud storage. All selected items are shared as a single bundle.</string>
-    <string name="help_tip_selection_batch_share_p1_s1">Long press to start selection</string>
-    <string name="help_tip_selection_batch_share_p1_s2">Tap additional photos to add</string>
-    <string name="help_tip_selection_batch_share_p1_s3">Tap the Share action in the sheet</string>
-    <string name="help_tip_selection_batch_share_p1_s4">Choose the app to share with</string>
+    <string name="help_tip_selection_batch_share_p1_desc">Select multiple photos, then tap Share to send them all at once to any app — great for vacation batches, documents, or cloud uploads.</string>
+    <string name="help_tip_selection_batch_share_p1_s1">Long-press to start selecting</string>
+    <string name="help_tip_selection_batch_share_p1_s2">Tap more photos to add to selection</string>
+    <string name="help_tip_selection_batch_share_p1_s3">Tap the Share action</string>
+    <string name="help_tip_selection_batch_share_p1_s4">Pick where to share</string>
     <string name="help_tip_selection_batch_delete_title">Batch delete</string>
     <string name="help_tip_selection_batch_delete_subtitle">Delete multiple photos at once</string>
     <string name="help_tip_selection_batch_delete_p1_title">Batch delete</string>
     <string name="help_tip_selection_batch_delete_p1_desc">Select multiple photos, then tap Delete to move them all to trash at once. If trash confirmation is enabled, you\'ll be asked to confirm. If the trash is enabled, items can be recovered within 30 days from Library > Trash. This is the fastest way to clean up unwanted photos from a specific event or duplicates.</string>
-    <string name="help_tip_selection_batch_delete_p1_s1">Long press to start selection</string>
+    <string name="help_tip_selection_batch_delete_p1_s1">Long-press to start selecting</string>
     <string name="help_tip_selection_batch_delete_p1_s2">Tap photos to add to selection</string>
     <string name="help_tip_selection_batch_delete_p1_s3">Tap the Delete action in the sheet</string>
     <string name="help_tip_selection_batch_delete_p1_s4">Items go to trash (recoverable for 30 days)</string>
@@ -835,11 +835,11 @@
     <string name="help_tip_advanced_standalone_title">Open from other apps</string>
     <string name="help_tip_advanced_standalone_subtitle">View photos sent from other apps</string>
     <string name="help_tip_advanced_standalone_p1_title">Standalone viewer</string>
-    <string name="help_tip_advanced_standalone_p1_desc">When you tap an image or video link in a browser, file manager, or any other app, Gallery can open it as a standalone viewer. You get the full viewing experience — zoom, pan, video playback, and info sheet — even for files that aren\'t in your regular gallery. Set Gallery as your default image viewer in Android settings for the best experience.</string>
+    <string name="help_tip_advanced_standalone_p1_desc">When you tap an image or video link in a browser, file manager, or any other app, Gallery can open it as a standalone viewer. You get the full viewing experience — zoom, pan, video playback, and info sheet — even for files aren\'t in your regular gallery. Set Gallery as your default image viewer in Android settings for the best experience.</string>
     <string name="help_tip_advanced_wallpaper_title">Set as wallpaper</string>
     <string name="help_tip_advanced_wallpaper_subtitle">Use any photo as your device wallpaper</string>
     <string name="help_tip_advanced_wallpaper_p1_title">Set wallpaper</string>
-    <string name="help_tip_advanced_wallpaper_p1_desc">Open any photo and use the action menu to set it as your device wallpaper. You can choose to set it for the home screen, lock screen, or both. Gallery opens a crop interface so you can position and resize the photo to fit your screen perfectly before applying.</string>
+    <string name="help_tip_advanced_wallpaper_p1_desc">Open any photo and use the action menu to set it as your device wallpaper. You can choose to set it for the home screen, lock screen, or both. Gallery opens a crop interface so position and resize the photo to fit your screen perfectly before applying.</string>
     <string name="help_tip_advanced_wallpaper_p1_s1">Open a photo in the viewer</string>
     <string name="help_tip_advanced_wallpaper_p1_s2">Tap the three-dot menu</string>
     <string name="help_tip_advanced_wallpaper_p1_s3">Select \'Set as wallpaper\'</string>
@@ -866,7 +866,7 @@
     <string name="help_tip_viewer_auto_contrast_subtitle">Automatically enhance display contrast based on image brightness</string>
     <string name="help_tip_viewer_auto_contrast_p1_title">Smart contrast adjustment</string>
     <string name="help_tip_viewer_auto_contrast_p1_desc">When enabled, Gallery analyzes the brightness of each photo in real time and automatically adjusts the display contrast to make dark images easier to see and bright images more vivid. The adjustment is subtle and happens instantly as you swipe between photos. This only affects how images look on screen — your original files are never modified. This feature is currently in Beta.</string>
-    <string name="help_tip_viewer_auto_contrast_p1_s1">Go to Settings > Appearance</string>
+    <string name="help_tip_viewer_auto_contrast_p1_s1">Settings > Appearance</string>
     <string name="help_tip_viewer_auto_contrast_p1_s2">Toggle \'Auto-contrast\'</string>
     <string name="help_tip_viewer_auto_contrast_p1_s3">Swipe between photos to see real-time adjustments</string>
 
@@ -874,8 +874,8 @@
     <string name="help_tip_selection_right_align_title">Right-align top actions</string>
     <string name="help_tip_selection_right_align_subtitle">Move action buttons to the right side for easier reach</string>
     <string name="help_tip_selection_right_align_p1_title">Right-aligned actions</string>
-    <string name="help_tip_selection_right_align_p1_desc">When enabled, the top action buttons in the selection bar (Select All, Details) are pushed to the right edge of the screen while the Close button stays on the left. This makes the actions easier to reach with one hand, especially on larger phones. The buttons are placed in a scrollable row to prevent overflow.</string>
-    <string name="help_tip_selection_right_align_p1_s1">Go to Settings > Navigation > Selection actions</string>
+    <string name="help_tip_selection_right_align_p1_desc">When enabled, the top action buttons in the selection bar (Select All, Details) are pushed to the right edge of the screen while the Close button stays on the left. The actions easier to reach with one hand, especially on larger phones. The buttons are placed in a scrollable row to prevent overflow.</string>
+    <string name="help_tip_selection_right_align_p1_s1">Settings > Navigation > Selection actions</string>
     <string name="help_tip_selection_right_align_p1_s2">Toggle \'Right-align top actions\'</string>
     <string name="help_tip_selection_right_align_p1_s3">Select items to see the new layout</string>
 
@@ -883,12 +883,12 @@
     <string name="help_tip_vault_overhaul_title">Redesigned vault security</string>
     <string name="help_tip_vault_overhaul_subtitle">Gate authentication, custom passwords, and a streamlined vault flow</string>
     <string name="help_tip_vault_overhaul_p1_title">Gate authentication</string>
-    <string name="help_tip_vault_overhaul_p1_desc">Add an extra layer of security before the vault selector screen. Choose between no gate, device security (biometrics or screen lock), or a custom password. When active, you must authenticate before you can even see the list of available vaults — preventing others from knowing which vaults exist on your device.</string>
+    <string name="help_tip_vault_overhaul_p1_desc">Add an extra layer of security before the vault selector screen. Choose between no gate, device security (biometrics or screen lock), or a custom password. When active, you must authenticate before even see the list of available vaults — preventing others from knowing vaults exist on your device.</string>
     <string name="help_tip_vault_overhaul_p1_s1">Open the Vault from the Library</string>
     <string name="help_tip_vault_overhaul_p1_s2">Tap the security settings button</string>
     <string name="help_tip_vault_overhaul_p1_s3">Choose None, Device Security, or Custom Password</string>
     <string name="help_tip_vault_overhaul_p2_title">Custom passwords &amp; per-vault security</string>
-    <string name="help_tip_vault_overhaul_p2_desc">Each vault now supports its own authentication — biometrics, PIN, or a custom password — so you can have different security levels for different vaults. The vault creation flow has been streamlined: create a vault, set its password, then configure the global gate. Vault deletion now returns you to the selector with re-authentication required, and the last vault deletion exits to the library.</string>
+    <string name="help_tip_vault_overhaul_p2_desc">Each vault now supports its own authentication — biometrics, PIN, or a custom password — so have different security levels for different vaults. The vault creation flow has been streamlined: create a vault, set its password, then configure the global gate. Vault deletion now returns you to the selector with re-authentication required, and the last vault deletion exits to the library.</string>
     <string name="help_tip_vault_overhaul_p2_s1">Create or open a vault</string>
     <string name="help_tip_vault_overhaul_p2_s2">Set a custom password or use device security</string>
     <string name="help_tip_vault_overhaul_p2_s3">Each vault can have its own independent security</string>
@@ -909,7 +909,7 @@
     <string name="help_tip_security_encrypted_storage_p1_title">What gets encrypted?</string>
     <string name="help_tip_security_encrypted_storage_p1_desc">When enabled, your app preferences are encrypted using AES-256-GCM with keys stored in the Android Keystore. The Room database is also encrypted using SQLCipher, protecting your trash index, categories, and internal data at rest — even if the device is rooted.</string>
     <string name="help_tip_security_encrypted_storage_p2_title">Enabling encrypted storage</string>
-    <string name="help_tip_security_encrypted_storage_p2_desc">Encryption is opt-in. Enabling it triggers a one-time migration that encrypts your existing data. This runs in the background and only needs to happen once.</string>
+    <string name="help_tip_security_encrypted_storage_p2_desc">Encryption is opt-in. Enabling it triggers a one-time migration encrypts your existing data. This runs in the background and only needs to happen once.</string>
     <string name="help_tip_security_encrypted_storage_p2_s1">Go to Settings → Security</string>
     <string name="help_tip_security_encrypted_storage_p2_s2">Toggle Encrypted settings on</string>
     <string name="help_tip_security_encrypted_storage_p2_s3">The app will migrate your data automatically</string>
@@ -930,7 +930,7 @@
     <string name="help_tip_timeline_filter_p1_title">Filter your timeline</string>
     <string name="help_tip_timeline_filter_p1_desc">The timeline filter lets you narrow down what you see without leaving the main screen. Filter by media type (photos, videos, GIFs), show only favorites, jump to a specific year, or scope the timeline to a single album. Combine multiple filters for precise results.</string>
     <string name="help_tip_timeline_filter_p2_title">How to use</string>
-    <string name="help_tip_timeline_filter_p2_desc">Access the filter directly from the search bar at the top of the timeline. Tap the filter icon to expand filter options. Active filters are shown as chips that can be individually removed.</string>
+    <string name="help_tip_timeline_filter_p2_desc">Access the filter directly from the search bar at the top of the timeline. Tap the filter icon to expand filter options. Active filters are shown as chips can be individually removed.</string>
     <string name="help_tip_timeline_filter_p2_s1">Tap the filter icon in the search bar</string>
     <string name="help_tip_timeline_filter_p2_s2">Select a filter category (type, favorites, year, album)</string>
     <string name="help_tip_timeline_filter_p2_s3">Tap a filter chip to remove it</string>
@@ -965,13 +965,13 @@
     <string name="help_tip_search_metadata_title">Search descriptions &amp; metadata</string>
     <string name="help_tip_search_metadata_subtitle">Find photos by their description or metadata text</string>
     <string name="help_tip_search_metadata_p1_title">Extended search</string>
-    <string name="help_tip_search_metadata_p1_desc">Search now extends beyond filenames and AI analysis. Your search queries also match against image descriptions, EXIF metadata text fields, and other embedded metadata. This makes it easier to find photos you have annotated or that contain specific camera or lens information.</string>
+    <string name="help_tip_search_metadata_p1_desc">Search now extends beyond filenames and AI analysis. Your search queries also match against image descriptions, EXIF metadata text fields, and other embedded metadata. This makes it easier to find photos you have annotated or contain specific camera or lens information.</string>
 
     <!-- Copy/Move Album Picker Search (4.2.3) -->
     <string name="help_tip_album_picker_search_title">Album picker search</string>
     <string name="help_tip_album_picker_search_subtitle">Search for albums when copying or moving photos</string>
     <string name="help_tip_album_picker_search_p1_title">Find albums quickly</string>
-    <string name="help_tip_album_picker_search_p1_desc">When copying or moving photos to another album, you can now search for the target album by name. A search bar at the top of the album picker sheet lets you quickly filter the album list, making it much faster to find the right destination when you have many albums.</string>
+    <string name="help_tip_album_picker_search_p1_desc">When copying or moving photos to another album, now search for the target album by name. A search bar at the top of the album picker sheet lets you quickly filter the album list, making it much faster to find the right destination when you have many albums.</string>
 
     <!-- Redesigned Trash &amp; Favorites (4.2.3) -->
     <string name="help_tip_trash_fav_redesign_title">Redesigned Trash &amp; Favorites</string>
@@ -985,7 +985,7 @@
     <string name="help_tip_story_cards_p1_title">Relive your memories</string>
     <string name="help_tip_story_cards_p1_desc">Story cards appear as a horizontal carousel above your timeline, surfacing highlights from your recent photos, albums, categories, locations, and favorites. Tap any card to open an immersive full-screen story viewer with auto-advancing slides and progress indicators — just like stories in social media apps.</string>
     <string name="help_tip_story_cards_p2_title">Customize your cards</string>
-    <string name="help_tip_story_cards_p2_desc">Control which card types are shown and their order. You can toggle memory, album, category, location, and favorites cards individually, reorder them by drag, and configure the story viewer behavior including auto-advance and duration per photo.</string>
+    <string name="help_tip_story_cards_p2_desc">Control card types are shown and their order. You can toggle memory, album, category, location, and favorites cards individually, reorder them by drag, and configure the story viewer behavior including auto-advance and duration per photo.</string>
     <string name="help_tip_story_cards_p2_s1">Go to Settings > Timeline &amp; albums > Story cards</string>
     <string name="help_tip_story_cards_p2_s2">Toggle individual card types on or off</string>
     <string name="help_tip_story_cards_p2_s3">Drag to reorder card types</string>
@@ -995,7 +995,7 @@
     <string name="help_tip_video_options_popup_title">Video options popup</string>
     <string name="help_tip_video_options_popup_subtitle">Compact animated popup for video controls</string>
     <string name="help_tip_video_options_popup_p1_title">Cleaner video controls</string>
-    <string name="help_tip_video_options_popup_p1_desc">Video control buttons (subtitle, speed, volume, rotate) have been consolidated into a single \'more options\' button that expands into a blurred animated popup. The popup uses a row layout in landscape and column in portrait, keeping the video view uncluttered while still providing quick access to all controls.</string>
+    <string name="help_tip_video_options_popup_p1_desc">Video control buttons (subtitle, speed, volume, rotate) have been consolidated into a single \'more options\' button expands into a blurred animated popup. The popup uses a row layout in landscape and column in portrait, keeping the video view uncluttered while still providing quick access to all controls.</string>
 
 
 
@@ -1006,7 +1006,7 @@
     <string name="help_tip_timeline_group_period_title">Group by day, month, or year</string>
     <string name="help_tip_timeline_group_period_subtitle">Choose how each screen groups media — and set it per screen</string>
     <string name="help_tip_timeline_group_period_p1_title">Flexible date grouping</string>
-    <string name="help_tip_timeline_group_period_p1_desc">Pick how your media is grouped under date headers: a flat list, by day, by month, or by year. Bigger groups make it faster to scan a large library, while daily grouping keeps each day neatly separated. Each section of the app — Timeline, Favorites, albums, locations, and cloud archive — can use its own grouping, so you can keep the Timeline by month while browsing Favorites by year.</string>
+    <string name="help_tip_timeline_group_period_p1_desc">Pick how your media is grouped under date headers: a flat list, by day, by month, or by year. Bigger groups make it faster to scan a large library, while daily grouping keeps each day neatly separated. Each section of the app — Timeline, Favorites, albums, locations, and cloud archive — can use its own grouping, so keep the Timeline by month while browsing Favorites by year.</string>
     <string name="help_tip_timeline_group_period_p2_title">Set grouping per screen</string>
     <string name="help_tip_timeline_group_period_p2_desc">Open Settings &gt; Timeline &amp; albums to choose the grouping method and toggle date separators independently for each screen. You can also turn off date headers entirely for a clean, continuous grid.</string>
     <string name="help_tip_timeline_group_period_p2_s1">Go to Settings &gt; Timeline &amp; albums</string>
@@ -1018,7 +1018,7 @@
     <string name="help_tip_action_save_motion_video_title">Save motion photo as video</string>
     <string name="help_tip_action_save_motion_video_subtitle">Export the embedded clip from a motion photo as a standalone video</string>
     <string name="help_tip_action_save_motion_video_p1_title">Extract the motion clip</string>
-    <string name="help_tip_action_save_motion_video_p1_desc">Motion photos store a short video alongside the still image. When you open one, Gallery shows a \'Save as video\' action that exports the embedded clip as a regular MP4 in your Movies folder — perfect for sharing the moment as a video. This works on local, non-encrypted motion photos.</string>
+    <string name="help_tip_action_save_motion_video_p1_desc">Motion photos store a short video alongside the still image. When you open one, Gallery shows a \'Save as video\' action exports the embedded clip as a regular MP4 in your Movies folder — perfect for sharing the moment as a video. This works on local, non-encrypted motion photos.</string>
     <string name="help_tip_action_save_motion_video_p1_s1">Open a motion photo</string>
     <string name="help_tip_action_save_motion_video_p1_s2">Open the action menu</string>
     <string name="help_tip_action_save_motion_video_p1_s3">Tap \'Save as video\'</string>
@@ -1028,9 +1028,9 @@
     <string name="help_tip_edit_effects_title">Effects &amp; colour tools</string>
     <string name="help_tip_edit_effects_subtitle">Posterize, Edges, Borders, Hue, and black &amp; white</string>
     <string name="help_tip_edit_effects_p1_title">The Effects tab</string>
-    <string name="help_tip_edit_effects_p1_desc">The editor now has an Effects tab with creative tools: Posterize reduces the photo to flat bands of colour, Edges traces outlines for a sketch-like look, and Borders adds a frame around the image. Each effect renders a live preview so you can dial it in before saving.</string>
+    <string name="help_tip_edit_effects_p1_desc">The editor now has an Effects tab with creative tools: Posterize reduces the photo to flat bands of colour, Edges traces outlines for a sketch-like look, and Borders adds a frame around the image. Each effect renders a live preview so dial it in before saving.</string>
     <string name="help_tip_edit_effects_p2_title">Hue, black &amp; white, and Negative</string>
-    <string name="help_tip_edit_effects_p2_desc">In the Colour tab you can shift the overall Hue or convert to black &amp; white with GPU-accelerated previews. The Filters grid also includes a one-tap Negative preset that inverts colours instantly. Combine effects, colour tools, filters, and adjustments for a fully custom look.</string>
+    <string name="help_tip_edit_effects_p2_desc">In the Colour tab shift the overall Hue or convert to black &amp; white with GPU-accelerated previews. The Filters grid also includes a one-tap Negative preset inverts colours instantly. Combine effects, colour tools, filters, and adjustments for a fully custom look.</string>
     <string name="help_tip_edit_effects_p2_s1">Open a photo and tap edit</string>
     <string name="help_tip_edit_effects_p2_s2">Open the Effects or Colour tab</string>
     <string name="help_tip_edit_effects_p2_s3">Adjust the effect and preview live</string>
@@ -1042,25 +1042,25 @@
     <string name="help_tip_albums_sections_p1_title">Album sections</string>
     <string name="help_tip_albums_sections_p1_desc">When enabled, Gallery automatically sorts your albums into collapsible sections — Common (Camera, Pictures, Downloads), Apps (media from other apps), and Other — based on where they\'re stored. Collapse the sections you don\'t need to keep the Albums screen tidy. This is off by default and can be enabled in album settings.</string>
     <string name="help_tip_albums_sections_p2_title">Move an album to a section</string>
-    <string name="help_tip_albums_sections_p2_desc">Sections are auto-detected, but you can override them. Long press an album and choose \'Move to section\' to place it exactly where you want. Your manual choices are remembered.</string>
+    <string name="help_tip_albums_sections_p2_desc">Sections are auto-detected, but override them. Long press an album and choose \'Move to section\' to place it exactly where you want. Your manual choices are remembered.</string>
     <string name="help_tip_albums_sections_p2_s1">Enable album sections in settings</string>
     <string name="help_tip_albums_sections_p2_s2">Long press an album</string>
     <string name="help_tip_albums_sections_p2_s3">Tap \'Move to section\'</string>
-    <string name="help_tip_albums_sections_p2_s4">Pick the section for that album</string>
+    <string name="help_tip_albums_sections_p2_s4">Pick the section for album</string>
 
     <!-- SETTINGS: BACKUP &amp; RESTORE WIZARD (5.0.0) -->
     <string name="help_tip_settings_backup_restore_title">Back up &amp; restore app data</string>
     <string name="help_tip_settings_backup_restore_subtitle">Export and import settings, favorites, cloud configs, and vaults</string>
     <string name="help_tip_settings_backup_restore_p1_title">Back up your setup</string>
-    <string name="help_tip_settings_backup_restore_p1_desc">The backup &amp; restore wizard lets you export your settings, favorites, cloud server configs, and vaults into a single archive you can move to a new device or keep safe. You can optionally protect the whole archive with a password. Vault backup is off by default and requires your vault credential before any vault is included.</string>
+    <string name="help_tip_settings_backup_restore_p1_desc">The backup &amp; restore wizard lets you export your settings, favorites, cloud server configs, and vaults into a single archive move to a new device or keep safe. You can optionally protect the whole archive with a password. Vault backup is off by default and requires your vault credential before any vault is included.</string>
     <string name="help_tip_settings_backup_restore_p2_title">Export a backup</string>
-    <string name="help_tip_settings_backup_restore_p2_desc">Choose exactly what to include. If you enable vaults, you select which ones, and each is authenticated with its own credential at export time so nothing leaves your device unlocked by accident.</string>
+    <string name="help_tip_settings_backup_restore_p2_desc">Choose exactly what to include. If you enable vaults, you select ones, and each is authenticated with its own credential at export time so nothing leaves your device unlocked by accident.</string>
     <string name="help_tip_settings_backup_restore_p2_s1">Go to Settings &gt; Backup &amp; restore</string>
     <string name="help_tip_settings_backup_restore_p2_s2">Choose Export and pick what to include</string>
     <string name="help_tip_settings_backup_restore_p2_s3">Optionally set an archive password</string>
     <string name="help_tip_settings_backup_restore_p2_s4">Save the backup file to a safe place</string>
     <string name="help_tip_settings_backup_restore_p3_title">Restore from a backup</string>
-    <string name="help_tip_settings_backup_restore_p3_desc">Importing lets you pick which parts of the archive to restore. Select the backup file, enter the password if one was set, then choose the data and vaults to bring back.</string>
+    <string name="help_tip_settings_backup_restore_p3_desc">Importing lets you pick parts of the archive to restore. Select the backup file, enter the password if one was set, then choose the data and vaults to bring back.</string>
     <string name="help_tip_settings_backup_restore_p3_s1">Choose Import and select your backup file</string>
     <string name="help_tip_settings_backup_restore_p3_s2">Enter the password if the archive is encrypted</string>
     <string name="help_tip_settings_backup_restore_p3_s3">Pick the data and vaults to restore</string>
@@ -1090,15 +1090,15 @@
     <string name="help_tip_cloud_timeline_title">Cloud photos in your timeline</string>
     <string name="help_tip_cloud_timeline_subtitle">Remote and local media merge into one unified timeline</string>
     <string name="help_tip_cloud_timeline_p1_title">One unified timeline</string>
-    <string name="help_tip_cloud_timeline_p1_desc">Once a server is connected, your cloud assets are merged into the same timeline as your device photos, sorted by date. Photos that exist both locally and on the server are intelligently grouped so you don\'t see duplicates. A small icon on each thumbnail shows its sync status.</string>
+    <string name="help_tip_cloud_timeline_p1_desc">Once a server is connected, your cloud assets are merged into the same timeline as your device photos, sorted by date. Photos exist both locally and on the server are intelligently grouped so you don\'t see duplicates. A small icon on each thumbnail shows its sync status.</string>
     <string name="help_tip_cloud_timeline_p2_title">View remote media</string>
     <string name="help_tip_cloud_timeline_p2_desc">Open any cloud photo or video to view it full quality, streamed from your server. You can see its full EXIF metadata — camera, lens, GPS, exposure — and favorite or unfavorite it just like local media.</string>
     <string name="help_tip_cloud_backup_title">Back up to your server</string>
     <string name="help_tip_cloud_backup_subtitle">Upload selected albums with Wi-Fi and cellular controls</string>
     <string name="help_tip_cloud_backup_p1_title">Automatic photo backup</string>
-    <string name="help_tip_cloud_backup_p1_desc">Choose which local albums to back up to your server and let Gallery upload them in the background. A checksum-based deduplication check avoids re-uploading photos that already exist on the server, saving time and bandwidth.</string>
+    <string name="help_tip_cloud_backup_p1_desc">Choose local albums to back up to your server and let Gallery upload them in the background. A checksum-based deduplication check avoids re-uploading photos already exist on the server, saving time and bandwidth.</string>
     <string name="help_tip_cloud_backup_p2_title">Control when it uploads</string>
-    <string name="help_tip_cloud_backup_p2_desc">Set separate Wi-Fi and cellular rules for photos and videos so backups only run when you want. Background uploads are scheduled periodically, and you can watch progress on the backup details screen.</string>
+    <string name="help_tip_cloud_backup_p2_desc">Set separate Wi-Fi and cellular rules for photos and videos so backups only run when you want. Background uploads are scheduled periodically, and watch progress on the backup details screen.</string>
     <string name="help_tip_cloud_backup_p2_s1">Open cloud backup settings</string>
     <string name="help_tip_cloud_backup_p2_s2">Pick the albums to back up</string>
     <string name="help_tip_cloud_backup_p2_s3">Set Wi-Fi and cellular preferences</string>
@@ -1149,7 +1149,7 @@
     <string name="help_tip_view_cutout_title">Cut out a subject</string>
     <string name="help_tip_view_cutout_subtitle">Lift a person or object from the background</string>
     <string name="help_tip_view_cutout_p1_title">Lift the detected subject</string>
-    <string name="help_tip_view_cutout_p1_desc">In the viewer, ReFra can detect the main subject on-device and show a highlighted suggestion. Open it to refine the mask, then copy, share or save a transparent cutout. You can also make long-press start cutout from Media Viewer settings.</string>
+    <string name="help_tip_view_cutout_p1_desc">In the viewer, Theoria can detect the main subject on-device and show a highlighted suggestion. Open it to refine the mask, then copy, share or save a transparent cutout. You can also make long-press start cutout from Media Viewer settings.</string>
     <string name="help_tip_view_cutout_p1_s1">Open a photo with a clear subject</string>
     <string name="help_tip_view_cutout_p1_s2">Tap the Cut out subject suggestion</string>
     <string name="help_tip_view_cutout_p1_s3">Refine the outline with include or exclude points</string>
@@ -1174,7 +1174,7 @@
     <string name="help_tip_settings_date_format_title">Date format</string>
     <string name="help_tip_settings_date_format_subtitle">Choose how dates appear</string>
     <string name="help_tip_settings_date_format_p1_title">Pick your format</string>
-    <string name="help_tip_settings_date_format_p1_desc">ReFra follows your system date and 12/24-hour preferences by default. Set an override only when you want a custom pattern, and use the information button to review supported format symbols.</string>
+    <string name="help_tip_settings_date_format_p1_desc">Theoria follows your system date and 12/24-hour preferences by default. Set an override only when you want a custom pattern, and use the information button to review supported format symbols.</string>
     <string name="help_tip_settings_date_format_p1_s1">Open Date format</string>
     <string name="help_tip_settings_date_format_p1_s2">Keep Follow system or enter a custom pattern</string>
     <string name="help_tip_settings_date_format_p1_s3">Preview the result and open format guidance if needed</string>
@@ -1182,7 +1182,7 @@
     <string name="help_tip_basics_setup_title">First-run setup</string>
     <string name="help_tip_basics_setup_subtitle">Grant access and pick your defaults</string>
     <string name="help_tip_basics_setup_p1_title">Getting started</string>
-    <string name="help_tip_basics_setup_p1_desc">On first launch ReFra guides you through permissions, appearance, AI models, cloud accounts and useful tips. You can revisit the setup at any time.</string>
+    <string name="help_tip_basics_setup_p1_desc">On first launch Theoria guides you through permissions, appearance, AI models, cloud accounts and useful tips. You can revisit the setup at any time.</string>
 
     <string name="help_tip_albums_ignored_manage_title">Manage ignored albums</string>
     <string name="help_tip_albums_ignored_manage_subtitle">Review and restore hidden folders</string>
@@ -1204,7 +1204,7 @@
     <string name="help_tip_cloud_destinations_title">Backup destinations</string>
     <string name="help_tip_cloud_destinations_subtitle">Map each album to one or more clouds</string>
     <string name="help_tip_cloud_destinations_p1_title">Destinations matrix</string>
-    <string name="help_tip_cloud_destinations_p1_desc">Choose exactly which albums back up to which connected accounts using a simple matrix.</string>
+    <string name="help_tip_cloud_destinations_p1_desc">Choose exactly albums back up to connected accounts using a simple matrix.</string>
 
     <string name="help_tip_cloud_provider_settings_title">Account settings</string>
     <string name="help_tip_cloud_provider_settings_subtitle">Manage a connected account</string>
@@ -1229,12 +1229,12 @@
     <string name="help_tip_cloud_free_up_space_title">Free up space</string>
     <string name="help_tip_cloud_free_up_space_subtitle">Remove local copies safely backed up</string>
     <string name="help_tip_cloud_free_up_space_p1_title">Reclaim storage</string>
-    <string name="help_tip_cloud_free_up_space_p1_desc">Delete on-device copies of media that is already safely backed up to the cloud.</string>
+    <string name="help_tip_cloud_free_up_space_p1_desc">Delete on-device copies of media is already safely backed up to the cloud.</string>
 
     <string name="help_tip_media_type_albums_title">Browse by media type</string>
     <string name="help_tip_media_type_albums_subtitle">Automatic albums for photos, videos, GIFs and RAW files</string>
     <string name="help_tip_media_type_albums_p1_title">Media-type albums</string>
-    <string name="help_tip_media_type_albums_p1_desc">ReFra creates virtual albums from your unified library so you can open all photos, videos, GIFs or RAW files together. Their visibility is controlled from Timeline &amp; Albums settings.</string>
+    <string name="help_tip_media_type_albums_p1_desc">Theoria creates virtual albums from your unified library so open all photos, videos, GIFs or RAW files together. Their visibility is controlled from Timeline &amp; Albums settings.</string>
     <string name="help_tip_media_type_albums_p1_s1">Open Albums and scroll to Media types</string>
     <string name="help_tip_media_type_albums_p1_s2">Open a type to browse matching media</string>
     <string name="help_tip_media_type_albums_p1_s3">Use Timeline &amp; Albums settings to show or hide the section</string>
@@ -1242,7 +1242,7 @@
     <string name="help_tip_raw_develop_title">Develop RAW photos</string>
     <string name="help_tip_raw_develop_subtitle">Adjust sensor data before exporting</string>
     <string name="help_tip_raw_develop_p1_title">Use the Develop controls</string>
-    <string name="help_tip_raw_develop_p1_desc">Open a supported RAW photo in the editor to adjust white balance, exposure, highlights, output colour and demosaicing. ReFra uses a memory-safe preview while preserving full-resolution output.</string>
+    <string name="help_tip_raw_develop_p1_desc">Open a supported RAW photo in the editor to adjust white balance, exposure, highlights, output colour and demosaicing. Theoria uses a memory-safe preview while preserving full-resolution output.</string>
     <string name="help_tip_raw_develop_p1_s1">Open a RAW photo and tap Edit</string>
     <string name="help_tip_raw_develop_p1_s2">Choose options in the Develop tab</string>
     <string name="help_tip_raw_develop_p1_s3">Apply any additional crop, filter or markup</string>
@@ -1251,7 +1251,7 @@
     <string name="help_tip_people_grouping_title">Group people on-device</string>
     <string name="help_tip_people_grouping_subtitle">Find faces without uploading your library</string>
     <string name="help_tip_people_grouping_p1_title">Scan and organize people</string>
-    <string name="help_tip_people_grouping_p1_desc">With the face model installed, ReFra scans and groups people locally. You can start a fresh scan from People, hide a person, merge groups and create blurred copies when privacy matters.</string>
+    <string name="help_tip_people_grouping_p1_desc">With the face model installed, Theoria scans and groups people locally. You can start a fresh scan from People, hide a person, merge groups and create blurred copies when privacy matters.</string>
     <string name="help_tip_people_grouping_p1_s1">Install the Face Detection model</string>
     <string name="help_tip_people_grouping_p1_s2">Open Library, then People</string>
     <string name="help_tip_people_grouping_p1_s3">Tap Scan for people and wait for indexing</string>
@@ -1268,7 +1268,7 @@
     <string name="help_tip_metadata_sanitize_title">Remove sensitive metadata</string>
     <string name="help_tip_metadata_sanitize_subtitle">Sanitize supported files without recompressing pixels</string>
     <string name="help_tip_metadata_sanitize_p1_title">Choose what to remove</string>
-    <string name="help_tip_metadata_sanitize_p1_desc">From a photo\'s details, choose Remove metadata and select location only, descriptive fields or all supported metadata. ReFra writes and verifies a lossless sanitized copy before replacing the original.</string>
+    <string name="help_tip_metadata_sanitize_p1_desc">From a photo\'s details, choose Remove metadata and select location only, descriptive fields or all supported metadata. Theoria writes and verifies a lossless sanitized copy before replacing the original.</string>
     <string name="help_tip_metadata_sanitize_p1_s1">Open a supported local photo</string>
     <string name="help_tip_metadata_sanitize_p1_s2">Expand its details and tap Remove metadata</string>
     <string name="help_tip_metadata_sanitize_p1_s3">Choose the sanitization level</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">ギャラリー</string>
     <string name="change_app_name">アプリ名</string>
     <string name="change_app_name_summary">ランチャーに表示されるアプリ名を変更する</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Open externally</string>
     <string name="no_map_app">位置情報を表示できるアプリがありません</string>
     <string name="app_dev">作成者: %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">寄付</string>
     <string name="github">GitHub</string>
     <string name="donate_button_cd">寄付ボタン</string>
     <string name="github_button_cd">GitHub ボタン</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">バナーを閉じる</string>
     <string name="dismiss_banner_title">バナーを移動しますか？</string>
     <string name="dismiss_banner_message">寄付ボタンとGitHubボタンは、設定ページの下部にあるコンパクトなバーに移動します。</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">すべてのメタデータ</string>
     <string name="no_metadata_found">メタデータがありません</string>
     <string name="loading_metadata">メタデータの読み込み中…</string>
-    <string name="categorise_your_media">メディアを分類する</string>
-    <string name="disclaimer_classification">あなたのメディアはどのサーバーにもアップロードされておらず、すべての分類はデバイス上でローカルに行われ、アプリのアセットにある事前トレーニング済みモデルを使用して行われます。</string>
+
     <string name="ai_category">スマートな機能</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">AIモデルがインストールされていません。設定 &gt; スマートな機能からダウンロードしてください。</string>
+
     <string name="ai_models_manager">AIモデルマネージャー</string>
     <string name="ai_models_download">AIモデルをダウンロード</string>
-    <string name="ai_models_download_summary">画像検索および分類用のAIモデルをダウンロード（約147 MB）</string>
+
     <string name="ai_models_downloading">AIモデルのダウンロード中…</string>
-    <string name="ai_models_ready_summary">AIによる検索と分類が利用可能です</string>
-    <string name="ai_models_error">AI Model Error</string>
+
     <string name="ai_models_delete">AIモデルを削除</string>
     <string name="ai_models_delete_confirm">AIモデルを削除してもよろしいですか？AI機能を使用するには再度ダウンロードする必要があります。</string>
     <string name="ai_models_size">モデルサイズ： %s</string>
-    <string name="ai_models_unavailable">利用不可 — AIモデル機能が必要です</string>
+
     <string name="ai_models_description">AIモデルにより、インテリジェント画像検索と自動メディア分類が可能になります。 アプリは、あなたの写真の内容を理解するためにONNX形式のCLIP(Contrastive Language-Image Pretraining)モデルを使用します。</string>
     <string name="ai_models_privacy_description">すべてのAI処理はデバイス上で完全に実行されます。画像、検索クエリ、または分類データは端末から離れることはありません。 モデルはONNXランタイムを使用してローカルで実行され、ダウンロード後はインターネット接続を必要としません。メディアは完全に非公開のままです。</string>
     <string name="ai_models_source">ソース</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">モデルファイル</string>
-    <string name="ai_models_feature_search">説明で検索</string>
-    <string name="ai_models_feature_categories">自動カテゴリ</string>
+
     <!-- New Category System -->
-    <string name="add_category">Add category</string>
-    <string name="edit_category">カテゴリを編集</string>
-    <string name="delete_category_title">カテゴリを削除しますか？</string>
-    <string name="delete_category_confirmation">このカテゴリを削除してもよろしいですか？この操作は元に戻せません。</string>
-    <string name="category_name">カテゴリ名</string>
-    <string name="category_name_hint">例：自然、食、旅行</string>
-    <string name="search_terms">Search terms</string>
-    <string name="search_terms_hint">Comma-separated keywords to match images</string>
-    <string name="search_terms_example">sunset, sunrise, golden hour, sky</string>
-    <string name="accuracy_threshold">Accuracy threshold</string>
-    <string name="more_results">More results</string>
-    <string name="more_accurate">More accurate</string>
+
     <string name="preview">プレビュー</string>
-    <string name="matching_photos">Matching photos</string>
-    <string name="best_match">Best Match</string>
-    <string name="matching_photos_count">%1$d matching</string>
-    <string name="recommended">recommended</string>
-    <string name="no_matching_photos">No matching photos found</string>
-    <string name="category_helper_text">Add a name, search terms and adjust the accuracy to create your category</string>
-    <string name="reset_categories">カテゴリをリセット</string>
-    <string name="reset_categories_summary">すべてのカテゴリを削除し、デフォルトで再初期化します</string>
+
     <string name="create">作成</string>
     <string name="save">保存</string>
-    <string name="browse_categories">カテゴリを閲覧</string>
-    <string name="category_media_count">%1$d アイテム</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">新しいカテゴリ</string>
-    <string name="describe_content">何を含めるか説明してください</string>
-    <string name="describe_content_hint">このカテゴリに含める写真を説明してください</string>
-    <string name="describe_content_example">例：photos of my dog at the beach</string>
-    <string name="quick_start">クイックスタート</string>
-    <string name="quick_start_subtitle">提案をタップして開始</string>
-    <string name="matching_preview">プレビュー</string>
-    <string name="see_all_matches">すべての %1$d 件を表示</string>
-    <string name="sensitivity">感度</string>
-    <string name="sensitivity_broad">幅広く</string>
-    <string name="sensitivity_broad_desc">関連性の薄い写真も含める</string>
-    <string name="sensitivity_balanced">バランス</string>
-    <string name="sensitivity_balanced_desc">関連性の良いミックス</string>
-    <string name="sensitivity_strict">厳格</string>
-    <string name="sensitivity_strict_desc">関連性の高いもののみ</string>
-    <string name="sensitivity_exact">完全一致</string>
-    <string name="sensitivity_exact_desc">ほぼ一致する結果のみ</string>
-    <string name="fine_tune">微調整</string>
-    <string name="category_created">Category created — classifying photos…</string>
-    <string name="category_updated">Category updated — reclassifying…</string>
-    <string name="category_deleted">Category deleted</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">参考写真</string>
-    <string name="reference_images_hint">視覚的に似ているものを見つけるために写真を追加します</string>
-    <string name="add_reference_photos">写真を追加</string>
-    <string name="reference_images_count">%1$d 個選択済み</string>
+
     <string name="restore">復元</string>
     <string name="encrypted">暗号化されています</string>
     <string name="date_format_settings">日付の形式</string>
     <string name="date_header">日付の形式</string>
     <string name="date_header_summary">独自の日付形式を設定</string>
     <string name="launch_on_library">ライブラリで起動</string>
-    <string name="categories">カテゴリー</string>
-    <string name="classified_media">%1$s 分類されたメディア</string>
-    <string name="scan_for_new_categories">新しいカテゴリをスキャン</string>
-    <string name="ai_models_not_available">AI models are not downloaded. Download them from Settings → Smart Features.</string>
-    <string name="scanning_media">メディアをスキャン中...</string>
+
     <string name="date_header_title">日付ヘッダー</string>
     <string name="media_view">メディアビュー</string>
     <string name="exif_date">Exifデータの日付</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" %1$s で"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">メタデータを収集しています…</string>
@@ -926,7 +877,7 @@
     <string name="backup_encrypt_header">暗号化</string>
     <string name="backup_restore_header">復元するものを選択してください</string>
     <string name="backup_restore">復元</string>
-    <string name="backup_made_with_version">ReFra %1$s で作成されました</string>
+    <string name="backup_made_with_version">Theoria %1$s で作成されました</string>
     <string name="backup_empty">This backup doesn\'t contain any restorable data.</string>
     <string name="backup_items_count">%1$d アイテム</string>
     <string name="backup_pick_file_prompt">復元するバックアップファイルを選択してください。</string>

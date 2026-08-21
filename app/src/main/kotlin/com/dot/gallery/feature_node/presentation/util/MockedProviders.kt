@@ -24,7 +24,6 @@ import com.dot.gallery.core.util.SetupMediaProviders
 import com.dot.gallery.feature_node.domain.model.AlbumState
 import com.dot.gallery.feature_node.domain.model.CollectionWithCount
 import com.dot.gallery.feature_node.domain.model.IgnoredAlbum
-import com.dot.gallery.feature_node.domain.model.ImageEmbedding
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.model.GeoMedia
 import com.dot.gallery.feature_node.domain.model.LocationMedia
@@ -81,7 +80,6 @@ open class MockedMediaDistributor: MediaDistributor {
     override val geoMediaFlow: StateFlow<List<GeoMedia>> = MutableStateFlow(emptyList())
     override val vaultsMediaFlow: StateFlow<VaultState> = MutableStateFlow(VaultState())
     override fun vaultMediaFlow(vault: Vault?): StateFlow<MediaState<Media.UriMedia>> = MutableStateFlow(MediaState())
-    override val imageEmbeddingsFlow: StateFlow<List<ImageEmbedding>> = MutableStateFlow(emptyList())
     override fun locationBasedMedia(
         gpsLocationNameCity: String,
         gpsLocationNameCountry: String

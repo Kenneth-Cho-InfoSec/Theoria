@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.memories
@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -46,12 +47,21 @@ class MemoriesViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true)
         val type = providers.first().providerType
         viewModelScope.launch {
-            repository.getMemories(type).collect { resource ->
+            repository.getMemories(type)
+                .catch { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Unable to load memories"
+                    )
+                }
+                .collect { resource ->
                 when (resource) {
                     is Resource.Success -> _uiState.value = MemoriesUiState(
-                        memories = resource.data ?: emptyList()
+                        memories = resource.data ?: emptyList(),
+                        isLoading = false
                     )
                     is Resource.Error -> _uiState.value = MemoriesUiState(
+                        isLoading = false,
                         error = resource.message
                     )
                 }

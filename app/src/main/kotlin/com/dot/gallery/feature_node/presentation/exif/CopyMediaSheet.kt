@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.exif
 
 import android.os.Build
@@ -94,6 +99,7 @@ fun <T: Media> CopyMediaSheet(
     val viewModel: CopyMediaViewModel = hiltViewModel()
     val progress by viewModel.progress.collectAsState()
     val isActive by viewModel.isActive.collectAsState()
+    val showProgress = isActive || progress > 0f
 
     val newAlbumSheetState = rememberAppBottomSheetState()
     val securitySheetState = rememberAppBottomSheetState()
@@ -140,8 +146,8 @@ fun <T: Media> CopyMediaSheet(
         enter = enterAnimation,
         exit = exitAnimation
     ) {
-        val shouldDismiss by rememberedDerivedState(progress) {
-            progress == 0f
+        val shouldDismiss by rememberedDerivedState(showProgress) {
+            !showProgress
         }
         val prop = ModalBottomSheetProperties(
             securePolicy = SecureFlagPolicy.Inherit,
@@ -151,7 +157,7 @@ fun <T: Media> CopyMediaSheet(
             sheetState = sheetState.sheetState,
             onDismissRequest = {
                 scope.launch {
-                    if (progress == 0f) {
+                    if (!showProgress) {
                         sheetState.hide()
                     } else {
                         sheetState.show()
@@ -216,7 +222,7 @@ fun <T: Media> CopyMediaSheet(
                 }
 
                 AnimatedVisibility(
-                    visible = progress > 0f,
+                    visible = showProgress,
                     modifier = Modifier
                         .padding(32.dp)
                         .align(Alignment.CenterHorizontally),
@@ -228,21 +234,26 @@ fun <T: Media> CopyMediaSheet(
                             .padding(bottom = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            progress = {
-                                progress
-                            },
-                            strokeWidth = 4.dp,
-                            strokeCap = StrokeCap.Round,
-                            modifier = Modifier.size(128.dp),
-                        )
-                        Text(text = "${(progress * 100).roundToInt()}%")
+                        if (progress > 0f) {
+                            CircularProgressIndicator(
+                                progress = { progress },
+                                strokeWidth = 4.dp,
+                                strokeCap = StrokeCap.Round,
+                                modifier = Modifier.size(128.dp),
+                            )
+                            Text(text = "${(progress * 100).roundToInt()}%")
+                        } else {
+                            CircularProgressIndicator(
+                                strokeWidth = 4.dp,
+                                modifier = Modifier.size(128.dp),
+                            )
+                        }
                     }
                 }
 
                 val albumSize by rememberAlbumGridSize()
                 AnimatedVisibility(
-                    visible = progress == 0f,
+                    visible = !showProgress,
                     enter = enterAnimation,
                     exit = exitAnimation
                 ) {
@@ -310,19 +321,14 @@ fun <T: Media> CopyMediaSheet(
                                 key = { item -> "group_album_${item.id}" }
                             ) { item ->
                                 val mediaVolume = (mediaList.firstOrNull()?.volume ?: item.volume)
-                                val albumOwnership =
-                                    item.relativePath.substringBeforeLast("Android/media/", "allow")
-                                val mediaOwnership =
-                                    mediaList.firstOrNull()?.relativePath?.substringBeforeLast(
-                                        "Android/media/",
-                                        "allow"
-                                    ) ?: albumOwnership
                                 AlbumComponent(
                                     modifier = Modifier.animateItem(),
                                     album = item,
-                                    isEnabled = hasFullMediaAccess || (item.volume == mediaVolume
-                                            && albumOwnership == "allow"
-                                            && mediaOwnership == "allow"),
+                                    // A scoped MediaStore write request can authorize ordinary
+                                    // folders. The previous Android/media substring comparison
+                                    // returned the whole path for normal folders and disabled
+                                    // every existing album for scoped-permission users.
+                                    isEnabled = hasFullMediaAccess || item.volume == mediaVolume,
                                     onItemClick = { album ->
                                         if (album.isLocked) {
                                             if (!biometricState.isSupported) {
@@ -369,18 +375,9 @@ fun <T: Media> CopyMediaSheet(
                                 key = { item -> item.toString() }
                             ) { item ->
                                 val mediaVolume = (mediaList.firstOrNull()?.volume ?: item.volume)
-                                val albumOwnership =
-                                    item.relativePath.substringBeforeLast("Android/media/", "allow")
-                                val mediaOwnership =
-                                    mediaList.firstOrNull()?.relativePath?.substringBeforeLast(
-                                        "Android/media/",
-                                        "allow"
-                                    ) ?: albumOwnership
                                 AlbumComponent(
                                     album = item,
-                                    isEnabled = hasFullMediaAccess || (item.volume == mediaVolume
-                                            && albumOwnership == "allow"
-                                            && mediaOwnership == "allow"),
+                                    isEnabled = hasFullMediaAccess || item.volume == mediaVolume,
                                     onItemClick = { album ->
                                         if (album.isLocked) {
                                             if (!biometricState.isSupported) {

@@ -17,18 +17,15 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.awxkee.jxlcoder.JxlCoder
 import com.dot.gallery.cloud.core.ProviderRegistry
 import com.dot.gallery.cloud.core.ProviderType
 import com.dot.gallery.cloud.core.capabilities.SyncCapableProvider
 import com.dot.gallery.cloud.util.CloudMediaDownloader
 import com.dot.gallery.core.Settings
 import com.dot.gallery.core.decoder.format.ImageReencoder
-import com.dot.gallery.core.decoder.format.SourceQualityProbe
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.util.getUri
 import com.github.panpf.sketch.util.rotate
-import com.radzivon.bartoshyk.avif.coder.HeifCoder
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -103,9 +100,7 @@ class RotateMediaWorker @AssistedInject constructor(
             // (RAW/TIFF/PSD/…) get PNG, which only happens on the forced-copy path.
             val writeFormat = ImageReencoder.formatForMime(mime, label)
                 ?: ImageReencoder.ImageWriteFormat.PNG
-            val detectedQuality = if (writeFormat == ImageReencoder.ImageWriteFormat.JPEG && !isCloud) {
-                runCatching { detectSourceQuality(sourceUri, mime) }.getOrNull()
-            } else null
+            val detectedQuality = null
             val config = Settings.Misc.getReencodeConfig(appContext, detectedQuality)
             if (isCloud) {
                 val localUri = saveRotatedAsNewLocalUri(rotated, writeFormat, config, label)
@@ -204,16 +199,6 @@ class RotateMediaWorker @AssistedInject constructor(
         }
     }
 
-    /** Reads a header prefix and estimates the JPEG source quality (or null). */
-    private fun detectSourceQuality(uri: Uri, mime: String): Int? {
-        val prefix = cr.openInputStream(uri)?.use { input ->
-            val buf = ByteArray(256 * 1024)
-            val read = input.read(buf)
-            if (read <= 0) null else buf.copyOf(read)
-        } ?: return null
-        return SourceQualityProbe.detect(prefix, mime)
-    }
-
     /** Builds a display name for a rotated copy carrying the write format's extension. */
     private fun copyDisplayName(label: String, writeFormat: ImageReencoder.ImageWriteFormat): String {
         val base = label.substringBeforeLast('.', label)
@@ -263,36 +248,15 @@ class RotateMediaWorker @AssistedInject constructor(
     }
 
     private fun decodeFullResolution(uri: Uri, mime: String): Bitmap? {
-        val lower = mime.lowercase()
         return cr.openInputStream(uri)?.use { input -> decodeFromStream(input, mime) }
     }
 
     private fun decodeFromStream(input: InputStream, mime: String): Bitmap? {
-        val lower = mime.lowercase()
-        return when {
-            lower.contains("jxl") -> {
-                val bytes = input.readBytes()
-                val size = JxlCoder.getSize(bytes) ?: return null
-                JxlCoder.decodeSampled(bytes, size.width, size.height)
-            }
-
-            lower.contains("heic") || lower.contains("heif") || lower.contains("avif") || lower.contains(
-                "avis"
-            ) -> {
-                val bytes = input.readBytes()
-                val coder = HeifCoder()
-                val size = coder.getSize(bytes) ?: return null
-                coder.decodeSampled(bytes, size.width, size.height)
-            }
-
-            else -> {
-                val opts = BitmapFactory.Options().apply {
-                    inPreferredConfig = Bitmap.Config.ARGB_8888
-                    inMutable = false
-                }
-                BitmapFactory.decodeStream(input, null, opts)
-            }
+        val opts = BitmapFactory.Options().apply {
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+            inMutable = false
         }
+        return BitmapFactory.decodeStream(input, null, opts)
     }
 
     private suspend fun update(@Status status: Int, msg: String) {

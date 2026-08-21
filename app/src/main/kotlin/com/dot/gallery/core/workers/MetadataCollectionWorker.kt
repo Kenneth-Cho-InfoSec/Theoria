@@ -26,10 +26,13 @@ import com.dot.gallery.feature_node.presentation.util.mediaStoreVersion
 import com.dot.gallery.feature_node.presentation.util.printDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
 fun WorkManager.forceMetadataCollect() {
@@ -50,6 +53,11 @@ class MetadataCollectionWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
+
+    private companion object {
+        const val MAX_FILE_SIZE_BYTES = 50L * 1024 * 1024
+        const val PER_FILE_TIMEOUT_MS = 5000L
+    }
 
     override suspend fun doWork(): Result = runCatching {
         if (!BuildConfig.ENABLE_INDEXING) {
@@ -96,14 +104,32 @@ class MetadataCollectionWorker @AssistedInject constructor(
             printDebug("Updating metadata for ${diffMedia.size} items... (isolation=$isolationMode)")
             val throttler = ProgressThrottler()
             val total = diffMedia.size
+            var failedCount = 0
             diffMedia.fastForEachIndexed { index, it ->
                 if (!currentCoroutineContext().isActive || isStopped) return@fastForEachIndexed
                 val pct =
                     if (total <= 1) 100 else (((index + 1).toFloat() / total.toFloat()) * 100f).roundToInt()
                 throttler.emit(pct) { setProgress(workDataOf("progress" to it)) }
-                appContext.retrieveExtraMediaMetadata(isolatedParser, geocoder, it, usePerFile)?.let { metadata ->
-                    database.getMetadataDao().addMetadata(metadata)
+                try {
+                    if (it.size > MAX_FILE_SIZE_BYTES) {
+                        printDebug("Skipping large file (${it.size / 1024 / 1024}MB): ${it.label}")
+                        return@fastForEachIndexed
+                    }
+                    withTimeoutOrNull(PER_FILE_TIMEOUT_MS) {
+                        appContext.retrieveExtraMediaMetadata(isolatedParser, geocoder, it, usePerFile)
+                    }?.let { metadata ->
+                        database.getMetadataDao().addMetadata(metadata)
+                    } ?: run {
+                        failedCount++
+                        printDebug("Timeout processing ${it.label}")
+                    }
+                } catch (e: Exception) {
+                    failedCount++
+                    printDebug("Failed to process ${it.label}: ${e.message}")
                 }
+            }
+            if (failedCount > 0) {
+                printDebug("Metadata collection finished with $failedCount failures out of $total")
             }
         }
         printDebug("Metadata update complete")
@@ -116,7 +142,8 @@ class MetadataCollectionWorker @AssistedInject constructor(
         return Result.success()
     }.getOrElse { exception ->
         printDebug("MetadataCollectionWorker failed with exception: ${exception.message}")
-        return Result.failure()
+        exception.printStackTrace()
+        Result.success()
     }
 
     private suspend fun collectCloudMediaMetadata() {

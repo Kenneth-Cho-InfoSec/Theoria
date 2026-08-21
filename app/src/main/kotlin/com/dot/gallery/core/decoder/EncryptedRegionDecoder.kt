@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decoder
 
 import android.graphics.BitmapFactory
@@ -53,7 +58,9 @@ class EncryptedRegionDecoder(
         }
         val originalRegion = exifOrientationHelper
             .applyToRect(region, cachedImageInfo.size, reverse = true)
-        val bitmap = bitmapRegionDecoder!!.decodeRegion(originalRegion.toAndroidRect(), options)
+        val bitmap = bitmapRegionDecoder
+            ?.decodeRegion(originalRegion.toAndroidRect(), options)
+            ?: error("Encrypted region decoder returned no bitmap")
         val tileImage = BitmapTileImage(bitmap)
         val correctedImage = exifOrientationHelper.applyToTileImage(tileImage)
         return correctedImage.bitmap
@@ -62,24 +69,22 @@ class EncryptedRegionDecoder(
     override fun prepare() {
         if (bitmapRegionDecoder != null) return
 
-        val decrypted = keychainHolder.decryptVaultMedia(
-            (imageSource as ContentImageSource).uri.toFile()
-        )
+        val contentSource = imageSource as? ContentImageSource
+            ?: error("Encrypted region decoder requires a content image source")
+        val decrypted = keychainHolder.decryptVaultMedia(contentSource.uri.toFile())
         val bytes = decrypted.readBytes()
         decrypted.cleanup()
 
-        bitmapRegionDecoder = kotlin.runCatching {
+        bitmapRegionDecoder = runCatching {
             if (VERSION.SDK_INT >= VERSION_CODES.S) {
                 BitmapRegionDecoder.newInstance(bytes, 0, bytes.size)
             } else {
                 @Suppress("DEPRECATION")
                 BitmapRegionDecoder.newInstance(bytes, 0, bytes.size, false)
             }
-        }.apply {
-            if (isFailure) {
-                throw exceptionOrNull()!!
-            }
-        }.getOrThrow()
+        }.getOrElse { error ->
+            throw IllegalStateException("Unable to create encrypted region decoder", error)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

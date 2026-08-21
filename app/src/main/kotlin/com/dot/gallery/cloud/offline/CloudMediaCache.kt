@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.offline
@@ -93,8 +93,12 @@ class CloudMediaCache @Inject constructor(
         true
     }.getOrElse { false }
 
-    fun autoSizeBytes(): Long = autoDir.listFiles()?.filter { it.isFile }?.sumOf { it.length() } ?: 0L
-    fun pinnedSizeBytes(): Long = pinnedDir.listFiles()?.filter { it.isFile }?.sumOf { it.length() } ?: 0L
+    fun autoSizeBytes(): Long = autoDir.listFiles()
+        ?.filter { it.isFile && !it.name.endsWith(".tmp") }
+        ?.sumOf { it.length() } ?: 0L
+    fun pinnedSizeBytes(): Long = pinnedDir.listFiles()
+        ?.filter { it.isFile && !it.name.endsWith(".tmp") }
+        ?.sumOf { it.length() } ?: 0L
     fun totalSizeBytes(): Long = autoSizeBytes() + pinnedSizeBytes()
 
     /** Every cache key (all size variants) that could exist for a single asset. */
@@ -143,12 +147,16 @@ class CloudMediaCache @Inject constructor(
     fun trimAuto(budgetBytes: Long) {
         runCatching {
             val files = autoDir.listFiles()?.filter { it.isFile && !it.name.endsWith(".tmp") } ?: return
-            var total = files.sumOf { it.length() }
+            val groups = files.groupBy { it.name.substringBeforeLast('.') }
+            val entries = groups.values.map { group ->
+                group to group.sumOf { it.length() }
+            }
+            var total = entries.sumOf { it.second }
             if (total <= budgetBytes) return
-            files.sortedBy { it.lastModified() }.forEach { f ->
+            entries.sortedBy { entry -> entry.first.minOf { it.lastModified() } }.forEach { entry ->
                 if (total <= budgetBytes) return
-                total -= f.length()
-                f.delete()
+                total -= entry.second
+                entry.first.forEach { it.delete() }
             }
             printDebug("CloudMediaCache: trimmed auto cache to <= ${budgetBytes / (1024 * 1024)}MB")
         }

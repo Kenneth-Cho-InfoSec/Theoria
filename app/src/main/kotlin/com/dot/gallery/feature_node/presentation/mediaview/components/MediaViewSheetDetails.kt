@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.mediaview.components
@@ -285,26 +285,6 @@ fun <T : Media> MediaViewSheetDetails(
                 )
 
                 val locationData = rememberLocationData(metadata)
-                var category by remember(currentMedia) {
-                    mutableStateOf(currentMedia.getCategory)
-                }
-                LaunchedEffect(currentMedia, category, handler) {
-                    if (category == null) {
-                        category = handler.getCategoryForMediaId(currentMedia.id)
-                    }
-                }
-                val mediaCategoryCounter by if (category != null) {
-                    handler.getClassifiedMediaCountAtCategory(category!!)
-                        .collectAsStateWithLifecycle(0)
-                } else {
-                    remember { mutableStateOf(0) }
-                }
-                val mediaCategoryThumbnail by if (category != null) {
-                    handler.getClassifiedMediaThumbnailByCategory(category!!)
-                        .collectAsStateWithLifecycle(null)
-                } else {
-                    remember { mutableStateOf(null) }
-                }
 
                 LazyColumn(
                     modifier = Modifier
@@ -558,51 +538,6 @@ fun <T : Media> MediaViewSheetDetails(
                                             Screen.MetadataViewScreen.uriAndType(
                                                 mediaUri = currentMedia.getUri().toString(),
                                                 isVideo = currentMedia.isVideo
-                                            )
-                                        )
-                                    }
-                                )
-                            }
-                            if (category != null) {
-                                val eventHandler = LocalEventHandler.current
-                                MediaInfoRow(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                    label = category!!,
-                                    content = stringResource(
-                                        R.string.s_items,
-                                        mediaCategoryCounter
-                                    ),
-                                    iconBackgroundModifier = Modifier
-                                        .then(iconBackgroundModifier)
-                                        .hazeEffectScaled(
-                                            state = LocalHazeState.current,
-                                            style = iconBackgroundHazeStyle
-                                        ),
-                                    trailingContent = {
-                                        AnimatedVisibility(
-                                            visible = mediaCategoryThumbnail != null,
-                                            enter = enterAnimation,
-                                            exit = exitAnimation
-                                        ) {
-                                            GlideImage(
-                                                model = mediaCategoryThumbnail!!.uri,
-                                                contentDescription = null,
-                                                contentScale = ContentScale.Crop,
-                                                modifier = Modifier
-                                                    .size(48.dp)
-                                                    .clip(RoundedCornerShape(16.dp)),
-                                                requestBuilderTransform = {
-                                                    it.signature(GlideInvalidation.signature(mediaCategoryThumbnail!!))
-                                                }
-                                            )
-                                        }
-                                    },
-                                    onClick = {
-                                        eventHandler.navigate(
-                                            Screen.CategoryViewScreen.category(
-                                                category!!
                                             )
                                         )
                                     }

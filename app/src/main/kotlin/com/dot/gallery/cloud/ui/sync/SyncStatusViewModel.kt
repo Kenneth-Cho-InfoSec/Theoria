@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.sync
@@ -76,7 +76,13 @@ class SyncStatusViewModel @Inject constructor(
 
     fun triggerSync() {
         val providers = registry.getRemoteProviders().filter { it.isAvailable }
-        if (providers.isEmpty()) return
+        if (providers.isEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                lastSyncError = "No remote media provider available"
+            )
+            return
+        }
         _uiState.value = _uiState.value.copy(isLoading = true, lastSyncError = null)
         viewModelScope.launch {
             try {

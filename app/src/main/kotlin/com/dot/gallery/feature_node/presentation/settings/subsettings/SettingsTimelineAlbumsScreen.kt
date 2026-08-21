@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.settings.subsettings
@@ -148,6 +148,7 @@ private const val DETAIL_HIDE_TIMELINE = "hide_timeline"
 private const val DETAIL_MERGE_ALBUMS = "merge_albums"
 private const val DETAIL_ALBUM_SECTIONS = "album_sections"
 private const val DETAIL_PINNED_GRID = "pinned_albums_as_grid"
+private const val DETAIL_ALBUM_THUMBNAIL_PADDING = "album_thumbnail_padding"
 private const val DETAIL_FAV_ICON = "fav_icon"
 private const val DETAIL_SEARCHBAR_FAV_BUTTON = "searchbar_fav_button"
 private const val DETAIL_DATE_HEADERS = "date_headers"
@@ -176,6 +177,7 @@ fun SettingsTimelineAlbumsScreen() {
     var albumSectionsEnabled by Settings.Album.rememberAlbumSectionsEnabled()
     var pinnedAlbumsAsGrid by Settings.Album.rememberPinnedAlbumsAsGrid()
     var showMediaTypeAlbums by Settings.Album.rememberShowMediaTypeAlbums()
+    var albumThumbnailPadding by Settings.Album.rememberAlbumThumbnailPadding()
     var favIconPosition by rememberFavoriteIconPosition()
     var dateHeaderTimeline by rememberTimelineGroupByDate()
     var dateHeaderFavorites by rememberFavoritesGroupByDate()
@@ -320,6 +322,32 @@ fun SettingsTimelineAlbumsScreen() {
                 preview = { checked -> PinnedAlbumsGridPreview(checked) },
             )
         }
+        DETAIL_ALBUM_THUMBNAIL_PADDING -> {
+            BackHandler { detailKey = null }
+            ChooserPreferenceDetailScreen(
+                title = stringResource(R.string.album_thumbnail_padding_title),
+                description = stringResource(R.string.album_thumbnail_padding_description),
+                preview = { AlbumThumbnailPaddingPreview(albumThumbnailPadding) },
+                options = listOf(
+                    PreferenceOption(
+                        Settings.Album.ALBUM_THUMBNAIL_PADDING_SMALL,
+                        stringResource(R.string.album_thumbnail_padding_small),
+                        albumThumbnailPadding == Settings.Album.ALBUM_THUMBNAIL_PADDING_SMALL
+                    ),
+                    PreferenceOption(
+                        Settings.Album.ALBUM_THUMBNAIL_PADDING_MEDIUM,
+                        stringResource(R.string.album_thumbnail_padding_medium),
+                        albumThumbnailPadding == Settings.Album.ALBUM_THUMBNAIL_PADDING_MEDIUM
+                    ),
+                    PreferenceOption(
+                        Settings.Album.ALBUM_THUMBNAIL_PADDING_LARGE,
+                        stringResource(R.string.album_thumbnail_padding_large),
+                        albumThumbnailPadding == Settings.Album.ALBUM_THUMBNAIL_PADDING_LARGE
+                    )
+                ),
+                onOptionSelected = { albumThumbnailPadding = it }
+            )
+        }
         DETAIL_FAV_ICON -> {
             BackHandler { detailKey = null }
             ChooserPreferenceDetailScreen(
@@ -451,6 +479,7 @@ fun SettingsTimelineAlbumsScreen() {
                 onPinnedAlbumsAsGridChange = { pinnedAlbumsAsGrid = it },
                 showMediaTypeAlbums = showMediaTypeAlbums,
                 onShowMediaTypeAlbumsChange = { showMediaTypeAlbums = it },
+                albumThumbnailPadding = albumThumbnailPadding,
                 favIconPosition = favIconPosition,
                 onDetailClick = { detailKey = it },
                 onDateFormatClick = { eventHandler.navigate(Screen.DateFormatScreen()) },
@@ -482,6 +511,7 @@ private fun TimelineAlbumsListScreen(
     onPinnedAlbumsAsGridChange: (Boolean) -> Unit = {},
     showMediaTypeAlbums: Boolean = true,
     onShowMediaTypeAlbumsChange: (Boolean) -> Unit = {},
+    albumThumbnailPadding: Int,
     favIconPosition: String,
     onDetailClick: (String) -> Unit,
     onDateFormatClick: () -> Unit,
@@ -617,6 +647,20 @@ private fun TimelineAlbumsListScreen(
             screenPosition = Position.Bottom
         )
 
+        val albumThumbnailPaddingPref = rememberPreference(
+            albumThumbnailPadding,
+            title = stringResource(R.string.album_thumbnail_padding_title),
+            summary = stringResource(
+                when (albumThumbnailPadding) {
+                    Settings.Album.ALBUM_THUMBNAIL_PADDING_SMALL -> R.string.album_thumbnail_padding_small
+                    Settings.Album.ALBUM_THUMBNAIL_PADDING_LARGE -> R.string.album_thumbnail_padding_large
+                    else -> R.string.album_thumbnail_padding_medium
+                }
+            ),
+            onClick = { onDetailClick(DETAIL_ALBUM_THUMBNAIL_PADDING) },
+            screenPosition = Position.Bottom
+        )
+
         val favIconPositionLabel = remember(favIconPosition) {
             when (favIconPosition) {
                 Settings.Misc.FAV_ICON_DISABLED -> context.getString(R.string.fav_position_disabled)
@@ -656,7 +700,7 @@ private fun TimelineAlbumsListScreen(
         return remember(
             timelineLayoutPref, groupSimilarMediaPref,
             allowGifAnimationPref, dateHeaderPref, showFilterButtonPref,
-            showSearchBarFavButtonPref, storyCardsPref,
+            showSearchBarFavButtonPref, storyCardsPref, albumThumbnailPaddingPref,
             hideTimelineOnAlbumPref, mergeAlbumsByNamePref, albumSectionsPref, pinnedAlbumsAsGridPref, showMediaTypeAlbumsPref, favIconPositionPref,
             dateHeadersPref, groupMethodPref
         ) {
@@ -678,6 +722,7 @@ private fun TimelineAlbumsListScreen(
                 add(albumSectionsPref)
                 add(pinnedAlbumsAsGridPref)
                 add(showMediaTypeAlbumsPref)
+                add(albumThumbnailPaddingPref)
 
                 add(displayHeader)
                 add(dateHeadersPref)
@@ -698,6 +743,28 @@ private fun TimelineAlbumsListScreen(
 }
 
 // ===== Preview Composables for Detail Screens =====
+
+@Composable
+private fun AlbumThumbnailPaddingPreview(paddingDp: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        repeat(3) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                    .padding(paddingDp.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            )
+        }
+    }
+}
 
 @Composable
 private fun GroupByMonthPreview(isChecked: Boolean) {

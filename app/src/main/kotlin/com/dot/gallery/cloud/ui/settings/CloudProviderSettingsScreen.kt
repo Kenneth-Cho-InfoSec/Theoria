@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -106,7 +106,7 @@ fun CloudProviderSettingsScreen(
         items.add(
             SettingsEntity.Preference(
                 title = if (isSyncing) context.getString(R.string.cloud_sync_now_syncing) else context.getString(R.string.cloud_sync_now),
-                summary = if (isSyncing) (syncProgress.message ?: "") else context.getString(R.string.cloud_sync_now_summary),
+                summary = if (isSyncing) syncProgress.message else context.getString(R.string.cloud_sync_now_summary),
                 enabled = !isSyncing,
                 onClick = { viewModel.triggerSync(config.id) },
                 screenPosition = Position.Top

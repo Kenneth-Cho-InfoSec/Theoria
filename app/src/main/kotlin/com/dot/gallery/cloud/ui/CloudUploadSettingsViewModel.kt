@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui
@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -95,10 +95,10 @@ class CloudUploadSettingsViewModel @Inject constructor(
 
     private fun resolveAccount() {
         viewModelScope.launch {
+            val activeConfigs = configDao.getActive().firstOrNull().orEmpty()
             val config = configDao.getById(requestedConfigId)
-                ?: configDao.getActive().first()
-                    .firstOrNull { it.syncEnabled }
-                ?: configDao.getActive().first().firstOrNull()
+                ?: activeConfigs.firstOrNull { it.syncEnabled }
+                ?: activeConfigs.firstOrNull()
             cachedConfig = config
             if (config != null) {
                 effectiveConfigId.value = config.id
@@ -189,7 +189,7 @@ class CloudUploadSettingsViewModel @Inject constructor(
                 try {
                     val allMedia = repository.getMediaByType(
                         AllowedMedia.BOTH
-                    ).first().data ?: emptyList()
+                    ).firstOrNull()?.data.orEmpty()
 
                     // Filter out cloud media
                     val localMedia = allMedia.filter {

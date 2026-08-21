@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@ package com.dot.gallery.feature_node.presentation.edit.bake
  * tile at a time without ever holding the whole output bitmap.
  *
  * [isAvailable] is false when the native library is a stub (ABI without prebuilt encoder libs);
- * callers then fall back to the whole-bitmap HeifCoder encode. Handles are NOT thread-safe.
+ * callers then fall back to a whole-bitmap encode. Handles are NOT thread-safe.
  */
 object NativeHeifEncoder {
 

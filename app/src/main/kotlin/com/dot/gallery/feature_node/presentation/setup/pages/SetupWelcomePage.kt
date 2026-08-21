@@ -1,6 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2026 kennethcho
+ * SPDX-License-Identifier: MPL-2.0
+ *
  */
 
 package com.dot.gallery.feature_node.presentation.setup.pages
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dot.gallery.BuildConfig
 import com.dot.gallery.R
@@ -81,7 +83,16 @@ fun SetupWelcomePage(onNext: () -> Unit) {
                 fontWeight = FontWeight.SemiBold
             )
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
+        Text(
+            modifier = Modifier.padding(horizontal = 32.dp),
+            text = stringResource(R.string.setup_welcome_slogan),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(8.dp))
         Text(
             modifier = Modifier.padding(horizontal = 40.dp),
             text = stringResource(R.string.setup_welcome_subtitle),

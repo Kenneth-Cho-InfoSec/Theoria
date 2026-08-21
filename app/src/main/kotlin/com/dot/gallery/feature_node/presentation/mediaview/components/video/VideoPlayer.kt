@@ -492,7 +492,7 @@ fun <T : Media> VideoPlayer(
     }
 
     // Loading & decrypt states
-    if (!playback.ready && !playback.decryptFailed) {
+    if (!playback.ready && !playback.decryptFailed && !playback.playbackFailed) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
             if (playback.isDecrypting) {
@@ -513,6 +513,20 @@ fun <T : Media> VideoPlayer(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = { vm.retryDecryption() }
+                    )
+            )
+        }
+    }
+
+    if (playback.playbackFailed) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = stringResource(R.string.video_playback_failed_tap_to_retry),
+                modifier = Modifier
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { vm.retryPlayback() }
                     )
             )
         }

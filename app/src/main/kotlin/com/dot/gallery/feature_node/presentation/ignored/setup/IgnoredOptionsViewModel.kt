@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.ignored.setup
 
 import androidx.lifecycle.ViewModel
@@ -66,7 +71,13 @@ class IgnoredOptionsViewModel @Inject constructor(
             val selectedAlbums = albums.filter { it.id in albumIds }
             state.copy(
                 albums = albums,
-                editSelectedAlbums = selectedAlbums.ifEmpty { state.editSelectedAlbums }
+                editSelectedAlbums = selectedAlbums.ifEmpty { state.editSelectedAlbums },
+                canProceed = calculateCanProceed(
+                    state.copy(
+                        albums = albums,
+                        editSelectedAlbums = selectedAlbums.ifEmpty { state.editSelectedAlbums }
+                    )
+                )
             )
         }
     }

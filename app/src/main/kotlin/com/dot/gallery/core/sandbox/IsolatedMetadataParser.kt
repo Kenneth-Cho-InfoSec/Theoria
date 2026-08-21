@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.sandbox
@@ -9,6 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -18,7 +19,6 @@ import android.os.Message
 import android.os.Messenger
 import android.os.ParcelFileDescriptor
 import java.util.concurrent.Executors
-import com.dot.gallery.core.decoder.format.SpecialFormatProbe
 import com.dot.gallery.core.sandbox.IsolatedMetadataService.Companion.KEY_ERROR
 import com.dot.gallery.core.sandbox.IsolatedMetadataService.Companion.KEY_IS_VIDEO
 import com.dot.gallery.core.sandbox.IsolatedMetadataService.Companion.KEY_LABEL
@@ -397,10 +397,10 @@ class IsolatedMetadataParser(private val context: Context) {
     }
 
     /**
-     * Ensures the "View all metadata" list shows resolution for special image formats (JXL, JP2,
-     * PSD, SVG, HEIF/AVIF/TIFF). metadata-extractor omits or can't read their dimensions, so probe
-     * the intrinsic size in-process (the same native decoders used for rendering) and prepend a
-     * synthetic directory when no width/height tag is already present.
+     * Ensures the "View all metadata" list shows resolution for image formats. metadata-extractor
+     * omits or can't read their dimensions, so probe the intrinsic size in-process via
+     * [BitmapFactory] bounds and prepend a synthetic directory when no width/height tag is already
+     * present.
      */
     private fun augmentWithProbeSize(
         uri: Uri,
@@ -412,7 +412,17 @@ class IsolatedMetadataParser(private val context: Context) {
             dir.tags.any { it.name.contains("width", ignoreCase = true) }
         }
         if (hasDimensions) return directories
-        val size = SpecialFormatProbe.getSize(context, uri) ?: return directories
+        val size = runCatching {
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeStream(stream, null, options)
+                if (options.outWidth > 0 && options.outHeight > 0) {
+                    android.util.Size(options.outWidth, options.outHeight)
+                } else {
+                    null
+                }
+            }
+        }.getOrNull() ?: return directories
         val synthetic = MetadataDirectory(
             name = "Image",
             tags = listOf(

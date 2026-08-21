@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.mediaview.components
@@ -265,6 +265,15 @@ fun Media.retrieveMetadata(
 
         // 9) Video fields
         if (isVideo) {
+            // Video metadata normally has dimensions, so it bypasses the image branch above
+            // where the file size is appended. Keep size as an explicit row for videos (#1041).
+            if (size > 0) {
+                info += InfoRow(
+                    icon = Icons.Outlined.VideoFile,
+                    label = context.getString(R.string.type_size),
+                    content = formatSize(size)
+                )
+            }
             md.durationMs?.takeIf { it > 0 }?.let {
                 info += InfoRow(
                     icon = Icons.Outlined.VideoFile,

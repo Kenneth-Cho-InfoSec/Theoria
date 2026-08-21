@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.mediaview.components.media
@@ -11,7 +11,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -41,6 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -48,23 +51,16 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import com.dot.gallery.R
 import com.dot.gallery.cloud.core.CloudRuntimeSettings
 import com.dot.gallery.cloud.core.ProviderType
 import com.dot.gallery.cloud.image.CloudImageSource
 import com.dot.gallery.core.Constants.DEFAULT_TOP_BAR_ANIMATION_DURATION
 import com.dot.gallery.core.Settings
 import com.dot.gallery.core.decoder.EncryptedRegionDecoder
-import com.dot.gallery.core.decoder.FullImageRegionDecoder
-import com.dot.gallery.core.decoder.HeifDebug
-import com.dot.gallery.core.decoder.HeifRegionDecoder
-import com.dot.gallery.core.decoder.JxlRegionDecoder
 import com.dot.gallery.core.decoder.isAnimatedWebp
-import com.dot.gallery.core.decoder.format.ImageFormatSniffer
-import com.dot.gallery.core.decoder.format.TiffImageDecoder
-import com.dot.gallery.core.decoder.NativeRawDecoder
-import com.dot.gallery.core.decoder.RawDevelopStore
-import com.dot.gallery.core.decoder.RawRegionDecoder
-import com.dot.gallery.core.util.HdrCapabilities
 import com.dot.gallery.core.presentation.components.util.LocalBatteryStatus
 import com.dot.gallery.core.presentation.components.util.ProvideBatteryStatus
 import com.dot.gallery.core.presentation.components.util.swipe
@@ -78,12 +74,7 @@ import com.dot.gallery.feature_node.domain.util.isCloud
 import com.dot.gallery.feature_node.domain.util.isEncrypted
 import com.dot.gallery.feature_node.domain.util.isGif
 import com.dot.gallery.feature_node.domain.util.isHeif
-import com.dot.gallery.feature_node.domain.util.isJp2
 import com.dot.gallery.feature_node.domain.util.isJxl
-import com.dot.gallery.feature_node.domain.util.isPsd
-import com.dot.gallery.feature_node.domain.util.isRaw
-import com.dot.gallery.feature_node.domain.util.isSvg
-import com.dot.gallery.feature_node.domain.util.isTiff
 import com.dot.gallery.feature_node.presentation.mediaview.rememberedDerivedState
 import com.dot.gallery.feature_node.presentation.util.rememberFeedbackManager
 import com.github.panpf.sketch.AsyncImage
@@ -111,41 +102,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
-import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.ScreenRotationAlt
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import com.dot.gallery.R
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.DisposableEffect
-import com.dot.gallery.core.ml.CutoutHelper
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.LinearEasing
 
 // Extended max zoom: allow zooming in until each source pixel is shown at this many screen pixels,
 // i.e. up to 5000% of the image's native (1:1) resolution. Double-tap zoom is unaffected — it still
@@ -171,7 +127,7 @@ private class ExtendedZoomScalesCalculator(
 
     private val base = ScalesCalculator.Dynamic
 
-    @Suppress("DEPRECATION")
+    @Deprecated("The zoom library requires this compatibility override.")
     override fun calculate(
         containerSize: IntSizeCompat,
         contentSize: IntSizeCompat,
@@ -180,12 +136,12 @@ private class ExtendedZoomScalesCalculator(
         minScale: Float,
         initialScale: Float,
     ): ScalesCalculator.Result {
-        val baseResult = base.calculate(
+        val baseResult = base.calculateWithBase(
             containerSize = containerSize,
             contentSize = contentSize,
             contentOriginSize = contentOriginSize,
             contentScale = contentScale,
-            minScale = minScale,
+            baseScale = minScale,
             initialScale = initialScale,
         )
         val nativeScale = if (contentOriginSize.isNotEmpty() && contentSize.isNotEmpty()) {
@@ -258,13 +214,10 @@ fun <T : Media> ZoomablePagerImage(
     onItemClick: () -> Unit,
     onSwipeDown: () -> Unit,
     onSubsamplingLoadingChange: (Boolean) -> Unit = {},
-    onCutoutStateChanged: (Boolean) -> Unit = {},
-    onCutoutController: (CutoutController?) -> Unit = {},
     isSelected: Boolean = true,
     uiVisible: Boolean = true,
-    // When false (e.g. during a slideshow) both the long-press cut-out gesture and the
-    // background subject-suggestion detection are disabled.
-    cutoutEnabled: Boolean = true
+    // When false (e.g. during a slideshow) the long-press rotate gesture is disabled.
+    longPressRotateEnabled: Boolean = true
 ) {
     val feedbackManager = rememberFeedbackManager()
     // Keyed by id (not the whole media object) so a same-id reload after an in-place overwrite
@@ -283,6 +236,7 @@ fun <T : Media> ZoomablePagerImage(
         zoomState.zoomable.setScalesCalculator(ExtendedZoomScalesCalculator(EXTENDED_MAX_NATIVE_SCALE))
     }
     val scope = rememberCoroutineScope()
+    var retryToken by rememberSaveable(media.id) { mutableIntStateOf(0) }
 
     val context = LocalContext.current
     val mediaUri = remember(media) {
@@ -298,10 +252,6 @@ fun <T : Media> ZoomablePagerImage(
         media.isEncrypted
     }
     val isJxl = remember(media) { media.isJxl }
-    // Cutout/subject-suggestion decode via BitmapFactory, which cannot decode TIFF/PSD/JP2 at all —
-    // so the feature can never work for them and running it just wastes work (and, for large 16-bit
-    // TIFFs, greedily reads metadata → OOM). Disable it for those formats.
-    val cutoutSupported = remember(media) { !(media.isTiff || media.isPsd || media.isJp2) }
     val isAnimated = remember(media) {
         media.isApng || media.isJxl || (media.isAvif && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ||
                 (media.isHeif && media.mimeType.endsWith("-sequence") &&
@@ -337,68 +287,23 @@ fun <T : Media> ZoomablePagerImage(
     val disableSmoothing by Settings.Misc.rememberDisableSmoothing()
     val usePixelPerfect = disableSmoothing && !isAnimated && !isAnimatedRaster
     val filterQuality = if (disableSmoothing) FilterQuality.None else DrawScope.DefaultFilterQuality
-    // #1054: MediaStore sometimes mislabels a standard JPEG/PNG/WebP/GIF/BMP as RAW/TIFF/PSD/JP2,
-    // so media.isRaw/isTiff/… are true and a custom region decoder would be attached that can't
-    // decode the real bytes — leaving zoom stuck on the low-res base ("magnified thumbnail"). Only
-    // for those already-special formats, sniff the header once (cached per media) on IO; if the
-    // bytes are a natively-decodable image, force the generic platform BitmapRegionDecoder path.
-    // Plain images never reach this probe (zero extra I/O per viewer page).
-    val mightBeSpecial = remember(media) {
-        media.isTiff || media.isRaw || media.isPsd || media.isJp2 || media.isSvg
-    }
-    var forceStandard by remember(media) { mutableStateOf(false) }
-    LaunchedEffect(media, mightBeSpecial) {
-        if (mightBeSpecial && !media.isEncrypted && !media.isCloud) {
-            forceStandard = withContext(Dispatchers.IO) {
-                runCatching {
-                    context.contentResolver.openInputStream(media.getUri())?.use { ins ->
-                        val head = ByteArray(32)
-                        val n = ins.read(head)
-                        n > 0 && ImageFormatSniffer.isNativelyDecodable(head.copyOf(n))
-                    } ?: false
-                }.getOrDefault(false)
-            }
-        }
-    }
-    // Region decoder for formats Android's BitmapRegionDecoder can't subsample (PSD/JP2/TIFF/SVG).
-    // Without this they only show the screen-resolution base painter and look blurry when zoomed.
-    // RAW develop recipe (per-image, session-scoped). Reading it here makes the region decoder
-    // rebuild whenever the Develop sheet tunes the recipe, live re-rendering the zoomed image.
-    val rawParams = if (media.isRaw) RawDevelopStore.paramsFor(media.id) else null
-    val customRegionFactory = remember(media, rawParams, forceStandard) {
-        when {
-            // Mislabeled standard image: keep the platform BitmapRegionDecoder (generic branch).
-            forceStandard -> null
-            media.isPsd -> FullImageRegionDecoder.forPsd()
-            media.isJp2 -> FullImageRegionDecoder.forJp2()
-            // The TIFF region decoder full-decodes the file into one bitmap for cropping; on a large
-            // 16-bit TIFF (the file IS the raster) that reads 150+ MB and OOMs. Only attach it for
-            // files that fit the heap; oversized TIFFs keep the downsampled base painter (no zoom
-            // subsampling) instead of crashing.
-            media.isTiff && media.size <= TiffImageDecoder.MAX_BYTES.toLong() ->
-                FullImageRegionDecoder.forTiff()
-            media.isSvg -> FullImageRegionDecoder.forSvg()
-            // RAW: demosaic via LibRaw for crisp zoom; falls back to embedded preview when the
-            // native lib is unavailable (ABI without prebuilt libs).
-            media.isRaw && NativeRawDecoder.isAvailable && rawParams != null ->
-                RawRegionDecoder.forRaw(rawParams)
-            else -> null
-        }
-    }
 
     // Fast low-res preview painter, shown until full image loads
+    val previewImageState = rememberAsyncImageState()
     val previewPainter = rememberAsyncImagePainter(
         request = ComposableImageRequest(mediaUri) {
             resize(width = 600, height = 600, precision = Precision.LESS_PIXELS)
             crossfade(false)
             setExtra("realMimeType", media.mimeType)
             setExtra(key = "mediaVersion", value = mediaVersion)
+            setExtra(key = "viewerRetry", value = retryToken)
             if (isEncrypted) {
                 setExtra(key = "mediaKeyPreviewEnc", value = media.idLessKey)
             }
         },
         contentScale = ContentScale.Fit,
-        filterQuality = filterQuality
+        filterQuality = filterQuality,
+        state = previewImageState
     )
 
     // Full-res painter with state tracking
@@ -417,6 +322,11 @@ fun <T : Media> ZoomablePagerImage(
             }
             setExtra("realMimeType", media.mimeType)
             setExtra(key = "mediaVersion", value = mediaVersion)
+            setExtra(key = "viewerRetry", value = retryToken)
+            // Keep the viewer's full-image request separate from the 600px grid/preview request.
+            // Some Sketch/cache combinations can otherwise reuse the preview decode for WEBP on
+            // large tablet layouts, leaving the image soft until a later size change (#972).
+            setExtra(key = "viewerFullImage", value = "1")
             if (isEncrypted) {
                 setExtra(key = "mediaKeyPreviewEnc", value = media.idLessKey)
             }
@@ -463,20 +373,13 @@ fun <T : Media> ZoomablePagerImage(
     }
 
     val isCloudMedia = remember(media) { media.isCloud }
+    val imageLoadFailed = fullImageState.painterState is PainterState.Error &&
+        previewImageState.painterState is PainterState.Error
 
     // Subsampling is set up the same way for both the smooth and pixel-perfect paths so that
     // high-resolution images retain native detail when zoomed. The difference is only in how the
     // tiles are drawn: PixelPerfectZoomImage draws them via a canvas transform with
     // FilterQuality.None (nearest-neighbor) instead of the smoothed default.
-    LaunchedEffect(media) {
-        HeifDebug.d(
-            "viewer media='${media.label}' mime='${media.mimeType}' isHeif=${media.isHeif} " +
-                "isJxl=$isJxl isAnimated=$isAnimated isAnimatedRaster=$isAnimatedRaster " +
-                "customRegion=${customRegionFactory != null} " +
-                "encrypted=$isEncrypted cloud=$isCloudMedia usePixelPerfect=$usePixelPerfect " +
-                "isFullImageLoaded=$isFullImageLoaded"
-        )
-    }
     if (isEncrypted) {
         val keychainHolder = remember { KeychainHolder(context) }
         LaunchedEffect(media, isFullImageLoaded, zoomState.subsampling) {
@@ -516,40 +419,6 @@ fun <T : Media> ZoomablePagerImage(
             }
             zoomState.setSubsamplingImage(SubsamplingImage(imageSource = cloudSource))
         }
-    } else if (isJxl) {
-        // Android's BitmapRegionDecoder can't decode JXL, so enable subsampling backed by a
-        // JxlCoder region decoder for high-resolution zoom. Animated JXL is rejected by the
-        // decoder and falls back to the animated base painter.
-        LaunchedEffect(media, isFullImageLoaded, zoomState.subsampling) {
-            zoomState.setSubsamplingImage(media.asSubsamplingImage(context))
-        }
-        LaunchedEffect(zoomState.subsampling, media) {
-            zoomState.subsampling.setRegionDecoders(listOf(JxlRegionDecoder.Factory()))
-        }
-    } else if (customRegionFactory != null) {
-        // PSD/JP2/TIFF/SVG: no native BitmapRegionDecoder support, so subsample via a
-        // full-decode-then-crop (PSD/JP2/TIFF) or high-res render (SVG) region decoder.
-        LaunchedEffect(media, isFullImageLoaded, zoomState.subsampling) {
-            zoomState.setSubsamplingImage(media.asSubsamplingImage(context))
-        }
-        LaunchedEffect(zoomState.subsampling, media) {
-            zoomState.subsampling.setRegionDecoders(listOf(customRegionFactory))
-        }
-    } else if (media.isHeif && !isAnimated) {
-        // HEIC/HEIF: dedicated hardware-first (platform BitmapRegionDecoder) / software-fallback
-        // (libheif full-decode-then-crop) region decoder so zoom stays sharp. The generic branch
-        // below relies on the platform decoder alone with no fallback, which fails on HDR/10-bit/
-        // grid HEICs and devices without HEIF region support.
-        LaunchedEffect(media, isFullImageLoaded, zoomState.subsampling) {
-            HeifDebug.d("HEIF branch: setSubsamplingImage for '${media.label}' (isFullImageLoaded=$isFullImageLoaded)")
-            zoomState.setSubsamplingImage(media.asSubsamplingImage(context))
-        }
-        LaunchedEffect(zoomState.subsampling, media) {
-            HeifDebug.d("HEIF branch: setRegionDecoders(HeifRegionDecoder) for '${media.label}'")
-            zoomState.subsampling.setRegionDecoders(
-                listOf(HeifRegionDecoder.Factory(hdrDisplay = HdrCapabilities.isHdrDisplay(context)))
-            )
-        }
     } else if (!isAnimated && !isAnimatedRaster) {
         // Animated raster (GIF/animated WebP/APNG) is intentionally excluded: BitmapRegionDecoder
         // can't tile a moving image, so subsampling would do nothing but waste work. Their crisp
@@ -559,12 +428,9 @@ fun <T : Media> ZoomablePagerImage(
         }
     }
 
-    // Track the swipe-to-dismiss drag offset so the cutout overlay can translate in lockstep with
-    // the image (the swipe modifier only offsets the image itself).
-    var swipeOffsetY by remember { mutableIntStateOf(0) }
     val imageModifier = Modifier
         .fillMaxSize()
-        .swipe(onSwipeDown = onSwipeDown, onOffset = { swipeOffsetY = it.y })
+        .swipe(onSwipeDown = onSwipeDown)
         .graphicsLayer {
             rotationZ = if (isRotating) rotationAnimation else 0f
         }
@@ -585,207 +451,26 @@ fun <T : Media> ZoomablePagerImage(
         }
     }
 
-    // --- Subject cutout (on-device MobileSAM) ---
-    val modelManager = remember { (context.applicationContext as com.dot.gallery.GalleryApp).modelManager }
-    val cutoutState = rememberCutoutState()
-    // When true, long-press starts a cutout session and Rotate is offered as an on-screen pill.
-    // When false (default), long-press rotates and Cut out is offered as an on-screen pill.
-    val longPressStartsCutout by Settings.Misc.rememberLongPressCutout()
+    // Tap toggles the UI chrome.
+    val onImageTap: (Offset) -> Unit = { onItemClick() }
 
-    // Pulsing glow for the cutout contour. The infinite animation is only created while it's
-    // actually needed (a cutout is active). An unconditional rememberInfiniteTransition would run a
-    // continuous per-frame animation and recomposition on every composed pager page — including
-    // neighbours that briefly compose during a fling — adding avoidable swipe jank.
-    val needsGlow = cutoutState.isActive
-    val glowRadius = if (needsGlow) {
-        val infiniteTransition = rememberInfiniteTransition(label = "glowTransition")
-        val animatedGlow by infiniteTransition.animateFloat(
-            initialValue = 2f,
-            targetValue = 6f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1200, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "glowRadius"
-        )
-        animatedGlow
-    } else {
-        2f
-    }
-
-    DisposableEffect(media) {
-        onDispose {
-            cutoutState.dismiss()
-        }
-    }
-
-    BackHandler(enabled = cutoutState.isActive) {
-        cutoutState.dismiss()
-    }
-
-    LaunchedEffect(cutoutState.isActive, isSelected) {
-        if (isSelected) {
-            onCutoutStateChanged(cutoutState.isActive)
-        }
-    }
-
-
-    // Start a cutout session seeded at the given screen-space point.
-    val startCutoutAt: (Offset) -> Unit = { offset ->
-        if (!cutoutState.isActive && !cutoutState.isProcessing) {
-            scope.launch {
-                cutoutState.isProcessing = true
-                try {
-                    feedbackManager.vibrate()
-                    val contentPoint = zoomState.zoomable.touchPointToContentPoint(offset)
-
-                    val session = CutoutHelper.CutoutSession(context, media, modelManager)
-                    val initOk = session.initAndRunEncoder()
-
-                    if (initOk) {
-                        val contentSize = zoomState.zoomable.contentSize
-                        val scaleX = if (contentSize.width > 0) session.widthOrig.toFloat() / contentSize.width.toFloat() else 1f
-                        val scaleY = if (contentSize.height > 0) session.heightOrig.toFloat() / contentSize.height.toFloat() else 1f
-
-                        val scaledX = contentPoint.x * scaleX
-                        val scaledY = contentPoint.y * scaleY
-
-                        val initialPoint = CutoutHelper.PromptPoint(x = scaledX, y = scaledY, isPositive = true)
-                        val pointsList = listOf(initialPoint)
-                        val result = session.runDecoder(pointsList)
-
-                        if (result != null) {
-                            // Only hoist session into state once we have a valid mask
-                            cutoutState.initSession(session, pointsList)
-                            feedbackManager.vibrate()
-                            cutoutState.updateResult(result, null)
-                        } else {
-                            // No mask found — clean up without touching cutoutState
-                            session.close()
-                            Toast.makeText(context, context.getString(R.string.cutout_no_object), Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        session.close()
-                        Toast.makeText(context, context.getString(R.string.cutout_init_failed), Toast.LENGTH_SHORT).show()
-                    }
-                } finally {
-                    // Always reset — even on OOM, ONNX crash, or coroutine cancellation
-                    cutoutState.isProcessing = false
-                }
-            }
-        }
-    }
-
-    // Tap handler: while a cutout session is active, add/remove a prompt point; otherwise pass through.
-    val onImageTap: (Offset) -> Unit = { offset ->
-        val session = cutoutState.session
-        if (session != null) {
-            val displayRect = zoomState.zoomable.contentDisplayRect
-            val isInsideImage = offset.x >= displayRect.left &&
-                    offset.x <= displayRect.right &&
-                    offset.y >= displayRect.top &&
-                    offset.y <= displayRect.bottom
-
-            if (isInsideImage && (cutoutState.activeTool == ZoomablePagerImagePointTool.ADD || cutoutState.activeTool == ZoomablePagerImagePointTool.REMOVE)) {
-                val contentPoint = zoomState.zoomable.touchPointToContentPoint(offset)
-                val contentSize = zoomState.zoomable.contentSize
-                val scaleX = if (contentSize.width > 0) session.widthOrig.toFloat() / contentSize.width.toFloat() else 1f
-                val scaleY = if (contentSize.height > 0) session.heightOrig.toFloat() / contentSize.height.toFloat() else 1f
-
-                val scaledX = contentPoint.x * scaleX
-                val scaledY = contentPoint.y * scaleY
-
-                if (scaledX in 0f..session.widthOrig.toFloat() && scaledY in 0f..session.heightOrig.toFloat()) {
-                    val newPoint = CutoutHelper.PromptPoint(
-                        x = scaledX,
-                        y = scaledY,
-                        isPositive = cutoutState.activeTool == ZoomablePagerImagePointTool.ADD
-                    )
-                    val previousPoints = cutoutState.promptPoints
-                    val updatedPoints = cutoutState.promptPoints + newPoint
-                    cutoutState.pushPoints(updatedPoints)
-
-                    scope.launch {
-                        cutoutState.isProcessing = true
-                        try {
-                            val res = session.runDecoder(updatedPoints)
-                            val newCache = cutoutState.result?.let { Pair(previousPoints, it) }
-                            cutoutState.updateResult(res, newCache)
-                        } finally {
-                            cutoutState.isProcessing = false
-                        }
-                    }
-                }
-            }
-        } else {
-            // No active session: normal tap toggles the UI chrome.
-            onItemClick()
-        }
-    }
-
-    // Configurable long-press action (default: rotate). Disabled entirely when cut-out is off
-    // (e.g. during a slideshow).
-    val onImageLongPress: (Offset) -> Unit = { offset ->
-        if (cutoutEnabled) {
-            // Cut-out can't run on TIFF/PSD/JP2 (BitmapFactory can't decode them); rotate instead.
-            if (longPressStartsCutout && cutoutSupported) startCutoutAt(offset) else rotateImage()
-        }
-    }
-
-    // Undo/redo: re-run the decoder for the target point set unless the result was cached.
-    val navigateHistory: (Int) -> Unit = { delta ->
-        val pts = cutoutState.navigateHistory(delta)
-        if (pts != null) {
-            scope.launch {
-                cutoutState.isProcessing = true
-                try {
-                    val res = cutoutState.session?.runDecoder(pts.second)
-                    val newCache = cutoutState.result?.let { Pair(pts.first, it) }
-                    cutoutState.updateResult(res, newCache)
-                } finally {
-                    cutoutState.isProcessing = false
-                }
-            }
-        }
-    }
-
-    // Run an export action (copy/share/save) on the current mask, then end the session.
-    val runRefinedAction: (suspend (android.graphics.Bitmap) -> Unit) -> Unit = { action ->
-        val bmp = cutoutState.result?.bitmap
-        if (bmp != null) {
-            scope.launch {
-                action(bmp)
-                cutoutState.dismiss()
-            }
-        }
-    }
-
-    // Controls surfaced in the MediaViewScreen bottom bar (replacing the quick actions) while active.
-    val cutoutController = remember(cutoutState) {
-        CutoutController(
-            state = cutoutState,
-            onToolChange = { cutoutState.activeTool = it },
-            onReset = { cutoutState.clearPoints() },
-            onUndo = { navigateHistory(-1) },
-            onRedo = { navigateHistory(1) },
-            onCopy = { runRefinedAction { CutoutHelper.copyToClipboard(context, it) } },
-            onShare = { runRefinedAction { CutoutHelper.shareCutout(context, it) } },
-            onSave = { runRefinedAction { CutoutHelper.saveToGallery(context, it) } },
-            onClose = { cutoutState.dismiss() },
-        )
-    }
-
-    // Publish the controller upward only for the selected page and only while active; clear on
-    // deselect/dispose so the screen bottom bar swaps back to the quick actions.
-    LaunchedEffect(cutoutState.isActive, isSelected) {
-        onCutoutController(if (isSelected && cutoutState.isActive) cutoutController else null)
-    }
-    DisposableEffect(Unit) {
-        onDispose { if (isSelected) onCutoutController(null) }
-    }
+    // Long-press rotates 90° (disabled when [longPressRotateEnabled] is false).
+    val onImageLongPress: (Offset) -> Unit = { if (longPressRotateEnabled) rotateImage() }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (usePixelPerfect) {
+        if (imageLoadFailed) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = stringResource(R.string.cloud_retry))
+                Button(onClick = { retryToken++ }) {
+                    Text(text = stringResource(R.string.cloud_retry))
+                }
+            }
+        } else if (usePixelPerfect) {
             // Pixel-art path: nearest-neighbor rendering with subsampling.
             PixelPerfectZoomImage(
                 zoomable = zoomState.zoomable,
@@ -808,96 +493,6 @@ fun <T : Media> ZoomablePagerImage(
                 scrollBar = null
             )
         }
-
-        // Cutout mask + animated contour + prompt markers (controls live in the screen bottom bar).
-        CutoutOverlay(
-            state = cutoutState,
-            zoomState = zoomState,
-            glowRadius = glowRadius,
-            translationY = swipeOffsetY.toFloat()
-        )
-
-        // Processing / refinement indicator
-        if (cutoutState.isProcessing) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .pointerInput(Unit) {
-                        detectTapGestures(onTap = {})
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    Text(
-                        text = stringResource(R.string.cutout_refining),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
-                }
-            }
-        }
-
-        val chromeVisible = isSelected && uiVisible && !cutoutState.isActive && !cutoutState.isProcessing
-
-        if (longPressStartsCutout) {
-            // Long-press does cutout → offer Rotate as a pill.
-            AnimatedVisibility(
-                visible = chromeVisible && !rotationDisabled,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(bottom = 96.dp)
-            ) {
-                MediaViewActionPill(
-                    icon = Icons.Outlined.ScreenRotationAlt,
-                    label = stringResource(R.string.rotate),
-                    onClick = rotateImage
-                )
-            }
-        }
-    }
-}
-
-/**
- * Small pill button matching the media viewer's motion-photo / rotate chip style, used to expose
- * whichever long-press action (rotate or cut out) is not currently bound to the long-press gesture.
- */
-@Composable
-private fun MediaViewActionPill(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .clip(CircleShape)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(0.85f),
-                shape = CircleShape
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp)
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

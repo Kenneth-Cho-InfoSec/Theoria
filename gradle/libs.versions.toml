@@ -2,7 +2,6 @@
 adaptive = "1.2.0"
 agp = "9.2.1"
 aire = "0.18.1"
-avifCoderCoil = "2.2.1"
 benchmarkMacroJunit4 = "1.5.0-alpha07"
 biometric = "1.2.0-alpha05"
 appcompat = "1.7.1"
@@ -15,6 +14,7 @@ haze = "1.7.2"
 hazeMaterials = "1.7.2"
 jp2forandroid = "1.0.4"
 jxlCoder = "2.6.1"
+avifCoder = "2.2.1"
 jp2Android = "1.0.3"
 ngaTiff = "3.0.0"
 androidsvg = "1.4"
@@ -42,6 +42,7 @@ media3Exoplayer = "1.10.1"
 metadataExtractor = "2.20.0"
 navigation-runtime-ktx = "2.9.8"
 onnxruntimeAndroid = "1.27.0"
+mlkitTextRecognition = "16.0.1"
 profileinstaller = "1.4.1"
 retrofit = "3.0.0"
 retrofitKotlinxSerialization = "2.1.0"
@@ -92,7 +93,6 @@ androidx-security-crypto = { module = "androidx.security:security-crypto", versi
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
 androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
-avif-coder-coil = { module = "io.github.awxkee:avif-coder-coil", version.ref = "avifCoderCoil" }
 
 # Compose
 compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -127,7 +127,8 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "hazeMaterials" }
 jp2forandroid = { module = "com.github.Tgo1014:JP2ForAndroid", version.ref = "jp2forandroid" }
-jxl-coder-coil = { module = "io.github.awxkee:jxl-coder-coil", version.ref = "jxlCoder" }
+jxl-coder = { module = "io.github.awxkee:jxl-coder", version.ref = "jxlCoder" }
+avif-coder = { module = "io.github.awxkee:avif-coder", version.ref = "avifCoder" }
 jp2-android = { module = "com.gemalto.jp2:jp2-android", version.ref = "jp2Android" }
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
 nga-tiff = { module = "mil.nga:tiff", version.ref = "ngaTiff" }
@@ -147,6 +148,7 @@ retrofit-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-ko
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 
 onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntimeAndroid" }
+mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "mlkitTextRecognition" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
@@ -214,4 +216,3 @@ baselineProfilePlugin = { id = "androidx.baselineprofile", version.ref = "benchm
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 [bundles]
-

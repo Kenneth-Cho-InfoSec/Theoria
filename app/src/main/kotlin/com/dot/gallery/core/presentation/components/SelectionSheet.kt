@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.core.presentation.components
@@ -39,9 +39,11 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Deselect
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.SelectAll
@@ -104,6 +106,7 @@ import com.dot.gallery.feature_node.domain.model.SelectionAction
 import com.dot.gallery.feature_node.domain.model.Vault
 import com.dot.gallery.feature_node.domain.util.getUri
 import com.dot.gallery.feature_node.domain.util.isCloud
+import com.dot.gallery.feature_node.domain.util.isFavorite
 import com.dot.gallery.feature_node.presentation.collection.CollectionViewModel
 import com.dot.gallery.feature_node.presentation.collection.components.AddToCollectionSheet
 import com.dot.gallery.feature_node.presentation.exif.CopyMediaSheet
@@ -149,6 +152,17 @@ fun <T : Media> BoxScope.SelectionSheet(
     val handler = LocalMediaHandler.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    // Keep the batch favorite action descriptive. A mixed selection remains
+    // actionable, but only an all-favorite selection is shown as filled.
+    val allSelectedFavorite = selectedMedia.isNotEmpty() && selectedMedia.all { it.isFavorite }
+    val favoriteActionIcon = if (allSelectedFavorite) {
+        Icons.Filled.Favorite
+    } else {
+        Icons.Outlined.FavoriteBorder
+    }
+    val favoriteActionTitle = stringResource(
+        if (allSelectedFavorite) R.string.unfavorite else R.string.favorite
+    )
     // Non-encodable selected items pending a rotate → offered as PNG copies via the fallback sheet.
     var rotateFallbackList by remember { mutableStateOf<List<T>>(emptyList()) }
     if (rotateFallbackList.isNotEmpty()) {
@@ -504,9 +518,9 @@ fun <T : Media> BoxScope.SelectionSheet(
                     // Favorite — only when every selected item's provider supports server favorites.
                     if (cloudSupportsFavorite && showFavoriteButton) {
                         SelectionBarColumn(
-                            imageVector = SelectionAction.FAVORITE.icon,
+                            imageVector = favoriteActionIcon,
                             tabletMode = tabletMode,
-                            title = stringResource(SelectionAction.FAVORITE.labelRes)
+                            title = favoriteActionTitle
                         ) {
                             scope.launch { cloudSelectionViewModel.toggleFavorite(result, selectedMedia) }
                         }
@@ -569,9 +583,9 @@ fun <T : Media> BoxScope.SelectionSheet(
                             }
                             SelectionAction.FAVORITE -> {
                                 SelectionBarColumn(
-                                    imageVector = action.icon,
+                                    imageVector = favoriteActionIcon,
                                     tabletMode = tabletMode,
-                                    title = stringResource(action.labelRes)
+                                    title = favoriteActionTitle
                                 ) {
                                     scope.launch {
                                         handler.toggleFavorite(result = result, selectedMedia)

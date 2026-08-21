@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.di
@@ -19,10 +19,12 @@ import com.dot.gallery.cloud.data.repository.CloudRepository
 import com.dot.gallery.cloud.network.ServerUrlResolver
 import com.dot.gallery.cloud.sync.CloudIndexProgressManager
 import com.dot.gallery.core.Resource
+import com.dot.gallery.core.error.ErrorReporter
+import com.dot.gallery.core.error.toAppError
 import com.dot.gallery.feature_node.presentation.util.printDebug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -78,7 +80,8 @@ class CloudProviderInitializer @Inject constructor(
                 var page = 0
                 var total = 0
                 while (true) {
-                    val resource = provider.getRemoteAssets(page, PREFETCH_PAGE_SIZE).first()
+                    val resource = provider.getRemoteAssets(page, PREFETCH_PAGE_SIZE).firstOrNull()
+                        ?: break
                     if (resource !is Resource.Success) break
                     val items = resource.data ?: emptyList()
                     if (items.isNotEmpty()) {
@@ -99,7 +102,7 @@ class CloudProviderInitializer @Inject constructor(
         }
         prefetchScope.launch {
             try {
-                val trashed = provider.getRemoteTrashed().first()
+                val trashed = provider.getRemoteTrashed().firstOrNull()
                 if (trashed is Resource.Success) {
                     trashed.data?.let { cloudMediaDao.insertAll(it) }
                 }
@@ -137,7 +140,7 @@ class CloudProviderInitializer @Inject constructor(
             val resolved = urlResolver.resolve(config)
             lastResolvedUrl[entity.id] = resolved.serverUrl
             provider.configure(resolved)
-            provider.authenticate(resolved)
+            provider.authenticate(resolved).getOrThrow()
             registry.register(entity.id, provider)
             cloudRepository.notifyProviderConnected(entity.providerType, ConnectionState.CONNECTED)
             // Populate the cache immediately so a freshly added account's media/albums appear
@@ -145,7 +148,10 @@ class CloudProviderInitializer @Inject constructor(
             prefetchProviderData(provider, entity.displayName.ifBlank { entity.providerType.displayName }, entity.id)
             printDebug("CloudProviderInitializer: Registered account ${entity.providerType} #${entity.id}")
         } catch (e: Exception) {
-            printDebug("CloudProviderInitializer: registerAccount failed for #${entity.id}: ${e.message}")
+            lastResolvedUrl.remove(entity.id)
+            val error = e.toAppError("register cloud account")
+            ErrorReporter.report(error)
+            printDebug("CloudProviderInitializer: registerAccount failed for #${entity.id}")
         }
     }
 
@@ -155,7 +161,7 @@ class CloudProviderInitializer @Inject constructor(
      * coroutine — never from the main thread.
      */
     suspend fun initializeAsync() {
-        val activeConfigs = configDao.getAll().first().filter { it.isActive }
+        val activeConfigs = configDao.getAll().firstOrNull().orEmpty().filter { it.isActive }
         // Prime the global viewer/advanced preferences snapshot from the active account so
         // settings like "Verbose logging" take effect from app start, not only after the
         // user visits the settings screen.
@@ -173,15 +179,18 @@ class CloudProviderInitializer @Inject constructor(
                 val resolved = urlResolver.resolve(config)
                 lastResolvedUrl[entity.id] = resolved.serverUrl
                 provider.configure(resolved)
-                provider.authenticate(resolved)
+                provider.authenticate(resolved).getOrThrow()
                 registry.register(entity.id, provider)
                 // Notify CONNECTED immediately so cached data from Room is displayed right away
                 cloudRepository.notifyProviderConnected(entity.providerType, ConnectionState.CONNECTED)
-                printDebug("CloudProviderInitializer: Auto-authenticated ${entity.providerType} #${entity.id} with ${resolved.serverUrl}")
+                printDebug("CloudProviderInitializer: Auto-authenticated ${entity.providerType} #${entity.id}")
                 // Proactive cache: fetch fresh data from network in parallel (non-blocking).
                 prefetchProviderData(provider, entity.displayName.ifBlank { entity.providerType.displayName }, entity.id)
             } catch (e: Exception) {
-                printDebug("CloudProviderInitializer: Auto-auth failed for ${entity.providerType} #${entity.id}: ${e.message}")
+                lastResolvedUrl.remove(entity.id)
+                val error = e.toAppError("initialize cloud account")
+                ErrorReporter.report(error)
+                printDebug("CloudProviderInitializer: Auto-auth failed for ${entity.providerType} #${entity.id}")
             }
         }
     }
@@ -212,13 +221,16 @@ class CloudProviderInitializer @Inject constructor(
             if (lastResolvedUrl[entity.id] == resolved.serverUrl) return
             lastResolvedUrl[entity.id] = resolved.serverUrl
             provider.configure(resolved)
-            provider.authenticate(resolved)
+            provider.authenticate(resolved).getOrThrow()
             cloudRepository.notifyProviderConnected(entity.providerType, ConnectionState.CONNECTED)
-            printDebug("CloudProviderInitializer: Reconfigured account #${entity.id} -> ${resolved.serverUrl}")
+            printDebug("CloudProviderInitializer: Reconfigured account #${entity.id}")
             // Re-pull data from the new URL so the timeline/albums reflect the switched host.
             prefetchProviderData(provider, entity.displayName.ifBlank { entity.providerType.displayName }, entity.id)
         } catch (e: Exception) {
-            printDebug("CloudProviderInitializer: reconfigureAccount failed for #${entity.id}: ${e.message}")
+            lastResolvedUrl.remove(entity.id)
+            val error = e.toAppError("reconfigure cloud account")
+            ErrorReporter.report(error)
+            printDebug("CloudProviderInitializer: reconfigureAccount failed for #${entity.id}")
         }
     }
 
@@ -229,7 +241,8 @@ class CloudProviderInitializer @Inject constructor(
      * Safe to call repeatedly; must run off the main thread.
      */
     suspend fun reconfigureActiveProviders() {
-        val activeConfigs = configDao.getAll().first().filter { it.isActive && it.autoUrlSwitch }
+        val activeConfigs = configDao.getAll().firstOrNull().orEmpty()
+            .filter { it.isActive && it.autoUrlSwitch }
         for (entity in activeConfigs) {
             val provider = registry.getByConfigId(entity.id) as? RemoteMediaProvider ?: continue
             try {
@@ -243,11 +256,14 @@ class CloudProviderInitializer @Inject constructor(
                 if (lastResolvedUrl[entity.id] == resolved.serverUrl) continue
                 lastResolvedUrl[entity.id] = resolved.serverUrl
                 provider.configure(resolved)
-                provider.authenticate(resolved)
+                provider.authenticate(resolved).getOrThrow()
                 cloudRepository.notifyProviderConnected(entity.providerType, ConnectionState.CONNECTED)
-                printDebug("CloudProviderInitializer: Reconfigured ${entity.providerType} #${entity.id} -> ${resolved.serverUrl}")
+                printDebug("CloudProviderInitializer: Reconfigured ${entity.providerType} #${entity.id}")
             } catch (e: Exception) {
-                printDebug("CloudProviderInitializer: Reconfigure failed for ${entity.providerType} #${entity.id}: ${e.message}")
+                lastResolvedUrl.remove(entity.id)
+                val error = e.toAppError("reconfigure active cloud account")
+                ErrorReporter.report(error)
+                printDebug("CloudProviderInitializer: Reconfigure failed for ${entity.providerType} #${entity.id}")
             }
         }
     }

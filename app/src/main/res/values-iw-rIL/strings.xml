@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">גלריה</string>
     <string name="change_app_name">שם האפליקציה</string>
     <string name="change_app_name_summary">שינוי שם האפליקציה המוצג במפעיל</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Open externally</string>
     <string name="no_map_app">אין אפליקציה זמינה להצגת המיקום</string>
     <string name="app_dev">מאת %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">תרומה</string>
     <string name="github">Github</string>
     <string name="donate_button_cd">לחצן תרומה</string>
     <string name="github_button_cd">לחצן Github</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">סגירת הבאנר</string>
     <string name="dismiss_banner_title">להעביר את הבאנר?</string>
     <string name="dismiss_banner_message">לחצני התרומה ו-GitHub יועברו לסרגל קומפקטי בתחתית עמוד ההגדרות.</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">כל המטא-נתונים</string>
     <string name="no_metadata_found">לא נמצאו מטא-נתונים</string>
     <string name="loading_metadata">טוען מטא-נתונים…</string>
-    <string name="categorise_your_media">קטלוג המדיה שלך</string>
-    <string name="disclaimer_classification">המדיה שלך אינה מועלית לאף שרת, כל הסיווג מתבצע מקומית במכשירך באמצעות ONNX Runtime עם מודל מאומן מראש הזמין בנכסי האפליקציה.</string>
+
     <string name="ai_category">תכונות חכמות</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">מודלי הבינה המלאכותית אינם מותקנים. הורד אותם מהגדרות &gt; תכונות חכמות.</string>
+
     <string name="ai_models_manager">מנהל מודלי בינה מלאכותית</string>
     <string name="ai_models_download">הורדת מודלי בינה מלאכותית</string>
-    <string name="ai_models_download_summary">הורדת מודלי בינה מלאכותית לחיפוש ולסיווג תמונות (כ-147 מ״ב)</string>
+
     <string name="ai_models_downloading">מוריד מודלי בינה מלאכותית…</string>
-    <string name="ai_models_ready_summary">חיפוש וסיווג מבוססי בינה מלאכותית זמינים</string>
-    <string name="ai_models_error">שגיאת מודל בינה מלאכותית</string>
+
     <string name="ai_models_delete">מחיקת מודלי הבינה המלאכותית</string>
     <string name="ai_models_delete_confirm">האם אתה בטוח שברצונך למחוק את מודלי הבינה המלאכותית? תצטרך להוריד אותם שוב כדי להשתמש בתכונות בינה מלאכותית.</string>
     <string name="ai_models_size">גודל המודל: %s</string>
-    <string name="ai_models_unavailable">לא זמין — דורש את תכונת מודלי הבינה המלאכותית</string>
+
     <string name="ai_models_description">מודלי בינה מלאכותית מאפשרים חיפוש תמונות חכם וסיווג מדיה אוטומטי. האפליקציה משתמשת במודלי CLIP (Contrastive Language-Image Pretraining) בפורמט ONNX כדי להבין את התוכן של התמונות שלך.</string>
     <string name="ai_models_privacy_description">כל עיבוד הבינה המלאכותית מתבצע במלואו במכשיר שלך. שום תמונה, שאילתת חיפוש או נתון סיווג לא עוזבים את הטלפון שלך. המודלים פועלים מקומית באמצעות ONNX Runtime ואינם דורשים חיבור אינטרנט לאחר ההורדה. המדיה שלך נשארת פרטית לחלוטין.</string>
     <string name="ai_models_source">מקור</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">קבצי המודל</string>
-    <string name="ai_models_feature_search">חיפוש לפי תיאור</string>
-    <string name="ai_models_feature_categories">קטגוריות אוטומטיות</string>
+
     <!-- New Category System -->
-    <string name="add_category">הוספת קטגוריה</string>
-    <string name="edit_category">עריכת קטגוריה</string>
-    <string name="delete_category_title">למחוק קטגוריה?</string>
-    <string name="delete_category_confirmation">האם אתה בטוח שברצונך למחוק קטגוריה זו? לא ניתן לבטל פעולה זו.</string>
-    <string name="category_name">שם הקטגוריה</string>
-    <string name="category_name_hint">למשל: טבע, אוכל, טיולים</string>
-    <string name="search_terms">מילות חיפוש</string>
-    <string name="search_terms_hint">מילות מפתח מופרדות בפסיקים להתאמת תמונות</string>
-    <string name="search_terms_example">שקיעה, זריחה, שעת זהב, שמיים</string>
-    <string name="accuracy_threshold">סף דיוק</string>
-    <string name="more_results">יותר תוצאות</string>
-    <string name="more_accurate">יותר מדויק</string>
+
     <string name="preview">תצוגה מקדימה</string>
-    <string name="matching_photos">תמונות תואמות</string>
-    <string name="best_match">ההתאמה הטובה ביותר</string>
-    <string name="matching_photos_count">%1$d מתאימות</string>
-    <string name="recommended">מומלץ</string>
-    <string name="no_matching_photos">לא נמצאו תמונות מתאימות</string>
-    <string name="category_helper_text">הוסף שם, מילות חיפוש והתאם את הדיוק כדי ליצור את הקטגוריה שלך</string>
-    <string name="reset_categories">איפוס קטגוריות</string>
-    <string name="reset_categories_summary">מחיקת כל הקטגוריות ואתחול מחדש עם ברירות המחדל</string>
+
     <string name="create">יצירה</string>
     <string name="save">שמירה</string>
-    <string name="browse_categories">עיון בקטגוריות</string>
-    <string name="category_media_count">%1$d פריטים</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">קטגוריה חדשה</string>
-    <string name="describe_content">תיאור התוכן הרצוי</string>
-    <string name="describe_content_hint">תאר אילו תמונות הקטגוריה הזו אמורה להכיל</string>
-    <string name="describe_content_example">למשל: תמונות של הכלב שלי בחוף הים</string>
-    <string name="quick_start">התחלה מהירה</string>
-    <string name="quick_start_subtitle">הקש על הצעה כדי להתחיל</string>
-    <string name="matching_preview">תצוגה מקדימה</string>
-    <string name="see_all_matches">הצגת כל %1$d ההתאמות</string>
-    <string name="sensitivity">רגישות</string>
-    <string name="sensitivity_broad">רחבה</string>
-    <string name="sensitivity_broad_desc">כוללת תמונות הקשורות באופן רופף</string>
-    <string name="sensitivity_balanced">מאוזנת</string>
-    <string name="sensitivity_balanced_desc">תמהיל טוב של רלוונטיות</string>
-    <string name="sensitivity_strict">קפדנית</string>
-    <string name="sensitivity_strict_desc">רק התאמות חזקות</string>
-    <string name="sensitivity_exact">מדויקת</string>
-    <string name="sensitivity_exact_desc">רק התאמות כמעט מושלמות</string>
-    <string name="fine_tune">כוונון עדין</string>
-    <string name="category_created">הקטגוריה נוצרה — מסווג תמונות…</string>
-    <string name="category_updated">הקטגוריה עודכנה — מסווג מחדש…</string>
-    <string name="category_deleted">הקטגוריה נמחקה</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">תמונות ייחוס</string>
-    <string name="reference_images_hint">הוסף תמונות כדי למצוא תמונות דומות חזותית</string>
-    <string name="add_reference_photos">הוספת תמונות</string>
-    <string name="reference_images_count">%1$d נבחרו</string>
+
     <string name="restore">שחזור</string>
     <string name="encrypted">מוצפן</string>
     <string name="date_format_settings">תבנית התאריך</string>
     <string name="date_header">תבניות תאריך</string>
     <string name="date_header_summary">הגדרת תבניות תאריך מותאמות אישית</string>
     <string name="launch_on_library">פתיחה בספרייה</string>
-    <string name="categories">קטגוריות</string>
-    <string name="classified_media">%1$s מדיה מסווגת</string>
-    <string name="scan_for_new_categories">סריקה לקטגוריות חדשות</string>
-    <string name="ai_models_not_available">מודלי הבינה המלאכותית לא הורדו. הורד אותם מהגדרות ← תכונות חכמות.</string>
-    <string name="scanning_media">סורק מדיה…</string>
+
     <string name="date_header_title">כותרת תאריך</string>
     <string name="media_view">תצוגת מדיה</string>
     <string name="exif_date">תאריך Exif</string>
@@ -439,7 +390,7 @@
     <string name="vault_notification_channel_name">פעולות כספת</string>
     <string name="vault_notification_channel_description">התקדמות משימות הצפנה / פענוח</string>
     <string name="decrypt_vault">פענוח הכספת</string>
-    <string name="restore_vault_summary">הכספת הנוכחית ותוכנה יפוענחו וישוחזרו.\nפעולה זו תהפוך את התוכן שלך לנגיש שוב ב-ReFra.</string>
+    <string name="restore_vault_summary">הכספת הנוכחית ותוכנה יפוענחו וישוחזרו.\nפעולה זו תהפוך את התוכן שלך לנגיש שוב ב-Theoria.</string>
     <string name="restore_vault_title">לאשר פענוח?</string>
     <string name="yes">כן</string>
     <string name="vault_deletion_title">לאשר מחיקה?</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s מ״פ</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" ב-%1$s"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">אוסף מטא-נתונים…</string>
@@ -932,7 +883,7 @@
     <string name="backup_encrypt_header">Encryption</string>
     <string name="backup_restore_header">Choose what to restore</string>
     <string name="backup_restore">Restore</string>
-    <string name="backup_made_with_version">Created with ReFra %1$s</string>
+    <string name="backup_made_with_version">Created with Theoria %1$s</string>
     <string name="backup_empty">This backup doesn\'t contain any restorable data.</string>
     <string name="backup_items_count">%1$d items</string>
     <string name="backup_pick_file_prompt">Choose a backup file to restore from.</string>

@@ -10,11 +10,9 @@
 #   2. Builds a SigningCertificateLineage proving old-key -> new-key, so
 #      existing installs accept updates signed with the new key.
 #
-# What is stubbed (pending public tooling):
-#   3. ML-DSA (PQC) key generation + pairing. Android 17 exposes ML-DSA-65 /
-#      ML-DSA-87 via KeyPairGenerator (Android Keystore), but the apksigner CLI
-#      flags to attach an ML-DSA signer to an APK are not documented publicly
-#      yet. The hook below is intentionally left as a TODO.
+#   3. Optionally generates an ML-DSA key in a JDK/provider that implements the
+#      ML-DSA algorithm. The generated keystore can be passed to apksigner as
+#      the PQC signer. Desktop JDKs without ML-DSA support fail explicitly.
 #
 # Usage:
 #   APKSIGNER=$ANDROID_HOME/build-tools/37.0.0/apksigner \
@@ -28,9 +26,13 @@ OLD_KEYSTORE="${OLD_KEYSTORE:?set OLD_KEYSTORE to the current release_key.jks}"
 OLD_ALIAS="${OLD_ALIAS:?set OLD_ALIAS to the current key alias}"
 
 NEW_KEYSTORE="${NEW_KEYSTORE:-new_release.jks}"
-NEW_ALIAS="${NEW_ALIAS:-refra-new}"
-LINEAGE="${LINEAGE:-refra.lineage}"
+NEW_ALIAS="${NEW_ALIAS:-theoria-new}"
+LINEAGE="${LINEAGE:-theoria.lineage}"
 VALIDITY_DAYS="${VALIDITY_DAYS:-10000}"
+PQC_KEYSTORE="${PQC_KEYSTORE:-pqc_release.jks}"
+PQC_ALIAS="${PQC_ALIAS:-theoria-pqc}"
+PQC_STORE_PASSWORD="${PQC_STORE_PASSWORD:-}"
+PQC_KEY_PASSWORD="${PQC_KEY_PASSWORD:-$PQC_STORE_PASSWORD}"
 
 echo "==> 1/3 Generating new classical RSA-4096 key ($NEW_KEYSTORE / $NEW_ALIAS)"
 if [[ -f "$NEW_KEYSTORE" ]]; then
@@ -49,16 +51,31 @@ echo "==> 2/3 Building rotation lineage ($LINEAGE): $OLD_ALIAS -> $NEW_ALIAS"
   --old-signer --ks "$OLD_KEYSTORE" --ks-key-alias "$OLD_ALIAS" \
   --new-signer --ks "$NEW_KEYSTORE" --ks-key-alias "$NEW_ALIAS"
 
-echo "==> 3/3 ML-DSA (PQC) key generation: PENDING"
-cat <<'EOF'
-    The ML-DSA signing key cannot be generated/paired with the public CLI yet.
-    Track Android 17 build-tools apksigner support for ML-DSA-65 / ML-DSA-87.
-    Once available, generate the PQC key and update pqc-hybrid-sign.sh to pass it.
-EOF
+echo "==> 3/3 Generating ML-DSA key ($PQC_KEYSTORE / $PQC_ALIAS)"
+if [[ -z "$PQC_STORE_PASSWORD" ]]; then
+  echo "    Set PQC_STORE_PASSWORD to generate the ML-DSA keystore." >&2
+  exit 1
+fi
+if [[ -f "$PQC_KEYSTORE" ]]; then
+  echo "    $PQC_KEYSTORE already exists, skipping ML-DSA key generation."
+else
+  if ! keytool -genkeypair -v \
+      -keystore "$PQC_KEYSTORE" \
+      -storepass "$PQC_STORE_PASSWORD" \
+      -keypass "$PQC_KEY_PASSWORD" \
+      -alias "$PQC_ALIAS" \
+      -keyalg ML-DSA \
+      -validity "$VALIDITY_DAYS" \
+      -dname "CN=Theoria PQC Signing Key"; then
+    echo "ML-DSA generation requires a JDK/provider with ML-DSA KeyPairGenerator support." >&2
+    exit 1
+  fi
+fi
 
 echo
 echo "Done. Base64-encode and store as GitHub secrets (DO NOT COMMIT):"
 echo "    base64 -i $NEW_KEYSTORE  -> secret SIGNING_KEY_NEW"
 echo "    base64 -i $LINEAGE       -> secret SIGNING_LINEAGE"
+echo "    base64 -i $PQC_KEYSTORE  -> secret SIGNING_PQC_KEYSTORE"
 echo "Also record fingerprints for release notes:"
 echo "    keytool -list -v -keystore $NEW_KEYSTORE -alias $NEW_ALIAS"

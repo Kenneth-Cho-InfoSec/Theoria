@@ -49,7 +49,6 @@ import com.dot.gallery.feature_node.domain.model.editor.DrawMode
 import com.dot.gallery.feature_node.domain.model.editor.PathProperties
 import com.dot.gallery.feature_node.domain.model.editor.TextAnnotation
 import com.dot.gallery.feature_node.presentation.edit.components.markup.MarkupPainter
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.CutoutState
 import com.dot.gallery.feature_node.presentation.util.quantizeBlur
 import com.dot.gallery.feature_node.presentation.util.resizeBitmap
 import com.dot.gallery.feature_node.presentation.util.safeSystemGesturesPadding
@@ -76,9 +75,6 @@ fun ImageViewer(
     cropAspectRatio: AspectRatio = AspectRatio.Original,
     showGridOverlay: Boolean = false,
     showMarkup: Boolean,
-    showCutout: Boolean = false,
-    cutoutState: CutoutState? = null,
-    onCutoutAddPoint: (Float, Float, Boolean) -> Unit = { _, _, _ -> },
     paths: List<Pair<Path, PathProperties>>,
     currentPosition: Offset,
     previousPosition: Offset,
@@ -103,8 +99,6 @@ fun ImageViewer(
     onTextAnnotationsChange: (List<TextAnnotation>) -> Unit = {},
     selectedTextIndex: Int = -1,
     onSelectedTextIndexChange: (Int) -> Unit = {},
-    pendingFaceRegions: List<android.graphics.RectF> = emptyList(),
-    onFaceRegionsConsumed: () -> Unit = {},
     vignetteIntensity: Float = 0f,
     blurRadius: Float = 0f,
     sharpnessValue: Float = 0f,
@@ -170,176 +164,165 @@ fun ImageViewer(
             .clipToBounds(),
         contentAlignment = Alignment.Center
     ) {
-      if (showCutout && currentImage != null && cutoutState != null) {
-        CutoutPainter(
-            bitmap = currentImage,
-            cutoutState = cutoutState,
-            onAddPoint = onCutoutAddPoint,
-            modifier = Modifier.fillMaxSize()
-        )
-      } else {
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxSize(),
-            visible = resizedBitmap != null && !cropState.showCropper,
-            enter = enterAnimation,
-            exit = exitAnimation
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        rotationZ = previewRotation + previewRotation90
-                        scaleX = if (previewFlipH) -1f else 1f
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                if (!showMarkup) {
-                    // When the image is pristine (no baked-in edits) we feed the ORIGINAL source to
-                    // zoomimage so the user can zoom to true 100% pixels via tile subsampling,
-                    // instead of the 2048 proxy. Live colour edits still preview via colorFilter.
-                    // Once edits are committed they are baked into the proxy, so we fall back to the
-                    // proxy bitmap to keep the displayed result correct.
-                    val baseModel: Any = if (showSourceSubsampling && sourceUri != null) {
-                        sourceUri
-                    } else {
-                        resizedBitmap!!
-                    }
-                    GlideZoomAsyncImage(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .then(
-                                if (blurRadius > 0f) {
-                                    // Snap to fixed buckets so the GPU reuses a handful of blur
-                                    // shaders instead of compiling a new pipeline per slider step.
-                                    val r = (blurRadius * 2f).quantizeBlur(2f).dp
-                                    Modifier.blur(radiusX = r, radiusY = r)
-                                } else Modifier
-                            ),
-                        model = baseModel,
-                        contentDescription = null,
-                        scrollBar = null,
-                        colorFilter = effectiveMatrix?.let { ColorFilter.colorMatrix(it) },
-                        onLongPress = { onLongClick?.invoke() }
-                    )
-                    // Vignette overlay — separate composable so it doesn't interfere with colorFilter
-                    if (vignetteIntensity > 0f) {
-                        val bmp = currentImage
-                        Canvas(modifier = Modifier.fillMaxSize()) {
-                            val imgW = bmp?.width?.toFloat() ?: size.width
-                            val imgH = bmp?.height?.toFloat() ?: size.height
-                            val scale = minOf(size.width / imgW, size.height / imgH)
-                            val contentW = imgW * scale
-                            val contentH = imgH * scale
-                            val contentCx = size.width / 2f
-                            val contentCy = size.height / 2f
-                            val contentRadius = maxOf(contentW, contentH) / 2f * 1.2f
+      AnimatedVisibility(
+          modifier = Modifier.fillMaxSize(),
+          visible = resizedBitmap != null && !cropState.showCropper,
+          enter = enterAnimation,
+          exit = exitAnimation
+      ) {
+          Box(
+              modifier = Modifier
+                  .fillMaxSize()
+                  .graphicsLayer {
+                      rotationZ = previewRotation + previewRotation90
+                      scaleX = if (previewFlipH) -1f else 1f
+                  },
+              contentAlignment = Alignment.Center
+          ) {
+              if (!showMarkup) {
+                  // When the image is pristine (no baked-in edits) we feed the ORIGINAL source to
+                  // zoomimage so the user can zoom to true 100% pixels via tile subsampling,
+                  // instead of the 2048 proxy. Live colour edits still preview via colorFilter.
+                  // Once edits are committed they are baked into the proxy, so we fall back to the
+                  // proxy bitmap to keep the displayed result correct.
+                  val baseModel: Any = if (showSourceSubsampling && sourceUri != null) {
+                      sourceUri
+                  } else {
+                      resizedBitmap!!
+                  }
+                  GlideZoomAsyncImage(
+                      modifier = Modifier
+                          .fillMaxSize()
+                          .then(
+                              if (blurRadius > 0f) {
+                                  // Snap to fixed buckets so the GPU reuses a handful of blur
+                                  // shaders instead of compiling a new pipeline per slider step.
+                                  val r = (blurRadius * 2f).quantizeBlur(2f).dp
+                                  Modifier.blur(radiusX = r, radiusY = r)
+                              } else Modifier
+                          ),
+                      model = baseModel,
+                      contentDescription = null,
+                      scrollBar = null,
+                      colorFilter = effectiveMatrix?.let { ColorFilter.colorMatrix(it) },
+                      onLongPress = { onLongClick?.invoke() }
+                  )
+                  // Vignette overlay — separate composable so it doesn't interfere with colorFilter
+                  if (vignetteIntensity > 0f) {
+                      val bmp = currentImage
+                      Canvas(modifier = Modifier.fillMaxSize()) {
+                          val imgW = bmp?.width?.toFloat() ?: size.width
+                          val imgH = bmp?.height?.toFloat() ?: size.height
+                          val scale = minOf(size.width / imgW, size.height / imgH)
+                          val contentW = imgW * scale
+                          val contentH = imgH * scale
+                          val contentCx = size.width / 2f
+                          val contentCy = size.height / 2f
+                          val contentRadius = maxOf(contentW, contentH) / 2f * 1.2f
 
-                            val alpha = (vignetteIntensity * 200f / 255f).coerceIn(0f, 1f)
-                            drawRect(
-                                brush = Brush.radialGradient(
-                                    colorStops = arrayOf(
-                                        0.0f to Color.Transparent,
-                                        0.5f to Color.Transparent,
-                                        1.0f to Color.Black.copy(alpha = alpha)
-                                    ),
-                                    center = Offset(contentCx, contentCy),
-                                    radius = contentRadius,
-                                    tileMode = TileMode.Clamp
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    MarkupPainter(
-                        bitmap = resizedBitmap!!,
-                        paths = paths,
-                        addPath = addPath,
-                        clearPathsUndone = clearPathsUndone,
-                        currentPosition = currentPosition,
-                        setCurrentPosition = setCurrentPosition,
-                        previousPosition = previousPosition,
-                        setPreviousPosition = setPreviousPosition,
-                        drawMode = drawMode,
-                        currentPath = currentPath,
-                        setCurrentPath = setCurrentPath,
-                        currentPathProperty = currentPathProperty,
-                        setCurrentPathProperty = setCurrentPathProperty,
-                        currentImage = currentImage,
-                        applyDrawing = applyDrawing,
-                        onNavigateBack = onNavigateBack,
-                        requestApply = requestApply,
-                        onApplyHandled = onApplyHandled,
-                        textAnnotations = textAnnotations,
-                        onTextAnnotationsChange = onTextAnnotationsChange,
-                        selectedTextIndex = selectedTextIndex,
-                        onSelectedTextIndexChange = onSelectedTextIndexChange,
-                        pendingFaceRegions = pendingFaceRegions,
-                        onFaceRegionsConsumed = onFaceRegionsConsumed
-                    )
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = cropState.showCropper && currentImage != null,
-            enter = enterAnimation,
-            exit = exitAnimation
-        ) {
-            val bitmap = currentImage ?: return@AnimatedVisibility
-            val previewBitmap = remember(bitmap) {
-                resizeBitmap(bitmap, 2048, 2048).asImageBitmap()
-            }
-            AnimatedContent(
-                targetState = cropAspectRatio,
-                transitionSpec = {
-                    fadeIn(tween(100)) togetherWith fadeOut(tween(100))
-                },
-                modifier = modifier.fillMaxWidth(),
-                label = "cropper",
-            ) { targetRatio ->
-                val props = remember(targetRatio) {
-                    CropDefaults.properties(
-                        cropOutlineProperty = CropOutlineProperty(
-                            outlineType = OutlineType.RoundedRect,
-                            cropOutline = RectCropShape(
-                                id = 0,
-                                title = OutlineType.RoundedRect.name
-                            )
-                        ),
-                        aspectRatio = targetRatio,
-                        overlayRatio = 1f,
-                        fixedAspectRatio = targetRatio != AspectRatio.Original
-                    )
-                }
-                val effectiveColorFilter = previewMatrix?.let { ColorFilter.colorMatrix(it) }
-                ImageCropper(
-                    modifier = Modifier.graphicsLayer {
-                        if (effectiveColorFilter != null) {
-                            // API 31+ RenderEffect for color matrix on cropper content
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                renderEffect = RenderEffect.createColorFilterEffect(
-                                    ColorMatrixColorFilter(
-                                        NativeColorMatrix(previewMatrix.values)
-                                    )
-                                ).asComposeRenderEffect()
-                            }
-                        }
-                    },
-                    imageBitmap = previewBitmap,
-                    contentDescription = null,
-                    cropStyle = CropDefaults.style(
-                        drawGrid = showGridOverlay,
-                        handleColor = MaterialTheme.colorScheme.tertiary,
-                        strokeWidth = 1.dp
-                    ),
-                    cropProperties = props,
-                    crop = cropState.isCropping,
-                    onCropStart = onCropStart,
-                    onCropSuccess = { },
-                    onCropRect = onCropRect,
-                )
-            }
-        }
+                          val alpha = (vignetteIntensity * 200f / 255f).coerceIn(0f, 1f)
+                          drawRect(
+                              brush = Brush.radialGradient(
+                                  colorStops = arrayOf(
+                                      0.0f to Color.Transparent,
+                                      0.5f to Color.Transparent,
+                                      1.0f to Color.Black.copy(alpha = alpha)
+                                  ),
+                                  center = Offset(contentCx, contentCy),
+                                  radius = contentRadius,
+                                  tileMode = TileMode.Clamp
+                              )
+                          )
+                      }
+                  }
+              } else {
+                  MarkupPainter(
+                      bitmap = resizedBitmap!!,
+                      paths = paths,
+                      addPath = addPath,
+                      clearPathsUndone = clearPathsUndone,
+                      currentPosition = currentPosition,
+                      setCurrentPosition = setCurrentPosition,
+                      previousPosition = previousPosition,
+                      setPreviousPosition = setPreviousPosition,
+                      drawMode = drawMode,
+                      currentPath = currentPath,
+                      setCurrentPath = setCurrentPath,
+                      currentPathProperty = currentPathProperty,
+                      setCurrentPathProperty = setCurrentPathProperty,
+                      currentImage = currentImage,
+                      applyDrawing = applyDrawing,
+                      onNavigateBack = onNavigateBack,
+                      requestApply = requestApply,
+                      onApplyHandled = onApplyHandled,
+                      textAnnotations = textAnnotations,
+                      onTextAnnotationsChange = onTextAnnotationsChange,
+                      selectedTextIndex = selectedTextIndex,
+                      onSelectedTextIndexChange = onSelectedTextIndexChange,
+                  )
+              }
+          }
       }
+
+      AnimatedVisibility(
+          visible = cropState.showCropper && currentImage != null,
+          enter = enterAnimation,
+          exit = exitAnimation
+      ) {
+          val bitmap = currentImage ?: return@AnimatedVisibility
+          val previewBitmap = remember(bitmap) {
+              resizeBitmap(bitmap, 2048, 2048).asImageBitmap()
+          }
+          AnimatedContent(
+              targetState = cropAspectRatio,
+              transitionSpec = {
+                  fadeIn(tween(100)) togetherWith fadeOut(tween(100))
+              },
+              modifier = modifier.fillMaxWidth(),
+              label = "cropper",
+          ) { targetRatio ->
+              val props = remember(targetRatio) {
+                  CropDefaults.properties(
+                      cropOutlineProperty = CropOutlineProperty(
+                          outlineType = OutlineType.RoundedRect,
+                          cropOutline = RectCropShape(
+                              id = 0,
+                              title = OutlineType.RoundedRect.name
+                          )
+                      ),
+                      aspectRatio = targetRatio,
+                      overlayRatio = 1f,
+                      fixedAspectRatio = targetRatio != AspectRatio.Original
+                  )
+              }
+              val effectiveColorFilter = previewMatrix?.let { ColorFilter.colorMatrix(it) }
+              ImageCropper(
+                  modifier = Modifier.graphicsLayer {
+                      if (effectiveColorFilter != null) {
+                          // API 31+ RenderEffect for color matrix on cropper content
+                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                              renderEffect = RenderEffect.createColorFilterEffect(
+                                  ColorMatrixColorFilter(
+                                      NativeColorMatrix(previewMatrix.values)
+                                  )
+                              ).asComposeRenderEffect()
+                          }
+                      }
+                  },
+                  imageBitmap = previewBitmap,
+                  contentDescription = null,
+                  cropStyle = CropDefaults.style(
+                      drawGrid = showGridOverlay,
+                      handleColor = MaterialTheme.colorScheme.tertiary,
+                      strokeWidth = 1.dp
+                  ),
+                  cropProperties = props,
+                  crop = cropState.isCropping,
+                  onCropStart = onCropStart,
+                  onCropSuccess = { },
+                  onCropRect = onCropRect,
+              )
+          }
+        }
     }
 }

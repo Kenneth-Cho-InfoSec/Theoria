@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">Thư viện</string>
     <string name="change_app_name">Tên ứng dụng</string>
     <string name="change_app_name_summary">Thay đổi tên ứng dụng hiện trên trình khởi chạy</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Mở bằng ứng dụng ngoài</string>
     <string name="no_map_app">Không có ứng dụng nào để xem vị trí</string>
     <string name="app_dev">bởi %s</string>
-    <string name="app_dev_name">Iacoblonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">Khuyên góp</string>
     <string name="github">Github</string>
     <string name="donate_button_cd">Nút khuyên góp</string>
     <string name="github_button_cd">Nút GitHub</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">Loại bỏ biểu ngữ</string>
     <string name="dismiss_banner_title">Di chuyển biểu ngữ?</string>
     <string name="dismiss_banner_message">Nút Khuyên góp và GitHub sẽ được thu gọn và di chuyển xuống cuối trang cài đặt.</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">Tất cả siêu dữ liệu</string>
     <string name="no_metadata_found">Không tim thấy siêu dữ liệu nào</string>
     <string name="loading_metadata">Đang tải siêu dữ liệu…</string>
-    <string name="categorise_your_media">Phân loại phương tiện của bạn</string>
-    <string name="disclaimer_classification">Phương tiện của bạn sẽ không bị đăng tải lên bắt cứ máy chủ nào, mọi hoạt động phân loại đều được thực hiện cục bộ bằng môi trường thực thi ONNX với một mô hình trí tuệ nhân tạo được huấn luyện từ trước trong ứng dụng.</string>
+
     <string name="ai_category">Tính năng thông minh</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">Các mô hình AI chưa được cài đặt. Tải chúng từ Cài đặt &gt; Tính năng thông minh.</string>
+
     <string name="ai_models_manager">Trình quản lý mô hình AI</string>
     <string name="ai_models_download">Tải xuống các mô hình AI</string>
-    <string name="ai_models_download_summary">Tải xuống các mô hình AI để tìm kiếm và phân loại ảnh (~147 MB)</string>
+
     <string name="ai_models_downloading">Đang tải xuống các mô hình AI…</string>
-    <string name="ai_models_ready_summary">Tính năng tìm kiếm và phân loại bằng AI hiện đã có sẵn</string>
-    <string name="ai_models_error">Lỗi mô hình AI</string>
+
     <string name="ai_models_delete">Xóa các mô hình AI</string>
     <string name="ai_models_delete_confirm">Bạn có chắc chắn muốn xóa các mô hình AI không? Bạn sẽ cần tải xuống lại chúng để sử dụng các tính năng AI.</string>
     <string name="ai_models_size">Kích thước mô hình: %s</string>
-    <string name="ai_models_unavailable">Không khả dụng — Yêu cầu tính năng Mô hình AI</string>
+
     <string name="ai_models_description">Các mô hình AI cho phép tìm kiếm ảnh thông minh và phân loại phương tiện tự động. Ứng dụng sử dụng các mô hình CLIP (Contrastive Language-Image Pretraining) ở định dạng ONNX để hiểu nội dung trong ảnh của bạn.</string>
     <string name="ai_models_privacy_description">Toàn bộ quá trình xử lý AI diễn ra trực tiếp trên thiết bị của bạn. Không có ảnh, truy vấn tìm kiếm hay dữ liệu phân loại nào được gửi ra ngoài điện thoại. Các mô hình hoạt động cục bộ bằng ONNX Runtime và không cần kết nối Internet sau khi tải xuống. Ảnh và đoạn phim của bạn luôn được bảo vệ và giữ riêng tư hoàn toàn.</string>
     <string name="ai_models_source">Nguồn</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">Tệp mô hình</string>
-    <string name="ai_models_feature_search">Tìm kiếm theo mô tả</string>
-    <string name="ai_models_feature_categories">Danh mục tự động</string>
+
     <!-- New Category System -->
-    <string name="add_category">Thêm danh mục</string>
-    <string name="edit_category">Sửa danh mục</string>
-    <string name="delete_category_title">Xóa danh mục?</string>
-    <string name="delete_category_confirmation">Bạn có chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác.</string>
-    <string name="category_name">Tên danh mục</string>
-    <string name="category_name_hint">ví dụ: Thiên nhiên, Ẩm thực, Du lịch</string>
-    <string name="search_terms">Tìm kiếm từ khóa</string>
-    <string name="search_terms_hint">Các từ khóa, phân tách bằng dấu phẩy, để khớp với ảnh</string>
-    <string name="search_terms_example">hoàng hôn, bình minh, giờ vàng, bầu trời</string>
-    <string name="accuracy_threshold">Ngưỡng độ chính xác</string>
-    <string name="more_results">Xem thêm kết quả</string>
-    <string name="more_accurate">More accurate</string>
+
     <string name="preview">Xem trước</string>
-    <string name="matching_photos">Ảnh khớp</string>
-    <string name="best_match">Khớp nhất</string>
-    <string name="matching_photos_count">%1$d ảnh khớp</string>
-    <string name="recommended">được đề xuất</string>
-    <string name="no_matching_photos">Không tìm thấy ảnh khớp nào</string>
-    <string name="category_helper_text">Thêm tên, từ khóa tìm kiếm và điều chỉnh độ chính xác để tạo danh mục của bạn</string>
-    <string name="reset_categories">Đặt lại danh mục</string>
-    <string name="reset_categories_summary">Xóa tất cả các danh mục và khôi phục các danh mục mặc định</string>
+
     <string name="create">Tạo</string>
     <string name="save">Lưu</string>
-    <string name="browse_categories">Duyệt danh mục</string>
-    <string name="category_media_count">%1$d mục</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">Danh mục mới</string>
-    <string name="describe_content">Mô tả những nội dung cần bao gồm</string>
-    <string name="describe_content_hint">Mô tả những bức ảnh nào nên có trong danh mục này</string>
-    <string name="describe_content_example">ví dụ: ảnh chú chó của tôi trên bãi biển</string>
-    <string name="quick_start">Bắt đầu nhanh</string>
-    <string name="quick_start_subtitle">Nhấn vào một gợi ý để bắt đầu</string>
-    <string name="matching_preview">Xem trước</string>
-    <string name="see_all_matches">Xem tất cả %1$d kết quả khớp</string>
-    <string name="sensitivity">Độ nhạy</string>
-    <string name="sensitivity_broad">Rộng</string>
-    <string name="sensitivity_broad_desc">Bao gồm các ảnh có liên quan ít hơn</string>
-    <string name="sensitivity_balanced">Cân bằng</string>
-    <string name="sensitivity_balanced_desc">Cân bằng tốt giữa độ liên quan và số lượng kết quả</string>
-    <string name="sensitivity_strict">Nghiêm ngặt</string>
-    <string name="sensitivity_strict_desc">Chỉ các kết quả khớp chính xác</string>
-    <string name="sensitivity_exact">Chính xác</string>
-    <string name="sensitivity_exact_desc">Chỉ hiển thị các kết quả khớp gần như hoàn hảo</string>
-    <string name="fine_tune">Tinh chỉnh</string>
-    <string name="category_created">Đã tạo danh mục — đang phân loại ảnh…</string>
-    <string name="category_updated">Đã cập nhật danh mục — đang phân loại lại…</string>
-    <string name="category_deleted">Danh mục đã bị xóa</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">Ảnh mẫu</string>
-    <string name="reference_images_hint">Thêm ảnh để tìm những ảnh có hình ảnh tương tự</string>
-    <string name="add_reference_photos">Thêm hình ảnh</string>
-    <string name="reference_images_count">Đã chọn %1$d</string>
+
     <string name="restore">Khôi phục</string>
     <string name="encrypted">Đã được mã hóa</string>
     <string name="date_format_settings">Định dạng ngày</string>
     <string name="date_header">Các định dạng ngày</string>
     <string name="date_header_summary">Đặt định dạng ngày tháng tùy chỉnh</string>
     <string name="launch_on_library">Khởi động vào Thư viện</string>
-    <string name="categories">Danh mục</string>
-    <string name="classified_media">%1$s phương tiện đã phân loại</string>
-    <string name="scan_for_new_categories">Quét để tìm danh mục mới</string>
-    <string name="ai_models_not_available">Các mô hình AI chưa được tải xuống. Tải chúng từ Cài đặt → Tính năng thông minh.</string>
-    <string name="scanning_media">Đang quét phương tiện…</string>
+
     <string name="date_header_title">Tiêu đề ngày</string>
     <string name="media_view">Chế độ xem phương tiện</string>
     <string name="exif_date">Ngày Exif</string>
@@ -439,7 +390,7 @@
     <string name="vault_notification_channel_name">Thao tác két</string>
     <string name="vault_notification_channel_description">Tiến trình các tác vụ mã hóa / giải mã</string>
     <string name="decrypt_vault">Giải mã két</string>
-    <string name="restore_vault_summary">Két hiện tại và toàn bộ nội dung của nó sẽ được giải mã và khôi phục.\nThao tác này sẽ làm cho nội dung của bạn có thể truy cập lại trong ReFra.</string>
+    <string name="restore_vault_summary">Két hiện tại và toàn bộ nội dung của nó sẽ được giải mã và khôi phục.\nThao tác này sẽ làm cho nội dung của bạn có thể truy cập lại trong Theoria.</string>
     <string name="restore_vault_title">Xác nhận giải mã?</string>
     <string name="yes">Có</string>
     <string name="vault_deletion_title">Xác nhận xóa?</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" tại %1$s"</string>
     <string name="video_fps">%.1f khung hình trên giây</string>
     <string name="collecting_metadata">Collecting metadata…</string>
@@ -926,7 +877,7 @@
     <string name="backup_encrypt_header">Encryption</string>
     <string name="backup_restore_header">Choose what to restore</string>
     <string name="backup_restore">Restore</string>
-    <string name="backup_made_with_version">Created with ReFra %1$s</string>
+    <string name="backup_made_with_version">Created with Theoria %1$s</string>
     <string name="backup_empty">This backup doesn\'t contain any restorable data.</string>
     <string name="backup_items_count">%1$d items</string>
     <string name="backup_pick_file_prompt">Choose a backup file to restore from.</string>

@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.data.repository
@@ -23,7 +23,6 @@ import com.dot.gallery.cloud.core.capabilities.MemoriesCapableProvider
 import com.dot.gallery.cloud.core.capabilities.PeopleCapableProvider
 import com.dot.gallery.cloud.core.capabilities.RemoteMediaProvider
 import com.dot.gallery.cloud.core.capabilities.ShareLinkCapableProvider
-import com.dot.gallery.cloud.core.capabilities.SmartSearchCapableProvider
 import com.dot.gallery.cloud.core.capabilities.SyncCapableProvider
 import com.dot.gallery.cloud.data.dao.CloudMediaDao
 import com.dot.gallery.cloud.data.entity.CloudMediaEntity
@@ -38,6 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -181,18 +181,6 @@ class CloudRepositoryImpl @Inject constructor(
         return combineResources(providers.map { it.getMapMarkers() })
     }
 
-    // === Smart Search ===
-
-    override suspend fun smartSearch(query: String): Result<List<Media>> {
-        val providers = registry.getSmartSearchProviders().filter { it.isAvailable }
-        if (providers.isEmpty()) return Result.success(emptyList())
-        val allResults = mutableListOf<Media>()
-        for (provider in providers) {
-            provider.smartSearch(query).onSuccess { allResults.addAll(it) }
-        }
-        return Result.success(allResults)
-    }
-
     // === Share Links ===
 
     override suspend fun createShareLink(
@@ -238,8 +226,19 @@ class CloudRepositoryImpl @Inject constructor(
         val providers = registry.getRemoteProviders().filter { it.isAvailable }
         if (providers.isEmpty()) return Result.success(emptyList())
         val allResults = mutableListOf<CloudMediaEntity>()
+        var successfulProviders = 0
+        var lastFailure: Throwable? = null
         for (provider in providers) {
-            provider.search(query).onSuccess { allResults.addAll(it) }
+            provider.search(query)
+                .onSuccess {
+                    successfulProviders++
+                    allResults.addAll(it)
+                }
+                .onFailure { lastFailure = it }
+        }
+        val failure = lastFailure
+        if (successfulProviders == 0 && failure != null) {
+            return Result.failure(failure)
         }
         return Result.success(allResults)
     }
@@ -256,7 +255,11 @@ class CloudRepositoryImpl @Inject constructor(
         val result = provider.deleteAsset(remoteId)
         if (result.isSuccess) {
             // Drop from the local cache so the timeline/backup sheet update reactively.
-            cloudMediaDao.delete(remoteId, type)
+            if (configId > 0L) {
+                cloudMediaDao.deleteForConfig(remoteId, type, configId)
+            } else {
+                cloudMediaDao.delete(remoteId, type)
+            }
         }
         return result
     }
@@ -393,7 +396,12 @@ class CloudRepositoryImpl @Inject constructor(
     private fun <T> combineResources(flows: List<Flow<Resource<List<T>>>>): Flow<Resource<List<T>>> {
         if (flows.isEmpty()) return flowOf(Resource.Success(emptyList()))
         if (flows.size == 1) return flows[0]
-        return combine(flows) { resources ->
+        val safeFlows = flows.map { providerFlow ->
+            providerFlow.catch { throwable ->
+                emit(Resource.Error("Provider request failed: ${throwable.message ?: "unknown error"}"))
+            }
+        }
+        return combine(safeFlows) { resources ->
             val allData = mutableListOf<T>()
             var hasError = false
             var errorMessage = ""

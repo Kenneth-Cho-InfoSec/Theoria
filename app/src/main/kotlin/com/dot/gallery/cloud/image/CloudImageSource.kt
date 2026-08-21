@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.image
 
+import android.net.Uri
 import android.content.Context
 import com.dot.gallery.cloud.core.CloudTrace
 import com.dot.gallery.cloud.core.ProviderType
@@ -59,12 +60,20 @@ class CloudImageSource private constructor(
         return result
     }
 
-    override fun toString(): String = "CloudImageSource(cloud://${providerType.name}/$remoteId)"
+    override fun toString(): String = "CloudImageSource($key)"
 
     companion object {
         private fun keyOf(providerType: ProviderType, remoteId: String, configId: Long): String =
-            "cloud://${providerType.name}/$remoteId?size=original" +
-                (if (configId > 0L) "&cfg=$configId" else "")
+            Uri.Builder()
+                .scheme("cloud")
+                .authority(providerType.name)
+                .appendEncodedPath(Uri.encode(remoteId, "/"))
+                .appendQueryParameter("size", "original")
+                .apply {
+                    if (configId > 0L) appendQueryParameter("cfg", configId.toString())
+                }
+                .build()
+                .toString()
 
         /**
          * Ensure the original is cached locally (downloading it off the main thread if needed) and
@@ -125,16 +134,20 @@ class CloudImageSource private constructor(
                     CloudTrace.w("ZoomSource[$providerType] original '$remoteId' -> HTTP ${it.code}")
                     throw Exception("HTTP ${it.code}: ${it.message}")
                 }
-                val body = it.body ?: throw Exception("Empty response body")
+                val body = it.body
                 // Stream to a temp file then rename, so a partial/failed download never leaves a
                 // truncated file that a later open would treat as complete.
                 val tmp = File(target.path + ".tmp")
-                body.source().use { src ->
-                    tmp.sink().buffer().use { sink -> sink.writeAll(src) }
-                }
-                if (!tmp.renameTo(target)) {
-                    tmp.copyTo(target, overwrite = true)
-                    tmp.delete()
+                try {
+                    body.source().use { src ->
+                        tmp.sink().buffer().use { sink -> sink.writeAll(src) }
+                    }
+                    if (!tmp.renameTo(target)) {
+                        tmp.copyTo(target, overwrite = true)
+                        tmp.delete()
+                    }
+                } finally {
+                    if (tmp.exists()) tmp.delete()
                 }
             }
         }

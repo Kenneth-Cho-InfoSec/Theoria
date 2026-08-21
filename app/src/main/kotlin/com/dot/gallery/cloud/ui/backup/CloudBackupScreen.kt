@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -195,7 +195,7 @@ fun CloudBackupScreen(
             // Album selection
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.cloud_backup_albums)) },
+                    content = { Text(stringResource(R.string.cloud_backup_albums)) },
                     supportingContent = {
                         Text(
                             if (state.enabledAlbumCount == 0) stringResource(R.string.cloud_backup_no_albums)

@@ -135,7 +135,7 @@ fun SettingsGeneralScreen() {
                 description = stringResource(R.string.app_name_description),
                 preview = { AppNamePreview(appNameAlias) },
                 options = listOf(
-                    PreferenceOption(Settings.Misc.ALIAS_REFRA, Settings.Misc.ALIAS_REFRA, appNameAlias == Settings.Misc.ALIAS_REFRA),
+                    PreferenceOption(Settings.Misc.ALIAS_THEORIA, Settings.Misc.ALIAS_THEORIA, appNameAlias == Settings.Misc.ALIAS_THEORIA),
                     PreferenceOption(Settings.Misc.ALIAS_GALLERY, Settings.Misc.ALIAS_GALLERY, appNameAlias == Settings.Misc.ALIAS_GALLERY),
                 ),
                 onOptionSelected = {
@@ -155,7 +155,7 @@ fun SettingsGeneralScreen() {
                 description = stringResource(R.string.app_logo_description),
                 preview = { AppLogoPreview(appLogoAlias) },
                 options = listOf(
-                    PreferenceOption(Settings.Misc.ALIAS_REFRA, Settings.Misc.ALIAS_REFRA, appLogoAlias == Settings.Misc.ALIAS_REFRA),
+                    PreferenceOption(Settings.Misc.ALIAS_THEORIA, Settings.Misc.ALIAS_THEORIA, appLogoAlias == Settings.Misc.ALIAS_THEORIA),
                     PreferenceOption(Settings.Misc.ALIAS_GALLERY, Settings.Misc.ALIAS_GALLERY, appLogoAlias == Settings.Misc.ALIAS_GALLERY),
                 ),
                 onOptionSelected = {
@@ -392,7 +392,7 @@ private fun AppNamePreview(currentAlias: String) {
             .padding(24.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        listOf(Settings.Misc.ALIAS_REFRA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
+        listOf(Settings.Misc.ALIAS_THEORIA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
             val selected = currentAlias == alias
             val borderColor = if (selected) MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.outlineVariant
@@ -444,7 +444,7 @@ private fun AppLogoPreview(currentAlias: String) {
             .padding(24.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        listOf(Settings.Misc.ALIAS_REFRA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
+        listOf(Settings.Misc.ALIAS_THEORIA, Settings.Misc.ALIAS_GALLERY).forEach { alias ->
             val selected = currentAlias == alias
             val borderColor = if (selected) MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.outlineVariant

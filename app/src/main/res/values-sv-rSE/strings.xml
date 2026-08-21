@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ReFra</string>
+    <string name="app_name">Theoria</string>
     <string name="app_name_gallery">Gallery</string>
     <string name="change_app_name">App name</string>
     <string name="change_app_name_summary">Change the app name shown on your launcher</string>
@@ -57,12 +57,12 @@
     <string name="open_externally">Open externally</string>
     <string name="no_map_app">No app available to show the location</string>
     <string name="app_dev">av %s</string>
-    <string name="app_dev_name">IacobIonut01</string>
+    <string name="app_dev_name">kennethcho</string>
     <string name="donate">Donera</string>
     <string name="github">Github</string>
     <string name="donate_button_cd">Donera-knapp</string>
     <string name="github_button_cd">Github-knapp</string>
-    <string name="github_url">https://github.com/IacobIonut01/Gallery</string>
+    <string name="github_url">https://github.com/Kenneth-Cho-InfoSec/Gallery</string>
     <string name="dismiss_banner">Dismiss banner</string>
     <string name="dismiss_banner_title">Move banner?</string>
     <string name="dismiss_banner_message">The Donate and GitHub buttons will move to a compact bar at the bottom of the Settings page.</string>
@@ -323,92 +323,43 @@
     <string name="all_metadata">All Metadata</string>
     <string name="no_metadata_found">No metadata found</string>
     <string name="loading_metadata">Loading metadata…</string>
-    <string name="categorise_your_media">Categorise your media</string>
-    <string name="disclaimer_classification">Your media is not uploaded to any server, all classification is done locally on your device by using TensorFlow-Lite with a pre-trained model available in the app\'s assets.</string>
+
     <string name="ai_category">Smart Features</string>
     <!-- AI Model Management -->
-    <string name="ai_models_not_installed">AI models are not installed. Download them from Settings &gt; Smart Features.</string>
+
     <string name="ai_models_manager">AI Models Manager</string>
     <string name="ai_models_download">Download AI Models</string>
-    <string name="ai_models_download_summary">Download AI models for image search and classification (~147 MB)</string>
+
     <string name="ai_models_downloading">Downloading AI Models…</string>
-    <string name="ai_models_ready_summary">AI-powered search and classification are available</string>
-    <string name="ai_models_error">AI Model Error</string>
+
     <string name="ai_models_delete">Delete AI Models</string>
     <string name="ai_models_delete_confirm">Are you sure you want to delete the AI models? You will need to download them again to use AI features.</string>
     <string name="ai_models_size">Model size: %s</string>
-    <string name="ai_models_unavailable">Unavailable — Requires AI Models Feature</string>
+
     <string name="ai_models_description">AI models enable intelligent image search and automatic media classification. The app uses CLIP (Contrastive Language-Image Pretraining) models in ONNX format to understand the content of your photos.</string>
     <string name="ai_models_privacy_description">All AI processing is performed entirely on your device. No images, search queries, or classification data ever leave your phone. The models run locally using ONNX Runtime and do not require an internet connection once downloaded. Your media remains fully private.</string>
     <string name="ai_models_source">Source</string>
-    <string name="ai_models_source_url">github.com/IacobIonut01/ReFra</string>
+    <string name="ai_models_source_url">github.com/Kenneth-Cho-InfoSec/Theoria</string>
     <string name="ai_models_files">Model Files</string>
-    <string name="ai_models_feature_search">Search by Description</string>
-    <string name="ai_models_feature_categories">Automatic Categories</string>
+
     <!-- New Category System -->
-    <string name="add_category">Add category</string>
-    <string name="edit_category">Edit category</string>
-    <string name="delete_category_title">Delete category?</string>
-    <string name="delete_category_confirmation">Are you sure you want to delete this category? This action cannot be undone.</string>
-    <string name="category_name">Category name</string>
-    <string name="category_name_hint">e.g., Nature, Food, Travel</string>
-    <string name="search_terms">Search terms</string>
-    <string name="search_terms_hint">Comma-separated keywords to match images</string>
-    <string name="search_terms_example">sunset, sunrise, golden hour, sky</string>
-    <string name="accuracy_threshold">Accuracy threshold</string>
-    <string name="more_results">More results</string>
-    <string name="more_accurate">More accurate</string>
+
     <string name="preview">Preview</string>
-    <string name="matching_photos">Matching photos</string>
-    <string name="best_match">Best Match</string>
-    <string name="matching_photos_count">%1$d matching</string>
-    <string name="recommended">recommended</string>
-    <string name="no_matching_photos">No matching photos found</string>
-    <string name="category_helper_text">Add a name, search terms and adjust the accuracy to create your category</string>
-    <string name="reset_categories">Reset categories</string>
-    <string name="reset_categories_summary">Delete all categories and reinitialize with defaults</string>
+
     <string name="create">Create</string>
     <string name="save">Save</string>
-    <string name="browse_categories">Browse categories</string>
-    <string name="category_media_count">%1$d items</string>
+
     <!-- Category Editor (unified create/edit) -->
-    <string name="new_category">New category</string>
-    <string name="describe_content">Describe what to include</string>
-    <string name="describe_content_hint">Describe what photos this category should contain</string>
-    <string name="describe_content_example">e.g., photos of my dog at the beach</string>
-    <string name="quick_start">Quick start</string>
-    <string name="quick_start_subtitle">Tap a suggestion to get started</string>
-    <string name="matching_preview">Preview</string>
-    <string name="see_all_matches">See all %1$d matches</string>
-    <string name="sensitivity">Sensitivity</string>
-    <string name="sensitivity_broad">Broad</string>
-    <string name="sensitivity_broad_desc">Include loosely related photos</string>
-    <string name="sensitivity_balanced">Balanced</string>
-    <string name="sensitivity_balanced_desc">Good mix of relevance</string>
-    <string name="sensitivity_strict">Strict</string>
-    <string name="sensitivity_strict_desc">Only strong matches</string>
-    <string name="sensitivity_exact">Exact</string>
-    <string name="sensitivity_exact_desc">Near-perfect matches only</string>
-    <string name="fine_tune">Fine-tune</string>
-    <string name="category_created">Category created — classifying photos…</string>
-    <string name="category_updated">Category updated — reclassifying…</string>
-    <string name="category_deleted">Category deleted</string>
+
     <!-- Reference images (image-to-image search) -->
-    <string name="reference_images">Reference photos</string>
-    <string name="reference_images_hint">Add photos to find visually similar ones</string>
-    <string name="add_reference_photos">Add photos</string>
-    <string name="reference_images_count">%1$d selected</string>
+
     <string name="restore">Återställ</string>
     <string name="encrypted">Krypterat</string>
     <string name="date_format_settings">Date Format</string>
     <string name="date_header">Date Formats</string>
     <string name="date_header_summary">Set your own custom date formats</string>
     <string name="launch_on_library">Starta på bibliotek</string>
-    <string name="categories">Kategorier</string>
-    <string name="classified_media">%1$s classified media</string>
-    <string name="scan_for_new_categories">Scan for new categories</string>
-    <string name="ai_models_not_available">AI models are not downloaded. Download them from Settings → Smart Features.</string>
-    <string name="scanning_media">Scanning media...</string>
+
     <string name="date_header_title">Date Header</string>
     <string name="media_view">Medievy</string>
     <string name="exif_date">Exif Date</string>
@@ -439,7 +390,7 @@
     <string name="vault_notification_channel_name">Vault Operations</string>
     <string name="vault_notification_channel_description">Progress of encryption / decryption tasks</string>
     <string name="decrypt_vault">Decrypt Vault</string>
-    <string name="restore_vault_summary">The current vault and its content will be decrypted and restored.\nThis action will make your content accessible again in the ReFra.</string>
+    <string name="restore_vault_summary">The current vault and its content will be decrypted and restored.\nThis action will make your content accessible again in the Theoria.</string>
     <string name="restore_vault_title">Confirm Decryption?</string>
     <string name="yes">Ja</string>
     <string name="vault_deletion_title">Confirm Deletion?</string>
@@ -523,7 +474,7 @@
     <string name="resolution_with_mp">%1$d × %2$d • %3$s MP</string>
     <string name="ppi">PPI</string>
     <string name="ppcm">PPCM</string>
-    <string name="ppi_resolution_string">" • %.1f × %.1f %s"</string>
+    <string name="ppi_resolution_string">" • %1$.1f × %2$.1f %3$s"</string>
     <string name="at_kbps">" at %1$s"</string>
     <string name="video_fps">%.1f fps</string>
     <string name="collecting_metadata">Collecting metadata...</string>
@@ -928,7 +879,7 @@
     <string name="backup_encrypt_header">Encryption</string>
     <string name="backup_restore_header">Choose what to restore</string>
     <string name="backup_restore">Restore</string>
-    <string name="backup_made_with_version">Created with ReFra %1$s</string>
+    <string name="backup_made_with_version">Created with Theoria %1$s</string>
     <string name="backup_empty">This backup doesn\'t contain any restorable data.</string>
     <string name="backup_items_count">%1$d items</string>
     <string name="backup_pick_file_prompt">Choose a backup file to restore from.</string>

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,9 +49,6 @@ interface CloudRepository {
 
     // Map markers from all providers
     fun getAllMapMarkers(): Flow<Resource<List<CloudMapMarker>>>
-
-    // Smart search across all providers
-    suspend fun smartSearch(query: String): Result<List<Media>>
 
     // Share links
     suspend fun createShareLink(type: ProviderType, assetIds: List<String>, expiresAt: Long? = null): Result<String>

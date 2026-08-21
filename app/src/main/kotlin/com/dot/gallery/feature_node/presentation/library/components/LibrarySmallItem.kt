@@ -40,7 +40,7 @@ fun LibrarySmallItem(
         ),
         modifier = modifier
             .clip(RoundedCornerShape(16.dp)),
-        headlineContent = {
+        content = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelLarge,

@@ -19,23 +19,7 @@ import com.dot.gallery.core.decoder.glide.EncryptedStreamingFileLoader
 import com.dot.gallery.core.decoder.glide.EncryptedStreamingUriLoader
 import com.dot.gallery.core.decoder.glide.EncryptedUriModelLoader
 import com.dot.gallery.core.decoder.glide.EncryptedVideoFrameDecoder
-import com.dot.gallery.core.decoder.glide.HeifEncryptedDecoder
-import com.dot.gallery.core.decoder.glide.HeifEncryptedSourceDecoder
-import com.dot.gallery.core.decoder.glide.HeifMimeInputStreamDecoder
-import com.dot.gallery.core.decoder.glide.JxlBitmapDecoder
-import com.dot.gallery.core.decoder.glide.SandboxedHeifBitmapDecoder
-import com.dot.gallery.core.decoder.glide.SandboxedHeifMimeDecoder
-import com.dot.gallery.core.decoder.glide.SandboxedJxlBitmapDecoder
-import com.dot.gallery.core.decoder.glide.JxlEncryptedDecoder
-import com.dot.gallery.core.decoder.glide.JxlEncryptedSourceDecoder
-import com.dot.gallery.core.decoder.glide.MimeInputStream
 import com.dot.gallery.cloud.image.CloudGlideModelLoader
-import com.dot.gallery.core.decoder.glide.MimeInputStreamModelLoader
-import com.dot.gallery.core.decoder.glide.PsdBitmapDecoder
-import com.dot.gallery.core.decoder.glide.Jp2BitmapDecoder
-import com.dot.gallery.core.decoder.glide.SvgBitmapDecoder
-import com.dot.gallery.core.decoder.glide.TiffMimeInputStreamDecoder
-import com.dot.gallery.core.decoder.glide.RawMimeInputStreamDecoder
 import com.dot.gallery.core.decoder.glide.StreamingEncryptedVideoFrameDecoder
 import java.io.File
 import java.io.InputStream
@@ -83,97 +67,11 @@ class GlideModule: AppGlideModule() {
             EncryptedUriModelLoader.Factory(context)
         )
 
-        registry.prepend(
-            Uri::class.java,
-            MimeInputStream::class.java,
-            MimeInputStreamModelLoader.Factory(context)
-        )
-        registry.prepend(
-            MimeInputStream::class.java,
-            Bitmap::class.java,
-            HeifMimeInputStreamDecoder(context, pool)
-        )
-        // TIFF via content Uri MIME (image/tiff is reliably reported by MediaStore)
-        registry.prepend(
-            MimeInputStream::class.java,
-            Bitmap::class.java,
-            TiffMimeInputStreamDecoder(pool)
-        )
-        // Camera RAW (CR2/NEF/ARW/DNG/ORF/PEF/RW2/SRW/…) via content Uri MIME. Android can't
-        // decode these natively, so the grid renders their embedded JPEG preview instead.
-        registry.prepend(
-            MimeInputStream::class.java,
-            Bitmap::class.java,
-            RawMimeInputStreamDecoder(pool)
-        )
-        // Formats Android can't decode natively, detected by magic bytes (MIME is unreliable):
-        // PSD, JPEG 2000, and SVG (rasterized). Registered on the InputStream path.
-        registry.prepend(
-            InputStream::class.java,
-            Bitmap::class.java,
-            PsdBitmapDecoder(pool)
-        )
-        registry.prepend(
-            InputStream::class.java,
-            Bitmap::class.java,
-            Jp2BitmapDecoder(pool)
-        )
-        registry.prepend(
-            InputStream::class.java,
-            Bitmap::class.java,
-            SvgBitmapDecoder(pool)
-        )
-        // Sandboxed MIME decoder: when enabled, intercepts HEIF before HeifMimeInputStreamDecoder
-        registry.prepend(
-            MimeInputStream::class.java,
-            Bitmap::class.java,
-            SandboxedHeifMimeDecoder(context, pool)
-        )
-        registry.prepend(
-            InputStream::class.java,
-            Bitmap::class.java,
-            JxlBitmapDecoder(pool)
-        )
-        // Sandboxed decoders: when enabled, intercept before the standard decoders above
-        registry.prepend(
-            InputStream::class.java,
-            Bitmap::class.java,
-            SandboxedHeifBitmapDecoder(context, pool)
-        )
-        registry.prepend(
-            InputStream::class.java,
-            Bitmap::class.java,
-            SandboxedJxlBitmapDecoder(context, pool)
-        )
-
-        // Decoders for our custom model type
-        registry.prepend(
-            EncryptedMediaStream::class.java,
-            Bitmap::class.java,
-            HeifEncryptedDecoder(pool)
-        )
-
-        // Bridging decoders: EncryptedMediaSource -> Bitmap (HEIF/JXL) without forcing legacy byte array for all images.
-        registry.prepend(
-            EncryptedMediaSource::class.java,
-            Bitmap::class.java,
-            HeifEncryptedSourceDecoder(pool)
-        )
-        registry.prepend(
-            EncryptedMediaSource::class.java,
-            Bitmap::class.java,
-            JxlEncryptedSourceDecoder(pool)
-        )
         // Streaming video frame decoder (EncryptedMediaSource -> Bitmap) preferred over legacy byte-array path
         registry.prepend(
             EncryptedMediaSource::class.java,
             Bitmap::class.java,
             StreamingEncryptedVideoFrameDecoder(pool, context.applicationContext) { context.cacheDir }
-        )
-        registry.prepend(
-            EncryptedMediaStream::class.java,
-            Bitmap::class.java,
-            JxlEncryptedDecoder(pool)
         )
         registry.prepend(
             EncryptedMediaStream::class.java,

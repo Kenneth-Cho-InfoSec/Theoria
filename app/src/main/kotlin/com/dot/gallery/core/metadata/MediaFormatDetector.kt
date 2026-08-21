@@ -7,7 +7,12 @@ object MediaFormatDetector {
 
     fun detect(input: InputStream, mimeType: String? = null, fileName: String? = null): MediaContainerFormat {
         val header = ByteArray(SNIFF_BYTES)
-        val length = input.read(header).coerceAtLeast(0)
+        var length = 0
+        while (length < header.size) {
+            val read = input.read(header, length, header.size - length)
+            if (read <= 0) break
+            length += read
+        }
         return detect(header, length, mimeType, fileName)
     }
 

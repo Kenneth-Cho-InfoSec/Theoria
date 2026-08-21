@@ -101,7 +101,7 @@ class SketchApngDecoder(
         } finally {
             imageDecoder?.close()
         }
-        requireNotNull(imageInfo)
+        val resolvedImageInfo = requireNotNull(imageInfo)
 
         if (drawable !is AnimatedImageDrawable) {
             // Not animated, fall back to static rendering
@@ -109,7 +109,7 @@ class SketchApngDecoder(
                 image = drawable.asImage(),
                 imageInfo = imageInfo,
                 dataFrom = dataSource.dataFrom,
-                resize = requestContext.computeResize(Size(imageInfo!!.width, imageInfo!!.height)),
+                resize = requestContext.computeResize(Size(resolvedImageInfo.width, resolvedImageInfo.height)),
                 transformeds = null,
                 extras = null,
             )
@@ -130,7 +130,7 @@ class SketchApngDecoder(
             }
         }
 
-        val imageSize = Size(imageInfo!!.width, imageInfo!!.height)
+        val imageSize = Size(resolvedImageInfo.width, resolvedImageInfo.height)
         val resize = requestContext.computeResize(imageSize)
 
         return ImageData(

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.metadata
 
 import android.content.ContentValues
@@ -68,7 +73,12 @@ class AndroidMetadataSanitizer @Inject constructor(
                 capability.limitation ?: "The selected metadata mode is not supported."
             )
         }
-        transactionDirectory.mkdirs()
+        if (!transactionDirectory.exists() && !transactionDirectory.mkdirs()) {
+            return@withContext SanitizationResult.CommitFailed(
+                "Unable to create metadata transaction directory",
+                rolledBack = true
+            )
+        }
         val required = media.size.coerceAtLeast(1L) * 2L + MINIMUM_FREE_MARGIN
         val available = transactionDirectory.usableSpace
         if (available < required) {

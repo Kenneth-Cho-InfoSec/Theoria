@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.people
@@ -21,7 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,8 +36,7 @@ data class PersonDetailUiState(
 class PersonDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: CloudRepository,
-    private val registry: ProviderRegistry,
-    private val blurrer: com.dot.gallery.cloud.local.LocalPeopleBlurrer
+    private val registry: ProviderRegistry
 ) : ViewModel() {
 
     private val personId: String = savedStateHandle["personId"] ?: ""
@@ -48,64 +47,30 @@ class PersonDetailViewModel @Inject constructor(
     private val _mediaState = MutableStateFlow(MediaState<Media.UriMedia>())
     val mediaState: StateFlow<MediaState<Media.UriMedia>> = _mediaState.asStateFlow()
 
-    /** Non-null (done,total) while a "blur everywhere" batch is running. */
-    private val _blurProgress = MutableStateFlow<Pair<Int, Int>?>(null)
-    val blurProgress: StateFlow<Pair<Int, Int>?> = _blurProgress.asStateFlow()
-
-    /** Other on-device people this person can be merged into. */
-    private val _mergeCandidates = MutableStateFlow<List<PersonInfo>>(emptyList())
-    val mergeCandidates: StateFlow<List<PersonInfo>> = _mergeCandidates.asStateFlow()
-
     /** Raw media of this person, used to pick a new cover face. */
     private val _personMedia = MutableStateFlow<List<Media.UriMedia>>(emptyList())
     val personMedia: StateFlow<List<Media.UriMedia>> = _personMedia.asStateFlow()
 
+    // On-device (ML) person management was removed. These stubs keep the UI compiling;
+    // they are never surfaced because isLocalPerson is always false.
+    val blurProgress: StateFlow<Pair<Int, Int>?> = MutableStateFlow(null)
+    val mergeCandidates: StateFlow<List<PersonInfo>> = MutableStateFlow(emptyList())
+    val isLocalPerson: Boolean = false
+
+    fun blurEverywhere(useMosaic: Boolean) = Unit
+
+    fun mergeInto(targetPersonId: String) = Unit
+
     fun setCover(media: Media.UriMedia) {
         val id = _uiState.value.person?.id ?: return
         val uri = media.getUri().toString()
-        viewModelScope.launch {
-            localProvider()?.setCover(id, media.id, uri)
-            _uiState.value = _uiState.value.copy(
-                person = _uiState.value.person?.copy(thumbnailUrl = uri)
-            )
-        }
+        _uiState.value = _uiState.value.copy(
+            person = _uiState.value.person?.copy(thumbnailUrl = uri)
+        )
     }
-
-    /** True when the current person is an on-device (local) cluster that supports management. */
-    val isLocalPerson: Boolean
-        get() = _uiState.value.person?.providerType == com.dot.gallery.cloud.core.ProviderType.LOCAL_PEOPLE
-
-    private fun localProvider(): com.dot.gallery.cloud.local.LocalPeopleProvider? =
-        registry.getPeopleProviders()
-            .firstOrNull { it.providerType == com.dot.gallery.cloud.core.ProviderType.LOCAL_PEOPLE }
-                as? com.dot.gallery.cloud.local.LocalPeopleProvider
 
     fun hidePerson(onDone: () -> Unit) {
-        val id = _uiState.value.person?.id ?: return
-        viewModelScope.launch {
-            localProvider()?.setHidden(id, true)
-            onDone()
-        }
-    }
-
-    fun mergeInto(targetPersonId: String) {
-        val sourceId = _uiState.value.person?.id ?: return
-        if (sourceId == targetPersonId) return
-        viewModelScope.launch { localProvider()?.mergePeople(sourceId, targetPersonId) }
-    }
-
-    fun blurEverywhere(useMosaic: Boolean) {
-        val id = _uiState.value.person?.id ?: return
-        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-            _blurProgress.value = 0 to 0
-            blurrer.blurPersonEverywhere(
-                personId = id,
-                brush = if (useMosaic) com.dot.gallery.feature_node.domain.model.editor.MarkupBrush.Mosaic
-                else com.dot.gallery.feature_node.domain.model.editor.MarkupBrush.Blur,
-                onProgress = { done, total -> _blurProgress.value = done to total }
-            )
-            _blurProgress.value = null
-        }
+        onDone()
     }
 
     init {
@@ -121,24 +86,32 @@ class PersonDetailViewModel @Inject constructor(
                 if (resource is Resource.Success) {
                     val person = resource.data?.find { it.id == personId }
                     _uiState.value = _uiState.value.copy(person = person)
-                    _mergeCandidates.value = resource.data
-                        ?.filter {
-                            it.id != personId &&
-                                it.providerType == com.dot.gallery.cloud.core.ProviderType.LOCAL_PEOPLE
-                        } ?: emptyList()
                 }
             }
         }
 
-        // Route to the provider that actually owns this person (local vs a specific cloud account),
-        // instead of assuming the first available people provider.
+        // Route to the provider that actually owns this person, instead of assuming the
+        // first available people provider.
         viewModelScope.launch {
             val allPeople = repository.getAllPeople()
                 .mapNotNull { (it as? Resource.Success)?.data }
-                .first()
+                .firstOrNull()
+            if (allPeople == null) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "Unable to load people"
+                )
+                return@launch
+            }
             val ownerType = allPeople.find { it.id == personId }?.providerType
             val providers = registry.getPeopleProviders().filter { it.isAvailable }
-            if (providers.isEmpty()) return@launch
+            if (providers.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "No people provider is available"
+                )
+                return@launch
+            }
             val provider = providers.firstOrNull { it.providerType == ownerType }
                 ?: providers.first()
 
@@ -151,7 +124,6 @@ class PersonDetailViewModel @Inject constructor(
                             data = mediaList,
                             error = "",
                             albumId = -1L,
-                            groupByMonth = false,
                             withMonthHeader = false,
                             groupSimilarMedia = false,
                             defaultDateFormat = Constants.DEFAULT_DATE_FORMAT,
@@ -188,13 +160,9 @@ class PersonDetailViewModel @Inject constructor(
         if (personId.isBlank()) return
         val providers = registry.getPeopleProviders().filter { it.isAvailable }
         if (providers.isEmpty()) return
-        val type = providers.first().providerType
+        val type = _uiState.value.person?.providerType ?: providers.first().providerType
         viewModelScope.launch {
-            repository.updatePersonBirthDate(type, personId, birthDate).onSuccess {
-                _uiState.value = _uiState.value.copy(
-                    person = _uiState.value.person?.copy(birthDate = birthDate)
-                )
-            }
+            repository.updatePersonBirthDate(type, personId, birthDate)
         }
     }
 }

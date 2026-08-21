@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.presentation.vault.utils
 
 import android.content.Context
@@ -140,45 +145,19 @@ object VaultPasswordManager {
         val key = keyFor(vaultUuid)
         val stored = context.activeDataStore.data.map { prefs -> prefs[key] }.first()
             ?: return VerifyResult.Failed(MAX_ATTEMPTS)
-        val parts = stored.split(":")
-        // New format: type:pbkdf2:salt:hash (4 parts)
-        // Legacy format: type:salt:hash (3 parts) or salt:hash (2 parts)
-        val salt: ByteArray
-        val expectedHash: ByteArray
-        val isPbkdf2: Boolean
-        val authType: VaultAuthType?
-        when {
-            parts.size == 4 && parts[1] == HASH_ALGORITHM -> {
-                // New PBKDF2 format
-                authType = runCatching { VaultAuthType.valueOf(parts[0]) }.getOrNull()
-                salt = parts[2].hexToBytes()
-                expectedHash = parts[3].hexToBytes()
-                isPbkdf2 = true
-            }
-            parts.size == 3 -> {
-                // Legacy: type:salt:hash (SHA-256)
-                authType = runCatching { VaultAuthType.valueOf(parts[0]) }.getOrNull()
-                salt = parts[1].hexToBytes()
-                expectedHash = parts[2].hexToBytes()
-                isPbkdf2 = false
-            }
-            parts.size == 2 -> {
-                // Legacy: salt:hash (SHA-256, no type)
-                authType = null
-                salt = parts[0].hexToBytes()
-                expectedHash = parts[1].hexToBytes()
-                isPbkdf2 = false
-            }
-            else -> return VerifyResult.Failed(MAX_ATTEMPTS)
-        }
+        val credential = parseCredential(stored) ?: return VerifyResult.Failed(MAX_ATTEMPTS)
 
-        val actualHash = if (isPbkdf2) pbkdf2Hash(secret, salt) else legacySha256Hash(secret, salt)
-        val matches = MessageDigest.isEqual(expectedHash, actualHash)
+        val actualHash = if (credential.isPbkdf2) {
+            pbkdf2Hash(secret, credential.salt)
+        } else {
+            legacySha256Hash(secret, credential.salt)
+        }
+        val matches = MessageDigest.isEqual(credential.expectedHash, actualHash)
 
         if (matches) {
             // Transparently upgrade legacy SHA-256 hashes to PBKDF2
-            if (!isPbkdf2) {
-                setPassword(context, vaultUuid, secret, authType ?: VaultAuthType.PASSWORD)
+            if (!credential.isPbkdf2) {
+                setPassword(context, vaultUuid, secret, credential.authType ?: VaultAuthType.PASSWORD)
             }
             resetAttempts(context, vaultUuid)
             return VerifyResult.Success
@@ -231,6 +210,50 @@ object VaultPasswordManager {
 
     private fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
-    private fun String.hexToBytes(): ByteArray =
-        chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+    private data class ParsedCredential(
+        val authType: VaultAuthType?,
+        val salt: ByteArray,
+        val expectedHash: ByteArray,
+        val isPbkdf2: Boolean
+    )
+
+    private fun parseCredential(stored: String): ParsedCredential? = runCatching {
+        if (stored.length > MAX_STORED_CREDENTIAL_LENGTH) return@runCatching null
+        val parts = stored.split(":")
+        val type: VaultAuthType?
+        val salt: ByteArray
+        val hash: ByteArray
+        val pbkdf2: Boolean
+        when {
+            parts.size == 4 && parts[1] == HASH_ALGORITHM -> {
+                type = runCatching { VaultAuthType.valueOf(parts[0]) }.getOrNull()
+                salt = parts[2].hexToBytes()
+                hash = parts[3].hexToBytes()
+                pbkdf2 = true
+            }
+            parts.size == 3 -> {
+                type = runCatching { VaultAuthType.valueOf(parts[0]) }.getOrNull()
+                salt = parts[1].hexToBytes()
+                hash = parts[2].hexToBytes()
+                pbkdf2 = false
+            }
+            parts.size == 2 -> {
+                type = null
+                salt = parts[0].hexToBytes()
+                hash = parts[1].hexToBytes()
+                pbkdf2 = false
+            }
+            else -> return@runCatching null
+        }
+        require(salt.size == SALT_LENGTH && hash.size == 32)
+        ParsedCredential(type, salt, hash, pbkdf2)
+    }.getOrNull()
+
+    private fun String.hexToBytes(): ByteArray {
+        require(length % 2 == 0 && length <= 64)
+        require(all { it in "0123456789abcdefABCDEF" })
+        return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+    }
+
+    private const val MAX_STORED_CREDENTIAL_LENGTH = 256
 }

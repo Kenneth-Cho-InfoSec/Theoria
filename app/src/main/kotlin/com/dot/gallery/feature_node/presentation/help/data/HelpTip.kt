@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.help.data
@@ -99,7 +99,6 @@ data class HelpIcon(
 
 enum class PreviewType {
     AI_SEARCH,
-    AI_CATEGORIES,
     TIMELINE_GRID,
     ALBUM_GRID,
     MEDIA_VIEWER,
@@ -121,7 +120,6 @@ enum class PreviewType {
     SLIDESHOW,
     MOTION_PHOTO,
     VIDEO_CONTROLS,
-    SUBJECT_CUTOUT,
     CASTING,
     PANORAMA,
     NONE
@@ -138,7 +136,6 @@ enum class HelpCategory {
     VIEWER_SETTINGS,
     EDITING,
     SEARCH,
-    AI_FEATURES,
     ALBUMS,
     VAULT,
     CLOUD_SYNC,
@@ -167,7 +164,6 @@ fun HelpCategory.displayTitle(): String = when (this) {
     HelpCategory.VIEWER_SETTINGS -> stringResource(R.string.help_cat_viewer_settings)
     HelpCategory.EDITING -> stringResource(R.string.help_cat_editing)
     HelpCategory.SEARCH -> stringResource(R.string.help_cat_search)
-    HelpCategory.AI_FEATURES -> stringResource(R.string.help_cat_ai)
     HelpCategory.ALBUMS -> stringResource(R.string.help_cat_albums)
     HelpCategory.VAULT -> stringResource(R.string.help_cat_vault)
     HelpCategory.CLOUD_SYNC -> stringResource(R.string.help_cat_cloud_sync)
@@ -195,7 +191,6 @@ fun HelpCategory.icon(): ImageVector = when (this) {
     HelpCategory.VIEWER_SETTINGS -> Icons.Outlined.Tune
     HelpCategory.EDITING -> Icons.Outlined.Brush
     HelpCategory.SEARCH -> Icons.Outlined.Search
-    HelpCategory.AI_FEATURES -> Icons.Outlined.AutoAwesome
     HelpCategory.ALBUMS -> Icons.Outlined.Collections
     HelpCategory.VAULT -> Icons.Outlined.Lock
     HelpCategory.CLOUD_SYNC -> Icons.Outlined.Cloud

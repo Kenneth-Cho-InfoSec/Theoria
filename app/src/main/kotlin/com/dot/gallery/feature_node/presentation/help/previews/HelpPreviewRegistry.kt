@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.help.previews
@@ -66,7 +66,6 @@ import com.dot.gallery.feature_node.domain.model.Vault
 import com.dot.gallery.feature_node.domain.model.VaultState
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.dot.gallery.feature_node.presentation.albums.AlbumsScreen
-import com.dot.gallery.feature_node.presentation.classifier.CategoriesScreen
 import com.dot.gallery.feature_node.presentation.exif.MetadataViewScreen
 import com.dot.gallery.feature_node.presentation.edit.EditScreen2
 import com.dot.gallery.feature_node.domain.model.editor.DrawMode
@@ -109,7 +108,6 @@ fun HelpPreview(
         PreviewType.TRASH_GRID -> TrashPreviewMini(modifier)
         PreviewType.SEARCH_BAR -> SearchBarPreviewMini(modifier)
         PreviewType.AI_SEARCH -> SearchBarPreviewMini(modifier)
-        PreviewType.AI_CATEGORIES -> CategoriesPreviewMini(modifier)
         PreviewType.MEDIA_VIEWER -> ViewerPreviewMini(modifier)
         PreviewType.EXIF_VIEWER -> ExifPreviewMini(modifier)
         PreviewType.PHOTO_EDITOR_CROP -> EditorCropPreviewMini(modifier)
@@ -126,7 +124,6 @@ fun HelpPreview(
         PreviewType.SLIDESHOW -> SlideshowPreviewMini(modifier)
         PreviewType.MOTION_PHOTO -> MotionPhotoPreviewMini(modifier)
         PreviewType.VIDEO_CONTROLS -> VideoControlsPreviewMini(modifier)
-        PreviewType.SUBJECT_CUTOUT -> SubjectCutoutPreviewMini(modifier)
         PreviewType.CASTING -> CastingPreviewMini(modifier)
         PreviewType.PANORAMA -> PanoramaPreviewMini(modifier)
         PreviewType.NONE -> {}
@@ -295,32 +292,6 @@ private fun SearchBarPreviewMini(modifier: Modifier = Modifier) {
                     isScrolling = remember { mutableStateOf(false) },
                     mediaState = remember { mutableStateOf(HelpMockData.MOCK_MEDIA_STATE) },
                     metadataState = remember { mutableStateOf(HelpMockData.MOCK_METADATA_STATE) },
-                    sharedTransitionScope = sharedScope,
-                    animatedContentScope = animScope,
-                )
-            }
-        }
-        SwipeGestureOverlay(
-            modifier = Modifier.matchParentSize(),
-            progress = animation.stepProgress,
-            direction = SwipeDirection.UP
-        )
-    }
-}
-
-@OptIn(ExperimentalSharedTransitionApi::class)
-@Composable
-private fun CategoriesPreviewMini(modifier: Modifier = Modifier) {
-    val animation = rememberPreviewAnimation(stepCount = 2)
-    PreviewFrame(modifier, applyPadding = false) {
-        AutoScrollBox(
-            scrollProgress = animation.stepProgress,
-            modifier = Modifier.matchParentSize()
-        ) {
-            PreviewScreenProvider { sharedScope, animScope ->
-                CategoriesScreen(
-                    categoriesWithCount = remember { HelpMockData.MOCK_CATEGORIES_WITH_COUNT },
-                    mediaState = remember { MediaState() },
                     sharedTransitionScope = sharedScope,
                     animatedContentScope = animScope,
                 )
@@ -806,5 +777,4 @@ private fun PreviewFrame(
         content()
     }
 }
-
 

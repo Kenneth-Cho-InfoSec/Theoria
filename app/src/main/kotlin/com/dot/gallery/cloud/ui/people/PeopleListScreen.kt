@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.people
@@ -24,9 +24,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PersonSearch
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -70,8 +67,6 @@ fun PeopleListScreen(
 ) {
     val viewModel = hiltViewModel<PeopleListViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val isScanning by viewModel.isScanning.collectAsStateWithLifecycle()
-    val scanProgress by viewModel.scanProgress.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         state = rememberTopAppBarState()
     )
@@ -86,36 +81,6 @@ fun PeopleListScreen(
                 ),
                 title = { Text(stringResource(R.string.cloud_people)) },
                 navigationIcon = { NavigationBackButton() },
-                actions = {
-                    if (viewModel.localScanAvailable) {
-                        if (isScanning) {
-                            Box(
-                                modifier = Modifier.size(48.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (scanProgress in 0f..100f) {
-                                    CircularProgressIndicator(
-                                        progress = { scanProgress / 100f },
-                                        modifier = Modifier.size(24.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(24.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                }
-                            }
-                        } else {
-                            IconButton(onClick = { viewModel.scanForPeople() }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.PersonSearch,
-                                    contentDescription = stringResource(R.string.scan_for_people)
-                                )
-                            }
-                        }
-                    }
-                },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
                     scrolledContainerColor = MaterialTheme.colorScheme.surface,
@@ -136,10 +101,7 @@ fun PeopleListScreen(
                 EmptyPeople(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding),
-                    canScan = viewModel.localScanAvailable,
-                    isScanning = isScanning,
-                    onScan = { viewModel.scanForPeople() }
+                        .padding(innerPadding)
                 )
             }
             else -> {
@@ -189,10 +151,7 @@ private fun ProviderHeader(name: String, count: Int) {
 
 @Composable
 private fun EmptyPeople(
-    modifier: Modifier = Modifier,
-    canScan: Boolean = false,
-    isScanning: Boolean = false,
-    onScan: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(top = 64.dp),
@@ -209,27 +168,6 @@ private fun EmptyPeople(
             text = stringResource(R.string.cloud_people_empty),
             style = MaterialTheme.typography.titleLarge
         )
-        if (canScan) {
-            Button(onClick = onScan, enabled = !isScanning) {
-                if (isScanning) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Outlined.PersonSearch,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.scan_for_people),
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-        }
     }
 }
 

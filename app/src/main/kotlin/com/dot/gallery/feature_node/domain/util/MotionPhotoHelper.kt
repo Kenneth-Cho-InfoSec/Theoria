@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.feature_node.domain.util
 
 import android.content.ContentValues
@@ -281,7 +286,7 @@ object MotionPhotoHelper {
                             if (samsungVideoBytes.size > 8) {
                                 val samsungFtyp = String(samsungVideoBytes, 4, 4, Charsets.US_ASCII)
                                 if (samsungFtyp == "ftyp") {
-                                    val tmpFile = File(context.cacheDir, "motion_photo_${System.currentTimeMillis()}.mp4")
+                                    val tmpFile = File.createTempFile("motion_photo_", ".mp4", context.cacheDir)
                                     tmpFile.writeBytes(samsungVideoBytes)
                                     printDebug("MotionPhoto: extracted ${samsungVideoBytes.size} bytes (Samsung fallback) to ${tmpFile.absolutePath}")
                                     return@withContext tmpFile
@@ -293,7 +298,7 @@ object MotionPhotoHelper {
                 }
             }
 
-            val tmpFile = File(context.cacheDir, "motion_photo_${System.currentTimeMillis()}.mp4")
+            val tmpFile = File.createTempFile("motion_photo_", ".mp4", context.cacheDir)
             tmpFile.writeBytes(videoBytes)
             printDebug("MotionPhoto: extracted ${videoBytes.size} bytes to ${tmpFile.absolutePath}")
             tmpFile
@@ -313,6 +318,7 @@ object MotionPhotoHelper {
         numFrames: Int = 10
     ): List<Bitmap> = withContext(Dispatchers.IO) {
         val frames = mutableListOf<Bitmap>()
+        val requestedFrames = numFrames.coerceIn(1, 120)
         val retriever = MediaMetadataRetriever()
         try {
             retriever.setDataSource(file.absolutePath)
@@ -322,8 +328,8 @@ object MotionPhotoHelper {
 
             if (durationUs <= 0 || numFrames <= 0) return@withContext frames
 
-            val intervalUs = durationUs / numFrames
-            for (i in 0 until numFrames) {
+            val intervalUs = durationUs / requestedFrames
+            for (i in 0 until requestedFrames) {
                 val timeUs = i * intervalUs + intervalUs / 2
                 val bitmap = retriever.getFrameAtTime(
                     timeUs,

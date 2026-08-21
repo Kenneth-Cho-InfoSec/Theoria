@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.immich.data.api
@@ -14,7 +14,6 @@ import com.dot.gallery.cloud.immich.data.dto.ImmichLoginResponseDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichMapMarkerDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichMemoryDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichPersonDto
-import com.dot.gallery.cloud.immich.data.dto.ImmichSearchDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichSearchResponseDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichServerAboutDto
 import com.dot.gallery.cloud.immich.data.dto.ImmichServerStorageDto
@@ -128,9 +127,6 @@ interface ImmichApiService {
     ): Response<List<ImmichMapMarkerDto>>
 
     // Search
-    @POST("api/search/smart")
-    suspend fun smartSearch(@Body searchDto: ImmichSearchDto): Response<ImmichSearchResponseDto>
-
     @POST("api/search/metadata")
     suspend fun metadataSearch(@Body body: Map<String, @JvmSuppressWildcards Any>): Response<ImmichSearchResponseDto>
 

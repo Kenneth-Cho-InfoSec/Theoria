@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.settings.subsettings
@@ -54,6 +54,8 @@ fun SettingsSecurityScreen() {
     var metadataIsolationMode by Settings.Security.rememberMetadataIsolationMode()
     var sandboxedDecode by Settings.Security.rememberSandboxedDecode()
     var privateFolderUri by Settings.Security.rememberPrivateFolderUri()
+    var lockTrash by Settings.Security.rememberLockTrash()
+    var lockApp by Settings.Security.rememberLockApp()
 
     // When Android Advanced Protection Mode (AAPM) is enabled, sandboxed decoding
     // is forced on and metadata isolation is raised to at least Hybrid. The stored
@@ -160,6 +162,10 @@ fun SettingsSecurityScreen() {
                 onSandboxedDecodeChange = { if (!advancedProtection) sandboxedDecode = it },
                 advancedProtection = advancedProtection,
                 privateFolderUri = privateFolderUri,
+                lockTrash = lockTrash,
+                onLockTrashChange = { lockTrash = it },
+                lockApp = lockApp,
+                onLockAppChange = { lockApp = it },
                 onDetailClick = { detailKey = it },
                 listState = listState,
             )
@@ -174,6 +180,10 @@ private fun SecurityListScreen(
     onSandboxedDecodeChange: (Boolean) -> Unit,
     advancedProtection: Boolean,
     privateFolderUri: String,
+    lockTrash: Boolean,
+    onLockTrashChange: (Boolean) -> Unit,
+    lockApp: Boolean,
+    onLockAppChange: (Boolean) -> Unit,
     onDetailClick: (String) -> Unit,
     listState: LazyListState,
 ) {
@@ -235,9 +245,29 @@ private fun SecurityListScreen(
             screenPosition = Position.Bottom
         )
 
+        val lockTrashPref = rememberSwitchPreference(
+            lockTrash,
+            title = stringResource(R.string.security_lock_trash),
+            summary = stringResource(R.string.security_lock_trash_summary),
+            isChecked = lockTrash,
+            onCheck = onLockTrashChange,
+            onClick = {},
+            screenPosition = Position.Bottom
+        )
+
+        val lockAppPref = rememberSwitchPreference(
+            lockApp,
+            title = stringResource(R.string.security_lock_app),
+            summary = stringResource(R.string.security_lock_app_summary),
+            isChecked = lockApp,
+            onCheck = onLockAppChange,
+            onClick = {},
+            screenPosition = Position.Bottom
+        )
+
         return remember(
             metadataIsolationPref, sandboxedDecodePref,
-            encryptionStatusPref, privateFolderPref
+            encryptionStatusPref, privateFolderPref, lockTrashPref, lockAppPref
         ) {
             mutableStateListOf(
                 sandboxHeaderPref,
@@ -246,6 +276,8 @@ private fun SecurityListScreen(
                 dataProtectionHeaderPref,
                 encryptionStatusPref,
                 privateFolderPref,
+                lockTrashPref,
+                lockAppPref,
             )
         }
     }

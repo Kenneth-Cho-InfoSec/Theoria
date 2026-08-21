@@ -33,7 +33,6 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AspectRatio
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Crop
 import androidx.compose.material.icons.outlined.Flip
 import androidx.compose.material.icons.outlined.GridOn
@@ -79,19 +78,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.toRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.activity.compose.BackHandler
 import androidx.navigation.compose.rememberNavController
 import com.dot.gallery.R
 import com.dot.gallery.core.Constants.Animation.enterAnimation
 import com.dot.gallery.core.Constants.Animation.exitAnimation
-import com.dot.gallery.core.decoder.RawDevelopParams
 import com.dot.gallery.feature_node.domain.model.editor.Adjustment
 import com.dot.gallery.feature_node.domain.model.editor.CropState
 import com.dot.gallery.feature_node.domain.model.editor.DrawMode
 import com.dot.gallery.feature_node.domain.model.editor.DrawType
-import com.dot.gallery.feature_node.domain.model.editor.DevelopCategory
 import com.dot.gallery.feature_node.domain.model.editor.EditorDestination
 import com.dot.gallery.feature_node.domain.model.editor.EditorItems
 import com.dot.gallery.feature_node.domain.model.editor.toEditorDestination
@@ -102,8 +98,6 @@ import com.dot.gallery.feature_node.presentation.edit.adjustments.varfilter.Vari
 import com.dot.gallery.feature_node.presentation.edit.components.editor.EditorNavigator
 import com.dot.gallery.feature_node.presentation.edit.components.editor.EditorSelector
 import com.dot.gallery.feature_node.presentation.edit.components.editor.ImageViewer
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.CutoutState
-import com.dot.gallery.feature_node.presentation.mediaview.components.media.ZoomablePagerImagePointTool
 import com.dot.gallery.feature_node.presentation.edit.components.markup.TextMarkupOverlay
 import com.dot.gallery.feature_node.presentation.mediaview.rememberedDerivedState
 import com.dot.gallery.feature_node.presentation.util.LocalHazeState
@@ -141,6 +135,7 @@ fun EditScreen2(
     onClose: () -> Unit,
     onOverride: () -> Unit,
     onSaveCopy: () -> Unit,
+    onShare: () -> Unit = {},
     onAdjustItemLongClick: (VariableFilterTypes) -> Unit,
     onAdjustmentChange: (Adjustment) -> Unit,
     onAdjustmentPreview: (Adjustment) -> Unit,
@@ -174,27 +169,6 @@ fun EditScreen2(
     previewFlipH: Boolean = false,
     onRotate90: () -> Unit = {},
     onFlipH: () -> Unit = {},
-    pendingFaceRegions: List<android.graphics.RectF> = emptyList(),
-    onFaceRegionsConsumed: () -> Unit = {},
-    onDetectFaces: () -> Unit = {},
-    faceDetectAvailable: Boolean = false,
-    isDetectingFaces: Boolean = false,
-    isRawEdit: Boolean = false,
-    rawDevelopParams: RawDevelopParams? = null,
-    onRawDevelopChange: (RawDevelopParams) -> Unit = {},
-    rawThumbnailProvider: (suspend (RawDevelopParams) -> android.graphics.Bitmap?)? = null,
-    cutoutAvailable: Boolean = false,
-    cutoutState: CutoutState? = null,
-    onCutoutAddPoint: (Float, Float, Boolean) -> Unit = { _, _, _ -> },
-    onCutoutToolChange: (ZoomablePagerImagePointTool) -> Unit = {},
-    onCutoutStart: (backgroundRemoval: Boolean) -> Unit = {},
-    onCutoutUndo: () -> Unit = {},
-    onCutoutRedo: () -> Unit = {},
-    onCutoutReset: () -> Unit = {},
-    onCutoutApply: () -> Unit = {},
-    onCutoutCancel: () -> Unit = {},
-    onCutoutCopy: () -> Unit = {},
-    onCutoutShare: () -> Unit = {},
 ) = GalleryTheme(darkTheme = true, ignoreUserPreference = true) {
     val context = LocalContext.current
     val navigator = rememberSupportingPaneScaffoldNavigator(
@@ -229,64 +203,24 @@ fun EditScreen2(
 
     var showRevertDialog by remember { mutableStateOf(false) }
 
-    // Visible tabs depend on the media: RAW hides Lighting/Colour/Effects behind the Develop tab.
-    val visibleTabs = remember(isRawEdit, cutoutAvailable) { EditorItems.visibleItems(isRawEdit, cutoutAvailable) }
+    // Visible tabs for the current media (standard toolset; the RAW develop tabs are gone).
+    val visibleTabs = remember { EditorItems.visibleItems(false) }
 
     // Track which tab is currently selected for the tab bar highlight
-    var selectedTab by remember(isRawEdit, cutoutAvailable) {
-        mutableStateOf<EditorItems?>(
-            when {
-                isRawEdit -> EditorItems.WhiteBalance
-                cutoutAvailable -> EditorItems.Smart
-                else -> EditorItems.Lighting
-            }
-        )
+    var selectedTab by remember {
+        mutableStateOf<EditorItems?>(EditorItems.Lighting)
     }
     val showingEditorScreen by rememberedDerivedState {
         navBackStackEntry?.destination?.hasRoute<EditorDestination.Editor>() == true
     }
 
-    // RAW loads asynchronously: the NavHost may have already started on Lighting before isRawEdit
-    // flipped true. Once it does, jump to the first develop tab so content matches the selected tab.
-    LaunchedEffect(isRawEdit) {
-        if (isRawEdit && navBackStackEntry?.destination?.hasRoute<EditorDestination.Develop>() != true) {
-            selectedTab = EditorItems.WhiteBalance
-            runCatching {
-                navController.navigate(EditorDestination.Develop(DevelopCategory.WhiteBalance)) {
-                    popUpTo(EditorDestination.Editor) { inclusive = false }
-                    launchSingleTop = true
-                }
-            }
-        }
-    }
-
-    // True while the interactive cut-out mode is active (takes over the image surface).
-    val isCutoutEditing by rememberedDerivedState {
-        navBackStackEntry?.destination?.hasRoute<EditorDestination.CutoutEdit>() == true
-    }
-    // Which Smart tool launched the session (Cutout vs Background Removal). Both share the workings.
-    val cutoutBackgroundRemoval by rememberedDerivedState {
-        runCatching { navBackStackEntry?.toRoute<EditorDestination.CutoutEdit>()?.backgroundRemoval }
-            .getOrNull() == true
-    }
-    // Entering encodes + auto-selects the subject; leaving bakes the mask into the editor pipeline
-    // (no explicit save/apply button — exit commits, mirroring the Markup tool).
-    var wasCutoutEditing by remember { mutableStateOf(false) }
-    LaunchedEffect(isCutoutEditing) {
-        if (isCutoutEditing && !wasCutoutEditing) onCutoutStart(cutoutBackgroundRemoval)
-        if (!isCutoutEditing && wasCutoutEditing) onCutoutApply()
-        wasCutoutEditing = isCutoutEditing
-    }
-
     // Determine if we're on a top-level tab (not in a detail view)
     val isOnTopLevelTab by rememberedDerivedState {
         showingEditorScreen ||
-        navBackStackEntry?.destination?.hasRoute<EditorDestination.Develop>() == true ||
         navBackStackEntry?.destination?.hasRoute<EditorDestination.Markup>() == true ||
         navBackStackEntry?.destination?.hasRoute<EditorDestination.Lighting>() == true ||
         navBackStackEntry?.destination?.hasRoute<EditorDestination.Colour>() == true ||
         navBackStackEntry?.destination?.hasRoute<EditorDestination.Effects>() == true ||
-        navBackStackEntry?.destination?.hasRoute<EditorDestination.Smart>() == true ||
         navBackStackEntry?.destination?.hasRoute<EditorDestination.More>() == true ||
         navBackStackEntry?.destination?.hasRoute<EditorDestination.Filters>() == true
     }
@@ -297,9 +231,9 @@ fun EditScreen2(
     var showGridOverlay by remember { mutableStateOf(false) }
 
     // Pre-enable cropper: visible on all top-level tabs, hidden during detail/adjust/markup-draw
-    // modes and the cut-out mode (which takes over the image surface with its own painter).
+    // modes.
     val shouldShowCropper by rememberedDerivedState {
-        isOnTopLevelTab && !isCutoutEditing
+        isOnTopLevelTab
     }
     LaunchedEffect(shouldShowCropper) {
         cropState = cropState.copy(showCropper = shouldShowCropper)
@@ -312,6 +246,14 @@ fun EditScreen2(
 
     // 3-dot menu state
     var showMenu by remember { mutableStateOf(false) }
+
+    // Consume back while the popup is open before the editor/navigation handlers run. This is
+    // especially important for predictive back gestures: popping the editor and then dismissing
+    // its DropdownMenu in the same gesture could leave the popup attached to a disposed host
+    // window (#1048).
+    BackHandler(enabled = showMenu) {
+        showMenu = false
+    }
 
     // Aspect ratio state for crop
     var selectedAspectRatio by remember { mutableStateOf(AspectRatio.Original) }
@@ -346,15 +288,9 @@ fun EditScreen2(
         }
     }
 
-    // Back while cutting out exits to the Smart selector; the exit effect bakes the mask.
-    BackHandler(enabled = isCutoutEditing) {
-        navController.popBackStack()
-    }
-
-    // Top-bar undo/redo drive the recipe and are hidden while cutting out (the cut-out selection has
-    // its own undo/redo in the markup-style bottom bar).
-    val effectiveCanUndo = canUndo && !isCutoutEditing
-    val effectiveCanRedo = canRedo && !isCutoutEditing
+    // Top-bar undo/redo drive the recipe.
+    val effectiveCanUndo = canUndo
+    val effectiveCanRedo = canRedo
     val effectiveUndo: () -> Unit = removeLast
     val effectiveRedo: () -> Unit = onRedo
 
@@ -374,11 +310,10 @@ fun EditScreen2(
                 .systemBarsPadding()
         ) {
             // ═══════════════════════════════════════════════════
-            // TOP BAR — hidden during detail modes (markup draw, crop, adjust scrubber) and the
-            // cut-out mode (which uses its own header Copy/Share + markup-style bottom bar).
+            // TOP BAR — hidden during detail modes (markup draw, crop, adjust scrubber).
             // ═══════════════════════════════════════════════════
             AnimatedVisibility(
-                visible = !isInDetailMode && !isCutoutEditing,
+                visible = !isInDetailMode,
                 enter = enterAnimation,
                 exit = exitAnimation
             ) {
@@ -409,7 +344,7 @@ fun EditScreen2(
                         )
                     }
 
-                    // Undo/Redo — drive the recipe normally, or the cut-out selection while editing.
+                    // Undo/Redo — drive the recipe.
                     AnimatedVisibility(
                         visible = effectiveCanUndo,
                         enter = enterAnimation,
@@ -452,6 +387,18 @@ fun EditScreen2(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
+                    IconButton(
+                        onClick = onShare,
+                        enabled = targetImage != null && !isProcessing,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Share,
+                            contentDescription = stringResource(R.string.share),
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
                     Button(
                         onClick = onSaveCopy,
                         enabled = isChanged && canSave && !isProcessing,
@@ -561,202 +508,155 @@ fun EditScreen2(
                 enter = enterAnimation,
                 exit = exitAnimation
             ) {
-              if (isCutoutEditing) {
-                // Cut-out mode: the crop toolbar is replaced with subject Copy / Share actions.
-                val cutoutHasResult = cutoutState?.hasResult == true
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FilledTonalButton(
-                        onClick = onCutoutCopy,
-                        enabled = cutoutHasResult,
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ContentCopy,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.cutout_copy),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
-                    FilledTonalButton(
-                        onClick = onCutoutShare,
-                        enabled = cutoutHasResult,
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Share,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.cutout_share),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
-                }
-              } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Left: Grid/Straighten icon
-                    IconButton(
-                        onClick = { showGridOverlay = !showGridOverlay },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = if (showGridOverlay)
-                                MaterialTheme.colorScheme.primaryContainer
-                            else
-                                MaterialTheme.colorScheme.surfaceContainerHigh,
-                            contentColor = Color.White
-                        ),
-                        shape = CircleShape,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.GridOn,
-                            contentDescription = stringResource(R.string.editor_grid),
-                            tint = if (showGridOverlay)
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            else
-                                Color.White,
-                            modifier = Modifier.size(32.dp).padding(6.dp)
-                        )
-                    }
+              Row(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(horizontal = 8.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+              ) {
+                  // Left: Grid/Straighten icon
+                  IconButton(
+                      onClick = { showGridOverlay = !showGridOverlay },
+                      colors = IconButtonDefaults.iconButtonColors(
+                          containerColor = if (showGridOverlay)
+                              MaterialTheme.colorScheme.primaryContainer
+                          else
+                              MaterialTheme.colorScheme.surfaceContainerHigh,
+                          contentColor = Color.White
+                      ),
+                      shape = CircleShape,
+                  ) {
+                      Icon(
+                          imageVector = Icons.Outlined.GridOn,
+                          contentDescription = stringResource(R.string.editor_grid),
+                          tint = if (showGridOverlay)
+                              MaterialTheme.colorScheme.onPrimaryContainer
+                          else
+                              Color.White,
+                          modifier = Modifier.size(32.dp).padding(6.dp)
+                      )
+                  }
 
-                    // Right cluster: Aspect ratio, Flip, Rotate
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box {
-                            IconButton(
-                                onClick = { showAspectMenu = true },
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    contentColor = Color.White
-                                ),
-                                shape = CircleShape,
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.AspectRatio,
-                                    contentDescription = stringResource(R.string.editor_aspect_ratio),
-                                    tint = Color.White,
-                                    modifier = Modifier.size(32.dp).padding(6.dp)
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = showAspectMenu,
-                                onDismissRequest = { showAspectMenu = false }
-                            ) {
-                                data class RatioOption(val label: String, val ratio: AspectRatio)
-                                val options = listOf(
-                                    RatioOption(stringResource(R.string.aspect_freeform), AspectRatio.Original),
-                                    RatioOption(stringResource(R.string.aspect_square), AspectRatio(1f)),
-                                    RatioOption("5:4", AspectRatio(5f / 4f)),
-                                    RatioOption("4:3", AspectRatio(4f / 3f)),
-                                    RatioOption("3:2", AspectRatio(3f / 2f)),
-                                    RatioOption("16:9", AspectRatio(16f / 9f)),
-                                    RatioOption("4:5", AspectRatio(4f / 5f)),
-                                    RatioOption("3:4", AspectRatio(3f / 4f)),
-                                    RatioOption("2:3", AspectRatio(2f / 3f)),
-                                    RatioOption("9:16", AspectRatio(9f / 16f))
-                                )
-                                options.forEach { option ->
-                                    val isSelected = selectedAspectRatio == option.ratio
-                                    DropdownMenuItem(
-                                        text = {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                            ) {
-                                                Text(option.label)
-                                                if (isSelected) {
-                                                    Icon(
-                                                        imageVector = Icons.Outlined.Check,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(16.dp)
-                                                    )
-                                                }
-                                            }
-                                        },
-                                        onClick = {
-                                            selectedAspectRatio = option.ratio
-                                            showAspectMenu = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                        IconButton(
-                            onClick = onFlipH,
-                            colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                contentColor = Color.White
-                            ),
-                            shape = CircleShape,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Flip,
-                                contentDescription = stringResource(R.string.editor_mirror),
-                                tint = Color.White,
-                                modifier = Modifier.size(32.dp).padding(6.dp)
-                            )
-                        }
-                        IconButton(
-                            onClick = onRotate90,
-                            colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                contentColor = Color.White
-                            ),
-                            shape = CircleShape,
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.RotateRight,
-                                contentDescription = stringResource(R.string.editor_rotate_90),
-                                tint = Color.White,
-                                modifier = Modifier.size(32.dp).padding(6.dp)
-                            )
-                        }
-                        Button(
-                            onClick = {
-                                cropState = cropState.copy(isCropping = true)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            ),
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Crop,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.editor_crop),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                    }
-                }
+                  // Right cluster: Aspect ratio, Flip, Rotate
+                  Row(
+                      horizontalArrangement = Arrangement.spacedBy(8.dp),
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                      Box {
+                          IconButton(
+                              onClick = { showAspectMenu = true },
+                              colors = IconButtonDefaults.iconButtonColors(
+                                  containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                  contentColor = Color.White
+                              ),
+                              shape = CircleShape,
+                          ) {
+                              Icon(
+                                  imageVector = Icons.Outlined.AspectRatio,
+                                  contentDescription = stringResource(R.string.editor_aspect_ratio),
+                                  tint = Color.White,
+                                  modifier = Modifier.size(32.dp).padding(6.dp)
+                              )
+                          }
+                          DropdownMenu(
+                              expanded = showAspectMenu,
+                              onDismissRequest = { showAspectMenu = false }
+                          ) {
+                              data class RatioOption(val label: String, val ratio: AspectRatio)
+                              val options = listOf(
+                                  RatioOption(stringResource(R.string.aspect_freeform), AspectRatio.Original),
+                                  RatioOption(stringResource(R.string.aspect_square), AspectRatio(1f)),
+                                  RatioOption("5:4", AspectRatio(5f / 4f)),
+                                  RatioOption("4:3", AspectRatio(4f / 3f)),
+                                  RatioOption("3:2", AspectRatio(3f / 2f)),
+                                  RatioOption("16:9", AspectRatio(16f / 9f)),
+                                  RatioOption("4:5", AspectRatio(4f / 5f)),
+                                  RatioOption("3:4", AspectRatio(3f / 4f)),
+                                  RatioOption("2:3", AspectRatio(2f / 3f)),
+                                  RatioOption("9:16", AspectRatio(9f / 16f))
+                              )
+                              options.forEach { option ->
+                                  val isSelected = selectedAspectRatio == option.ratio
+                                  DropdownMenuItem(
+                                      text = {
+                                          Row(
+                                              verticalAlignment = Alignment.CenterVertically,
+                                              horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                          ) {
+                                              Text(option.label)
+                                              if (isSelected) {
+                                                  Icon(
+                                                      imageVector = Icons.Outlined.Check,
+                                                      contentDescription = null,
+                                                      modifier = Modifier.size(16.dp)
+                                                  )
+                                              }
+                                          }
+                                      },
+                                      onClick = {
+                                          selectedAspectRatio = option.ratio
+                                          showAspectMenu = false
+                                      }
+                                  )
+                              }
+                          }
+                      }
+                      IconButton(
+                          onClick = onFlipH,
+                          colors = IconButtonDefaults.iconButtonColors(
+                              containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                              contentColor = Color.White
+                          ),
+                          shape = CircleShape,
+                      ) {
+                          Icon(
+                              imageVector = Icons.Outlined.Flip,
+                              contentDescription = stringResource(R.string.editor_mirror),
+                              tint = Color.White,
+                              modifier = Modifier.size(32.dp).padding(6.dp)
+                          )
+                      }
+                      IconButton(
+                          onClick = onRotate90,
+                          colors = IconButtonDefaults.iconButtonColors(
+                              containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                              contentColor = Color.White
+                          ),
+                          shape = CircleShape,
+                      ) {
+                          Icon(
+                              imageVector = Icons.AutoMirrored.Outlined.RotateRight,
+                              contentDescription = stringResource(R.string.editor_rotate_90),
+                              tint = Color.White,
+                              modifier = Modifier.size(32.dp).padding(6.dp)
+                          )
+                      }
+                      Button(
+                          onClick = {
+                              cropState = cropState.copy(isCropping = true)
+                          },
+                          colors = ButtonDefaults.buttonColors(
+                              containerColor = MaterialTheme.colorScheme.primaryContainer,
+                              contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                          ),
+                          shape = CircleShape,
+                          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
+                      ) {
+                          Icon(
+                              imageVector = Icons.Outlined.Crop,
+                              contentDescription = null,
+                              tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                              modifier = Modifier.size(20.dp)
+                          )
+                          Spacer(modifier = Modifier.width(8.dp))
+                          Text(
+                              text = stringResource(R.string.editor_crop),
+                              style = MaterialTheme.typography.labelLarge,
+                              color = MaterialTheme.colorScheme.onPrimaryContainer
+                          )
+                      }
+                  }
               }
             }
 
@@ -789,9 +689,6 @@ fun EditScreen2(
                             cropAspectRatio = selectedAspectRatio,
                             showGridOverlay = showGridOverlay,
                             showMarkup = isMarkupDrawing,
-                            showCutout = isCutoutEditing,
-                            cutoutState = cutoutState,
-                            onCutoutAddPoint = onCutoutAddPoint,
                             paths = paths,
                             currentPosition = currentPosition,
                             previousPosition = previousPosition,
@@ -817,8 +714,6 @@ fun EditScreen2(
                             onTextAnnotationsChange = { textAnnotations = it },
                             selectedTextIndex = selectedTextIndex,
                             onSelectedTextIndexChange = { selectedTextIndex = it },
-                            pendingFaceRegions = pendingFaceRegions,
-                            onFaceRegionsConsumed = onFaceRegionsConsumed,
                             vignetteIntensity = vignetteIntensity,
                             blurRadius = blurRadius,
                             sharpnessValue = sharpnessValue,
@@ -852,16 +747,7 @@ fun EditScreen2(
                                 textAnnotations = textAnnotations,
                                 onTextAnnotationsChange = { textAnnotations = it },
                                 selectedTextIndex = selectedTextIndex,
-                                onDetectFaces = onDetectFaces,
-                                faceDetectAvailable = faceDetectAvailable,
-                                isDetectingFaces = isDetectingFaces,
-                                startDestination = if (isRawEdit) EditorDestination.Develop(DevelopCategory.WhiteBalance) else if (cutoutAvailable) EditorDestination.Smart else EditorDestination.Lighting,
-                                rawDevelopParams = if (isRawEdit) rawDevelopParams else null,
-                                onRawDevelopChange = onRawDevelopChange,
-                                rawThumbnailProvider = rawThumbnailProvider,
-                                cutoutState = cutoutState,
-                                onCutoutToolChange = onCutoutToolChange,
-                                onCutoutReset = onCutoutReset,
+                                startDestination = EditorDestination.Lighting,
                             )
                         }
                     }
@@ -918,16 +804,7 @@ fun EditScreen2(
                         textAnnotations = textAnnotations,
                         onTextAnnotationsChange = { textAnnotations = it },
                         selectedTextIndex = selectedTextIndex,
-                        onDetectFaces = onDetectFaces,
-                        faceDetectAvailable = faceDetectAvailable,
-                        isDetectingFaces = isDetectingFaces,
-                        startDestination = if (isRawEdit) EditorDestination.Develop(DevelopCategory.WhiteBalance) else if (cutoutAvailable) EditorDestination.Smart else EditorDestination.Lighting,
-                        rawDevelopParams = if (isRawEdit) rawDevelopParams else null,
-                        onRawDevelopChange = onRawDevelopChange,
-                        rawThumbnailProvider = rawThumbnailProvider,
-                        cutoutState = cutoutState,
-                        onCutoutToolChange = onCutoutToolChange,
-                        onCutoutReset = onCutoutReset,
+                        startDestination = EditorDestination.Lighting,
                     )
                 }
 
@@ -1061,109 +938,17 @@ fun EditScreen2(
                         }
                     }
 
-                    isCutoutEditing -> {
-                        // Markup-style bottom bar for cut-out: X (discard) | ↶ Reset ↷ | ✓ (apply).
-                        // Include/Exclude live in the NavHost controls above; Copy/Share in the header.
-                        val canUndoCutout = cutoutState?.canUndo == true
-                        val canRedoCutout = cutoutState?.canRedo == true
-                        val hasResult = cutoutState?.hasResult == true
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // X — discard the selection and leave.
-                            IconButton(
-                                onClick = {
-                                    onCutoutCancel()
-                                    navController.popBackStack()
-                                },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                        shape = CircleShape
-                                    )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Close,
-                                    contentDescription = stringResource(R.string.close),
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-
-                            // Center: ↶ Reset ↷
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                IconButton(onClick = onCutoutUndo, enabled = canUndoCutout) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Outlined.Undo,
-                                        contentDescription = stringResource(R.string.editor_undo),
-                                        tint = if (canUndoCutout) Color.White else Color.White.copy(alpha = 0.3f),
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                                TextButton(onClick = onCutoutReset, enabled = hasResult) {
-                                    Text(
-                                        text = stringResource(R.string.cutout_reset),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = if (hasResult) Color.White else Color.White.copy(alpha = 0.3f)
-                                    )
-                                }
-                                IconButton(onClick = onCutoutRedo, enabled = canRedoCutout) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Outlined.Redo,
-                                        contentDescription = stringResource(R.string.editor_redo),
-                                        tint = if (canRedoCutout) Color.White else Color.White.copy(alpha = 0.3f),
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
-
-                            // ✓ — commit (the exit effect bakes the mask into the pipeline).
-                            IconButton(
-                                onClick = { navController.popBackStack() },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                        shape = CircleShape
-                                    )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Check,
-                                    contentDescription = stringResource(R.string.editor_done),
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        }
-                    }
-
                     else -> {
                         // Tab bar — visible on top-level tabs
                         // Sync selectedTab when returning from a tool
                         LaunchedEffect(navBackStackEntry) {
                             val dest = navBackStackEntry?.destination
                             val tab = when {
-                                dest?.hasRoute<EditorDestination.Develop>() == true -> {
-                                    val category = runCatching {
-                                        navBackStackEntry?.toRoute<EditorDestination.Develop>()?.category
-                                    }.getOrNull()
-                                    EditorItems.entries.firstOrNull { it.developCategory == category }
-                                }
                                 dest?.hasRoute<EditorDestination.Lighting>() == true -> EditorItems.Lighting
                                 dest?.hasRoute<EditorDestination.Filters>() == true -> EditorItems.Filters
                                 dest?.hasRoute<EditorDestination.Markup>() == true -> EditorItems.Markup
                                 dest?.hasRoute<EditorDestination.Colour>() == true -> EditorItems.Colour
                                 dest?.hasRoute<EditorDestination.Effects>() == true -> EditorItems.Effects
-                                dest?.hasRoute<EditorDestination.Smart>() == true -> EditorItems.Smart
-                                dest?.hasRoute<EditorDestination.CutoutEdit>() == true -> EditorItems.Smart
                                 dest?.hasRoute<EditorDestination.More>() == true -> EditorItems.More
                                 else -> null
                             }

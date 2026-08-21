@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.data.repository
@@ -105,6 +105,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
@@ -148,26 +150,31 @@ class MediaRepositoryImpl(
         //workManager.scheduleMediaMigrationCheck()
     }
 
-    /**
-     * TODO: Add media reordering
-     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getMedia(): Flow<Resource<List<UriMedia>>> =
+    override fun getMedia(): Flow<Resource<List<UriMedia>>> = combine(
+        database.getMediaDao().getTimelineSettings(),
         MediaFlow(
             contentResolver = contentResolver,
             buckedId = MediaStoreBuckets.MEDIA_STORE_BUCKET_TIMELINE.id
-        ).flowData().map {
-            Resource.Success(MediaOrder.Date(OrderType.Descending).sortMedia(it))
-        }.flowOn(Dispatchers.IO)
+        ).flowData()
+    ) { settings, media ->
+        Resource.Success(
+            (settings?.timelineMediaOrder ?: MediaOrder.Default).sortMedia(media)
+        )
+    }.flowOn(Dispatchers.IO)
 
-    override fun getCompleteMedia(): Flow<Resource<List<UriMedia>>> =
+    override fun getCompleteMedia(): Flow<Resource<List<UriMedia>>> = combine(
+        database.getMediaDao().getTimelineSettings(),
         MediaFlow(
             contentResolver = contentResolver,
             buckedId = MediaStoreBuckets.MEDIA_STORE_BUCKET_TIMELINE.id,
             skipBatching = true
-        ).flowData().map {
-            Resource.Success(MediaOrder.Date(OrderType.Descending).sortMedia(it))
-        }.flowOn(Dispatchers.IO)
+        ).flowData()
+    ) { settings, media ->
+        Resource.Success(
+            (settings?.timelineMediaOrder ?: MediaOrder.Default).sortMedia(media)
+        )
+    }.flowOn(Dispatchers.IO)
 
     override fun getMediaByType(allowedMedia: AllowedMedia): Flow<Resource<List<UriMedia>>> =
         MediaFlow(
@@ -591,12 +598,13 @@ class MediaRepositoryImpl(
         )
     }
 
-    override fun getEncryptedMedia(vault: Vault?): Flow<Resource<List<UriMedia>>> =
-        database.getVaultDao().getMediaFromVault(vault?.uuid).map { mediaList ->
+    override fun getEncryptedMedia(vault: Vault?): Flow<Resource<List<UriMedia>>> {
+        if (vault == null) return flowOf(Resource.Success(emptyList()))
+        return database.getVaultDao().getMediaFromVault(vault.uuid).map { mediaList ->
             with(keychainHolder) {
                 val newMedia = mediaList.mapNotNull { media ->
                     try {
-                        val encryptedFile = vault!!.mediaFile(media.id)
+                        val encryptedFile = vault.mediaFile(media.id)
                         if (encryptedFile.exists()) {
                             media.asUriMedia(Uri.fromFile(encryptedFile))
                         } else {
@@ -604,14 +612,15 @@ class MediaRepositoryImpl(
                             database.getVaultDao().deleteMediaFromVault(media)
                             null
                         }
-                    } catch (e: Throwable) {
-                        e.printStackTrace()
+                    } catch (e: Exception) {
+                        printError("Failed to read encrypted media ${media.label}: ${e.message.orEmpty()}")
                         null
                     }
                 }.sortedByDescending { it.timestamp }
                 Resource.Success(newMedia)
             }
         }
+    }
 
     override suspend fun <T : Media> addMedia(vault: Vault, media: T): Boolean =
         withContext(Dispatchers.IO) {
@@ -1135,7 +1144,12 @@ class MediaRepositoryImpl(
         val providerType = try {
             com.dot.gallery.cloud.core.ProviderType.valueOf(providerName)
         } catch (_: Exception) { return@withContext }
-        val entity = database.getCloudMediaDao().getByRemoteId(remoteId, providerType)
+        val configId = uri.getQueryParameter("cfg")?.toLongOrNull() ?: -1L
+        val entity = if (configId > 0L) {
+            database.getCloudMediaDao().getByRemoteIdForConfig(remoteId, providerType, configId)
+        } else {
+            database.getCloudMediaDao().getByRemoteId(remoteId, providerType)
+        }
             ?: return@withContext
         val locationName = listOfNotNull(entity.city, entity.state, entity.country)
             .joinToString(", ").ifBlank { null }

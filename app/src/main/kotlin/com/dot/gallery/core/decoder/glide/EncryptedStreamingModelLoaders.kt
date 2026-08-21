@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
+ */
+
 package com.dot.gallery.core.decoder.glide
 
 import android.content.Context
@@ -99,7 +104,10 @@ private class EncryptedSourceFetcher(
         }
     }
 
-    override fun cleanup() { data = null }
+    override fun cleanup() {
+        data?.close()
+        data = null
+    }
     override fun cancel() { cancelled = true }
     override fun getDataClass(): Class<EncryptedMediaSource> = EncryptedMediaSource::class.java
     override fun getDataSource(): DataSource = DataSource.LOCAL

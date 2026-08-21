@@ -1,12 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.data.entity
 
 import android.net.Uri
-import androidx.core.net.toUri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
@@ -74,14 +73,19 @@ data class CloudMediaEntity(
     val fileId: String = ""
 ) {
     fun toUriMedia(): Media.UriMedia {
-        val base = "cloud://${providerType.name}/$remoteId?size=preview"
+        val uriBuilder = Uri.Builder()
+            .scheme("cloud")
+            .authority(providerType.name)
+            .appendEncodedPath(Uri.encode(remoteId, "/"))
+            .appendQueryParameter("size", "preview")
         // Thread the server's numeric file id through the URI so the image
         // pipelines (Sketch/Glide) can request server-side video previews,
         // which require `fileId` on ownCloud/Nextcloud's core/preview endpoint.
         // Also thread the owning account id (cfg) so the right provider instance
         // resolves the URL when several accounts of the same type are configured.
-        val withFile = if (fileId.isNotBlank()) "$base&fileId=$fileId" else base
-        val cloudUri = (if (serverConfigId > 0L) "$withFile&cfg=$serverConfigId" else withFile).toUri()
+        if (fileId.isNotBlank()) uriBuilder.appendQueryParameter("fileId", fileId)
+        if (serverConfigId > 0L) uriBuilder.appendQueryParameter("cfg", serverConfigId.toString())
+        val cloudUri = uriBuilder.build()
         // timestamp → seconds (MediaStore DATE_MODIFIED convention)
         val timestampSeconds = timestamp / 1000L
         // takenTimestamp stays in millis (MediaStore DATE_TAKEN convention)

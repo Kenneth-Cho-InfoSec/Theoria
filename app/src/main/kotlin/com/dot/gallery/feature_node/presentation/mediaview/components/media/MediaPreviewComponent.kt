@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.mediaview.components.media
@@ -49,8 +49,6 @@ fun <T : Media> MediaPreviewComponent(
     currentVault: Vault? = null,
     onZoomChange: (Boolean) -> Unit = {},
     onSubsamplingLoadingChange: (Boolean) -> Unit = {},
-    onCutoutStateChanged: (Boolean) -> Unit = {},
-    onCutoutController: (CutoutController?) -> Unit = {},
     isSelected: Boolean = true,
     // Slideshow mode: mutes video audio and, together with [onVideoEnded], lets the video play
     // through once (no looping) so the slideshow can advance when playback finishes.
@@ -68,31 +66,32 @@ fun <T : Media> MediaPreviewComponent(
             .hazeSource(state = LocalHazeState.current),
         visible = media != null,
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Non-translating blurred background
-            if (!media!!.isVideo && !isPanorama && !isPhotosphere && renderBackground) {
-                BlurredMediaBackground(
-                    media = media,
-                    uiEnabled = uiEnabled
-                )
-            }
-            // Translating content
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .then(modifier)
-                    .then(containerModifier)
-                    .offset { offset },
-            ) {
+        media?.let { currentMedia ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Non-translating blurred background
+                if (!currentMedia.isVideo && !isPanorama && !isPhotosphere && renderBackground) {
+                    BlurredMediaBackground(
+                        media = currentMedia,
+                        uiEnabled = uiEnabled
+                    )
+                }
+                // Translating content
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .then(modifier)
+                        .then(containerModifier)
+                        .offset { offset },
+                ) {
                 AnimatedVisibility(
                     modifier = Modifier.fillMaxSize(),
-                    visible = media.isVideo,
+                    visible = currentMedia.isVideo,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
                     VideoPlayer(
                         modifier = Modifier,
-                        media = media,
+                        media = currentMedia,
                         playWhenReady = playWhenReady,
                         videoController = videoController,
                         onItemClick = onItemClick,
@@ -106,37 +105,35 @@ fun <T : Media> MediaPreviewComponent(
 
                 AnimatedVisibility(
                     modifier = Modifier.fillMaxSize(),
-                    visible = !media.isVideo && !isPanorama && !isPhotosphere,
+                    visible = !currentMedia.isVideo && !isPanorama && !isPhotosphere,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
                     ZoomablePagerImage(
-                        media = media,
+                        media = currentMedia,
                         rotationDisabled = rotationDisabled,
                         onImageRotated = onImageRotated,
                         onItemClick = onItemClick,
                         onSwipeDown = onSwipeDown,
                         onSubsamplingLoadingChange = onSubsamplingLoadingChange,
-                        onCutoutStateChanged = onCutoutStateChanged,
-                        onCutoutController = onCutoutController,
                         isSelected = isSelected,
                         uiVisible = uiEnabled,
-                        cutoutEnabled = !slideshowActive
+                        longPressRotateEnabled = !slideshowActive
                     )
                 }
 
-                if (!media.isVideo && isMotionPhoto && motionPhotoState != null) {
+                if (!currentMedia.isVideo && isMotionPhoto && motionPhotoState != null) {
                     MotionPhotoSurface(state = motionPhotoState)
                 }
 
                 AnimatedVisibility(
                     modifier = Modifier.fillMaxSize(),
-                    visible = !media.isVideo && !isMotionPhoto && (isPanorama || isPhotosphere),
+                    visible = !currentMedia.isVideo && !isMotionPhoto && (isPanorama || isPhotosphere),
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
                     PanoramaImageViewer(
-                        media = media,
+                        media = currentMedia,
                         isPhotosphere = isPhotosphere,
                         modifier = Modifier,
                         onItemClick = onItemClick,
@@ -145,6 +142,7 @@ fun <T : Media> MediaPreviewComponent(
                     )
                 }
             }
+        }
         }
     }
 }

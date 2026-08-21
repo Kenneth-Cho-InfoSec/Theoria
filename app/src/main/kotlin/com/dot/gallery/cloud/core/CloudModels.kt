@@ -1,12 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.core
 
 import android.net.Uri
-import androidx.core.net.toUri
 import com.dot.gallery.feature_node.domain.model.Album
 import com.dot.gallery.feature_node.domain.model.Media
 import kotlinx.serialization.Serializable
@@ -40,8 +39,17 @@ data class CloudAlbum(
 ) {
     fun toAlbum(): Album {
         val thumbUri = if (thumbnailAssetId != null) {
-            val base = "cloud://${providerType.name}/$thumbnailAssetId?size=thumbnail"
-            (if (serverConfigId > 0L) "$base&cfg=$serverConfigId" else base).toUri()
+            Uri.Builder()
+                .scheme("cloud")
+                .authority(providerType.name)
+                .appendEncodedPath(Uri.encode(thumbnailAssetId, "/"))
+                .appendQueryParameter("size", "thumbnail")
+                .apply {
+                    if (serverConfigId > 0L) {
+                        appendQueryParameter("cfg", serverConfigId.toString())
+                    }
+                }
+                .build()
         } else Uri.EMPTY
         return Album(
             id = cloudAlbumId(providerType, serverConfigId, remoteId),

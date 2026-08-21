@@ -295,10 +295,20 @@ open class VaultViewModel @Inject constructor(
             repository.deleteAllEncryptedMedia(
                 vault = vault,
                 onSuccess = {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        _userMessage.emit(appContext.getString(R.string.vault_items_deleted))
+                    }
                 },
                 onFailed = { failedFiles ->
                     printError("Failed to delete files: $failedFiles")
-                    // TODO: Handle failed files
+                    viewModelScope.launch(Dispatchers.Main) {
+                        _userMessage.emit(
+                            appContext.getString(
+                                R.string.vault_items_delete_failed,
+                                failedFiles.size
+                            )
+                        )
+                    }
                 }
             )
         }

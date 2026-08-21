@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.ui.backup
@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -172,7 +172,7 @@ class CloudBackupViewModel @Inject constructor(
      */
     private suspend fun loadInitialState() {
         val persisted = readPersistedAccounts()
-        val activeConfigs = configDao.getAll().first().filter { it.isActive }
+        val activeConfigs = configDao.getAll().firstOrNull().orEmpty().filter { it.isActive }
         val accounts = activeConfigs.mapNotNull { cfg ->
             // List EVERY active sync-capable account, keyed off the persisted config rather
             // than a live provider instance. An account whose provider failed to authenticate
@@ -206,7 +206,7 @@ class CloudBackupViewModel @Inject constructor(
             // ALL such accounts (even those with no albums selected yet) so the
             // dashboard surfaces every configured cloud and the user can configure
             // backup for each one. Each account is scanned independently.
-            val activeConfigs = configDao.getAll().first().filter { it.isActive }
+            val activeConfigs = configDao.getAll().firstOrNull().orEmpty().filter { it.isActive }
             val perConfig = activeConfigs.mapNotNull { cfg ->
                 // Keep listing sync-capable accounts even when their provider is not
                 // currently registered (e.g. it failed to authenticate). The live
@@ -239,11 +239,11 @@ class CloudBackupViewModel @Inject constructor(
                     // upload worker does — per enabled album via getMediaByAlbumId.
                     val scanned = perConfig.map { (cfg, provider, prefs) ->
                         val media = prefs.flatMap { pref ->
-                            repository.getMediaByAlbumId(pref.albumId, skipBatching = true).first().data ?: emptyList()
+                            repository.getMediaByAlbumId(pref.albumId, skipBatching = true).firstOrNull()?.data.orEmpty()
                         }.distinctBy { it.id }.filter { it.uri.scheme != "cloud" }
                         // Immich stores the original filename in `label` (remoteId is an
                         // opaque UUID); path-based stores key by remote path — cover both.
-                        val cachedNames: Set<String> = cloudMediaDao.getByServerConfig(cfg.id).first()
+                        val cachedNames: Set<String> = cloudMediaDao.getByServerConfig(cfg.id).firstOrNull().orEmpty()
                             .mapNotNull { it.label.ifBlank { it.remoteId.substringAfterLast('/') }.ifBlank { null } }
                             .toSet()
                         ScannedAccount(
@@ -335,7 +335,7 @@ class CloudBackupViewModel @Inject constructor(
     }
 
     private suspend fun readPersistedAccounts(): Map<Long, PersistedAccountStatus> {
-        val raw = context.activeDataStore.data.first()[STATUS_KEY] ?: return emptyMap()
+        val raw = context.activeDataStore.data.firstOrNull()?.get(STATUS_KEY) ?: return emptyMap()
         return runCatching { statusJson.decodeFromString<List<PersistedAccountStatus>>(raw) }
             .getOrDefault(emptyList())
             .associateBy { it.configId }

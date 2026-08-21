@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.cloud.core
@@ -58,16 +58,26 @@ class CredentialEncryptor @Inject constructor() {
 
     fun decrypt(encoded: String): String {
         if (encoded.isBlank()) return ""
+        val combined = try {
+            Base64.decode(encoded, Base64.NO_WRAP)
+        } catch (_: IllegalArgumentException) {
+            // Existing installations may still contain legacy plaintext credentials.
+            return encoded
+        }
+        // A valid legacy plaintext can happen to be base64-shaped. Treat values that are too
+        // short to contain IV + GCM tag as plaintext, but never fall back to ciphertext after a
+        // full-sized authenticated payload fails verification.
+        if (combined.size <= GCM_IV_LENGTH + GCM_TAG_LENGTH / 8) return encoded
         return try {
-            val combined = Base64.decode(encoded, Base64.NO_WRAP)
             val iv = combined.copyOfRange(0, GCM_IV_LENGTH)
             val ciphertext = combined.copyOfRange(GCM_IV_LENGTH, combined.size)
             val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(GCM_TAG_LENGTH, iv))
             String(cipher.doFinal(ciphertext), Charsets.UTF_8)
         } catch (_: Exception) {
-            // Decryption failed — possibly old unencrypted data
-            encoded
+            // Full-sized payloads are expected to be encrypted. Do not send a tampered or
+            // corrupted ciphertext to a provider as if it were a user credential.
+            ""
         }
     }
 

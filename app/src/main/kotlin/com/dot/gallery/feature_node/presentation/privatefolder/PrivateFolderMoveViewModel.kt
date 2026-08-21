@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2023-2026 IacobIacob01
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
+ * SPDX-License-Identifier: Apache-2.0 AND MPL-2.0
  */
 
 package com.dot.gallery.feature_node.presentation.privatefolder
@@ -33,11 +33,13 @@ class PrivateFolderMoveViewModel @Inject constructor(
     suspend fun <T : Media> copyIntoPrivateFolder(media: List<T>): List<T> =
         withContext(Dispatchers.IO) {
             media.filterNot { it.isCloud }.filter { item ->
-                repository.addMedia(
-                    sourceUri = item.getUri(),
-                    displayName = item.label,
-                    mimeType = item.mimeType
-                )
+                runCatching {
+                    repository.addMedia(
+                        sourceUri = item.getUri(),
+                        displayName = item.label,
+                        mimeType = item.mimeType
+                    )
+                }.getOrDefault(false)
             }
         }
 
@@ -50,11 +52,13 @@ class PrivateFolderMoveViewModel @Inject constructor(
     suspend fun <T : Media> moveOutOfPrivateFolder(media: List<T>): Int =
         withContext(Dispatchers.IO) {
             media.count { item ->
-                repository.moveOut(
-                    sourceUri = item.getUri(),
-                    displayName = item.label,
-                    mimeType = item.mimeType
-                )
+                runCatching {
+                    repository.moveOut(
+                        sourceUri = item.getUri(),
+                        displayName = item.label,
+                        mimeType = item.mimeType
+                    )
+                }.getOrDefault(false)
             }
         }
 
@@ -64,6 +68,6 @@ class PrivateFolderMoveViewModel @Inject constructor(
      */
     suspend fun <T : Media> deleteFromPrivateFolder(media: List<T>): Int =
         withContext(Dispatchers.IO) {
-            media.count { item -> repository.deleteByUri(item.getUri()) }
+            media.count { item -> runCatching { repository.deleteByUri(item.getUri()) }.getOrDefault(false) }
         }
 }

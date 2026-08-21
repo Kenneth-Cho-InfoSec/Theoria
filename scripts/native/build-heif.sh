@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# SPDX-FileCopyrightText: 2023-2026 IacobIacob01
+# SPDX-FileCopyrightText: 2023-2026 IacobIacob01, kennethcho
 # SPDX-License-Identifier: Apache-2.0
 #
 # Cross-compiles libde265 (HEVC decoder) + libheif (decode-only, static) for Android using the
