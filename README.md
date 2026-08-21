@@ -77,8 +77,8 @@ Theoria contains code from multiple provenance categories:
 
 - Project-owned new code and independently authored additions are licensed under the [Mozilla
   Public License 2.0](LICENSE-MPL) where marked with `SPDX-License-Identifier: MPL-2.0`.
-- Code inherited from [IacobIonut01/ReFra](https://github.com/IacobIonut01/ReFra) remains under the
-  [Apache License 2.0](LICENSE) where marked with `SPDX-License-Identifier: Apache-2.0`.
+- Inherited upstream code remains under the [Apache License 2.0](LICENSE) where marked with
+  `SPDX-License-Identifier: Apache-2.0`.
 - Third-party libraries, vendored codec sources, generated files, model assets, and other bundled
   material retain their original licenses and notices.
 
@@ -98,4 +98,4 @@ Bug reports and feature requests can be opened in the project’s issue tracker:
 
 ## Developer
 
-**kennethcho** — <https://github.com/Kenneth-Cho-InfoSec>
+**kennethcho**: <https://github.com/Kenneth-Cho-InfoSec>
