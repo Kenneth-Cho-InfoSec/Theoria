@@ -93,7 +93,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("release_key.jks")
+            storeFile = file(System.getenv("SIGNING_STORE_FILE") ?: "release_key.jks")
             storePassword = System.getenv("SIGNING_STORE_PASSWORD")
             keyAlias = System.getenv("SIGNING_KEY_ALIAS")
             keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
@@ -134,7 +134,7 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             buildConfigField("Boolean", "ALLOW_ALL_FILES_ACCESS", "$allowAllFilesAccess")
             buildConfigField("Boolean", "OFFLINE_MODE", "$isOffline")
             buildConfigField("Boolean", "MAPS_ENABLED", "$includeMaps")
