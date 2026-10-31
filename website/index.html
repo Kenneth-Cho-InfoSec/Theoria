@@ -3,304 +3,412 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#f4f2f8" />
+    <meta name="theme-color" content="#e5e9e8" />
     <meta
       name="description"
-      content="Theoria is an open-source Android gallery for browsing, organizing, editing, and protecting photos and videos. Currently in beta."
+      content="Theoria is an open-source Android gallery for browsing, searching, inspecting, and editing the photos and videos already on your device."
     />
-    <meta property="og:title" content="Theoria — room to look" />
-    <meta
-      property="og:description"
-      content="A thoughtful Android gallery for the photos and videos already on your phone."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://kenneth-cho-infosec.github.io/Theoria/" />
     <link rel="icon" href="assets/theoria-icon.png" type="image/png" />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="assets/site.css" />
-    <title>Theoria — room to look</title>
+    <title>Theoria — an Android gallery for your photos</title>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="Theoria home">
-        <img src="assets/theoria-icon.png" width="42" height="42" alt="" />
-        <span>Theoria</span>
-      </a>
-      <nav class="main-nav" aria-label="Main navigation">
-        <a href="#features">Explore</a>
-        <a href="#privacy">Permissions</a>
-        <a href="#compare">Alternatives</a>
-        <a href="#build">Build</a>
-      </nav>
-      <a class="header-action" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/latest">
-        Get the beta <span aria-hidden="true">↗</span>
-      </a>
+    <header class="site-header" id="top">
+      <div class="header-inner">
+        <a class="brand" href="#top" aria-label="Theoria home">
+          <img src="assets/theoria-icon.png" width="40" height="40" alt="" />
+          <span>Theoria</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="#features">Explore</a>
+          <a href="#get-started">Install</a>
+          <a href="#access">Access</a>
+          <a href="#compare">Compare</a>
+          <a href="#docs">Build</a>
+        </nav>
+        <a class="button button-primary header-action" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/tag/v0.0.1-beta-1">
+          Download beta
+        </a>
+      </div>
     </header>
 
-    <main id="main">
-      <section class="hero section-wrap" id="top" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> Android gallery · open source · beta</p>
-          <h1 id="hero-title">Room to<br /><em>look closer.</em></h1>
-          <p class="hero-intro">
-            Theoria brings your photos and videos into one considered place to browse, organize,
-            edit, and protect. It is built for the media already on your phone.
-          </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/latest">
-              Try the latest beta <span aria-hidden="true">↗</span>
-            </a>
-            <a class="text-link" href="#features">See what it can do <span aria-hidden="true">↓</span></a>
-          </div>
-          <div class="hero-facts" aria-label="Release summary">
-            <div><strong>0.0.1-beta-1</strong><span>first public beta</span></div>
-            <div><strong>Android 10+</strong><span>minimum platform</span></div>
-            <div><strong>ARM64</strong><span>current APK</span></div>
-          </div>
-        </div>
-
-        <div class="hero-art" aria-hidden="true">
-          <div class="art-label art-label-top"><span>ILLUSTRATION / NOT A SCREENSHOT</span><span>FIELD 001</span></div>
-          <div class="gallery-board">
-            <div class="board-heading"><span>On this device</span><span class="board-mark">◈</span></div>
-            <div class="photo-grid">
-              <div class="photo-tile tile-one"></div>
-              <div class="photo-tile tile-two"></div>
-              <div class="photo-tile tile-three"></div>
-              <div class="photo-tile tile-four"></div>
-              <div class="photo-tile tile-five"></div>
-              <div class="photo-tile tile-six"></div>
-              <div class="photo-tile tile-seven"></div>
-              <div class="photo-tile tile-eight"></div>
-              <div class="photo-tile tile-nine"></div>
-            </div>
-            <div class="board-footer"><span>PHOTOS &amp; VIDEO</span><span>LOCAL LIBRARY</span></div>
-          </div>
-          <div class="prism-orbit">
-            <div class="prism-shadow"></div>
-            <img src="assets/theoria-icon.png" width="220" height="220" alt="" />
-          </div>
-          <div class="art-note"><span class="note-rule"></span><span>Keep the frame.<br />Choose what belongs in it.</span></div>
-          <div class="art-label art-label-bottom"><span>VIEW · SORT · KEEP</span><span>FIG. 01</span></div>
-        </div>
-      </section>
-
-      <section class="release-strip section-wrap" aria-label="Beta status">
-        <span class="release-status"><span class="status-dot"></span> In active development</span>
-        <p>
-          The public release is an <strong>offline, no-ML beta</strong>. Features and behavior may
-          change as the project develops.
-        </p>
-        <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/tag/v0.0.1-beta-1">
-          Release notes <span aria-hidden="true">↗</span>
-        </a>
-      </section>
-
-      <section class="features section-wrap" id="features" aria-labelledby="features-title">
-        <div class="section-heading">
-          <p class="eyebrow">01 / Your library, in reach</p>
-          <h2 id="features-title">A gallery for the whole story.</h2>
-          <p>
-            Start with the moments you have. Find them again, make them yours, and decide what to
-            keep close.
-          </p>
-        </div>
-
-        <div class="feature-grid">
-          <article class="feature-card feature-card-large">
-            <div class="feature-number">01</div>
-            <div class="mini-calendar" aria-hidden="true">
-              <span>RECENT</span><span>ALBUMS</span><span>FAVOURITES</span><span>TRASH</span>
-              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            </div>
-            <h3>Find your way back.</h3>
-            <p>Browse photos and videos, search your library, and gather images into albums or favourites.</p>
-          </article>
-          <article class="feature-card feature-card-lilac">
-            <div class="feature-number">02</div>
-            <div class="feature-symbol symbol-edit" aria-hidden="true">✳</div>
-            <h3>Make small changes.</h3>
-            <p>Edit, crop, rotate, set wallpaper, or cast a view to a nearby screen.</p>
-          </article>
-          <article class="feature-card feature-card-blue">
-            <div class="feature-number">03</div>
-            <div class="feature-symbol symbol-meta" aria-hidden="true"><span>EXIF</span><b>⌕</b></div>
-            <h3>Look at the details.</h3>
-            <p>Inspect image and video metadata, then use the available tools to remove selected metadata.</p>
-          </article>
-          <article class="feature-card feature-card-dark">
-            <div class="feature-number">04</div>
-            <div class="vault-mark" aria-hidden="true"><span></span></div>
-            <h3>Keep some things private.</h3>
-            <p>Private folders, vault storage, encrypted media, and backup-related tools are part of the project.</p>
-            <small>These are beta features; their security properties have not been independently audited.</small>
-          </article>
-          <article class="feature-card feature-card-wide">
-            <div class="feature-number">05</div>
-            <div class="format-line" aria-hidden="true"><span>PHOTO</span><i></i><span>VIDEO</span><i></i><span>360°</span><i></i><span>MOTION</span></div>
-            <h3>More than a camera roll.</h3>
-            <p>Panoramas, motion photos, and additional image formats are supported through Android and bundled codec integrations. Compatibility depends on the media and device.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="privacy-section" id="privacy" aria-labelledby="privacy-title">
-        <div class="section-wrap privacy-inner">
-          <div class="privacy-copy">
-            <p class="eyebrow eyebrow-light">02 / Be clear about access</p>
-            <h2 id="privacy-title">Local first.<br /><em>Configuration matters.</em></h2>
-            <p class="privacy-lead">
-              The default project configuration and first published beta are offline builds. Other
-              build configurations can add maps and network providers, so the app’s behavior depends
-              on the variant you install.
+    <div class="closing-stage">
+      <main id="main">
+      <section class="hero-stage" aria-labelledby="hero-title">
+        <article class="paper hero-sheet">
+          <div class="hero-copy">
+            <h1 id="hero-title" data-reveal="text">Your Android gallery.</h1>
+            <p class="hero-intro" data-reveal="text">
+              Browse the photos and videos on your phone, search by date or type, inspect details,
+              and make edits.
             </p>
-            <a class="button button-light" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/blob/main/app.properties">
-              Read the build switches <span aria-hidden="true">↗</span>
+            <a class="button button-primary hero-action" data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/tag/v0.0.1-beta-1">
+              Download the beta <span aria-hidden="true">↗</span>
+            </a>
+            <p class="release-facts" data-reveal="text">Version 0.0.1-beta-1 · Android 10+ · ARM64 · 52.3 MiB</p>
+          </div>
+
+          <figure class="hero-screen" data-ui data-reveal="picture">
+            <img
+              src="assets/screens/search-and-types.png"
+              width="1080"
+              height="2400"
+              alt="Theoria gallery screen with search suggestions for screenshots, videos, and selfies, followed by media-type and grouping views."
+              fetchpriority="high"
+            />
+            <figcaption>Search and group the library on the device.</figcaption>
+          </figure>
+          <p class="hero-note" data-reveal="text">The public beta is offline and includes no machine-learning models.</p>
+        </article>
+      </section>
+
+      <section class="paper section-sheet feature-sheet" id="features" aria-labelledby="features-title">
+        <div class="section-intro">
+          <h2 id="features-title" data-reveal="text">A gallery on your terms.</h2>
+          <p data-reveal="text">
+            Theoria is an open-source Android gallery for the media you already have. Browse by
+            date, search your library, organise albums and favourites, then open a file when you
+            need more than its thumbnail.
+          </p>
+        </div>
+
+        <div class="screen-board" aria-label="Theoria interface screenshots">
+          <figure class="screen-main" data-ui data-reveal="picture">
+            <img
+              id="screen-focus"
+              src="assets/screens/search-and-types.png"
+              width="1080"
+              height="2400"
+              alt="Search view with media-type suggestions and grouped photos."
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption id="screen-caption" aria-live="polite">Search by media type and grouping.</figcaption>
+          </figure>
+          <div class="screen-index" role="group" aria-label="Choose a Theoria screen">
+            <a
+              class="screen-choice is-current"
+              href="assets/screens/search-and-types.png"
+              data-ui
+              data-screen-choice
+              data-alt="Search view with media-type suggestions and grouped photos."
+              data-caption="Search by media type and grouping."
+              aria-current="true"
+              aria-controls="screen-focus"
+            >
+              <img src="assets/screens/search-and-types.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <span>Search</span>
+            </a>
+            <a
+              class="screen-choice"
+              href="assets/screens/media-viewer.png"
+              data-ui
+              data-screen-choice
+              data-alt="Photo viewer with sharing, copying, favouriting, editing, and delete actions."
+              data-caption="Open a photo to share, edit, or organise it."
+              aria-controls="screen-focus"
+            >
+              <img src="assets/screens/media-viewer.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <span>Photo viewer</span>
+            </a>
+            <a
+              class="screen-choice"
+              href="assets/screens/media-details.png"
+              data-ui
+              data-screen-choice
+              data-alt="Media detail sheet showing date, filename, path, dimensions, metadata, and file actions."
+              data-caption="Inspect dates, file paths, dimensions, and metadata."
+              aria-controls="screen-focus"
+            >
+              <img src="assets/screens/media-details.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <span>File details</span>
+            </a>
+            <a
+              class="screen-choice"
+              href="assets/screens/album-actions.png"
+              data-ui
+              data-screen-choice
+              data-alt="Album action sheet with options to pin, lock, change a cover, ignore, group, or merge folders."
+              data-caption="Choose album actions and keep related folders together."
+              aria-controls="screen-focus"
+            >
+              <img src="assets/screens/album-actions.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <span>Album actions</span>
             </a>
           </div>
-          <div class="permission-card">
-            <div class="permission-card-head"><span>ACCESS, EXPLAINED</span><span>02—04</span></div>
-            <div class="permission-row">
-              <span class="permission-index">A</span>
-              <div><strong>Photos &amp; videos</strong><p>Android media access is needed to show and manage your library.</p></div>
-              <span class="permission-mark" aria-hidden="true">↗</span>
-            </div>
-            <div class="permission-row">
-              <span class="permission-index">B</span>
-              <div><strong>All Files Access</strong><p>The default source setting enables the broad <code>MANAGE_EXTERNAL_STORAGE</code> permission. The Play flavor disables it.</p></div>
-              <span class="permission-mark" aria-hidden="true">!</span>
-            </div>
-            <div class="permission-row">
-              <span class="permission-index">C</span>
-              <div><strong>Network access</strong><p>The offline build strips selected network permissions. Network providers are optional build features when offline mode is disabled.</p></div>
-              <span class="permission-mark" aria-hidden="true">↗</span>
-            </div>
-            <p class="permission-caveat"><strong>Network-build caveat.</strong> Non-Play release and staging builds currently trust all TLS certificates and hostnames. The published offline beta does not include network provider paths; inspect a custom online build before connecting accounts or credentials.</p>
-            <p class="permission-footnote">Check the release and its permissions before installing. Settings describe the repository defaults; a different build may behave differently.</p>
+        </div>
+
+        <div class="feature-list" aria-label="Gallery tools">
+          <article data-reveal="text">
+            <h3>Find it again</h3>
+            <p>Search, browse by date, and gather photos into albums or favourites.</p>
+          </article>
+          <article data-reveal="text">
+            <h3>Make a small change</h3>
+            <p>Crop, rotate, edit, set wallpaper, or cast a view to a nearby screen.</p>
+          </article>
+          <article data-reveal="text">
+            <h3>Read the file</h3>
+            <p>Inspect image and video metadata, with tools to remove selected metadata.</p>
+          </article>
+          <article data-reveal="text">
+            <h3>Keep some things private</h3>
+            <p>Private folders, vault storage, encrypted media, and backup-related tools are part of the project. They are beta features, not an independent security audit.</p>
+          </article>
+        </div>
+          <p class="feature-note" data-reveal="text">
+          Support for panoramas, motion photos, and additional formats depends on Android,
+          bundled codecs, the media file, and the device.
+        </p>
+      </section>
+
+      <section class="access-stage" id="access" aria-labelledby="access-title">
+        <div class="access-sheet">
+          <div class="access-copy">
+            <h2 id="access-title" data-reveal="text">Each build sets access.</h2>
+            <p data-reveal="text">
+              The first published beta is an offline build. Other build variants can include maps
+              and network providers, so check the exact release and its requested permissions.
+            </p>
+            <a class="text-link text-link-light" data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/blob/main/app.properties">
+              Read the build settings <span aria-hidden="true">↗</span>
+            </a>
           </div>
+
+          <dl class="access-list">
+            <div data-reveal="text">
+              <dt>Photos and videos</dt>
+              <dd>Android media access lets the gallery find and manage items on the device.</dd>
+            </div>
+            <div data-reveal="text">
+              <dt>All Files Access</dt>
+              <dd>The default source setting enables the broad <code>MANAGE_EXTERNAL_STORAGE</code> permission. The Play flavour disables it.</dd>
+            </div>
+            <div data-reveal="text">
+              <dt>Network access</dt>
+              <dd>The offline build removes selected network permissions. Network providers are optional build features when offline mode is disabled.</dd>
+            </div>
+          </dl>
+
+          <aside class="security-note">
+            <h3 data-reveal="text">Read this before using an online build</h3>
+            <p data-reveal="text">
+              Non-Play release and staging builds currently accept any TLS certificate and hostname.
+              The published offline beta does not include those network-provider paths. Review a
+              custom online build before connecting accounts or credentials.
+            </p>
+          </aside>
         </div>
       </section>
 
-      <section class="start-section section-wrap" id="get-started" aria-labelledby="start-title">
-        <div class="section-heading section-heading-split">
-          <div><p class="eyebrow">03 / First look</p><h2 id="start-title">Try the beta on Android.</h2></div>
-          <p>The current public APK is an ARM64, offline, no-ML build for Android 10 and newer. It is a development beta, not a stable release.</p>
+      <section class="paper section-sheet install-sheet" id="get-started" aria-labelledby="install-title">
+        <div class="section-intro">
+          <h2 id="install-title" data-reveal="text">Try the Android beta.</h2>
+          <p data-reveal="text">
+            The current public package is an ARM64, offline, no-ML build for Android 10 and newer.
+            It is a development beta, not a stable release.
+          </p>
         </div>
-        <div class="start-grid">
-          <div class="download-card">
-            <div class="download-top"><span>THEORIA / 0.0.1-BETA-1</span><span class="download-dot"></span></div>
-            <div class="download-main"><span class="download-icon">↓</span><div><strong>Offline · No ML · ARM64</strong><span>Android 10+ · 52 MiB</span></div></div>
-            <a class="button button-primary" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/download/v0.0.1-beta-1/Theoria-0.0.1-beta-1-offline-arm64-v8a-NoML-release.apk">Download APK <span aria-hidden="true">↗</span></a>
-            <a class="download-notes" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/tag/v0.0.1-beta-1">Read beta release notes <span aria-hidden="true">↗</span></a>
+        <div class="install-content">
+          <div class="release-slip">
+            <h3 data-reveal="text">Theoria 0.0.1-beta-1</h3>
+            <p data-reveal="text">52.3 MiB · ARM64 · Android 10 or later</p>
+            <p data-reveal="text">Offline build · no ML models</p>
+            <a class="button button-primary" data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/download/v0.0.1-beta-1/Theoria-0.0.1-beta-1-offline-arm64-v8a-NoML-release.apk">
+              Download the APK <span aria-hidden="true">↗</span>
+            </a>
+            <a class="text-link" data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases/tag/v0.0.1-beta-1">
+              Check the release notes
+            </a>
           </div>
+
           <ol class="install-steps">
-            <li><span>01</span><div><h3>Download the release APK.</h3><p>Use the project’s GitHub release page to check version details and the published file.</p></div></li>
-            <li><span>02</span><div><h3>Allow this installer, if Android asks.</h3><p>Android may ask you to allow installs from the browser or file manager you used to open the APK.</p></div></li>
-            <li><span>03</span><div><h3>Review the access request.</h3><p>Grant media access to browse your library. All Files Access is a separate, broad setting; read the prompt before enabling it.</p></div></li>
+            <li data-reveal="text">
+              <h3>Check your device.</h3>
+              <p>Use an ARM64 Android phone or tablet running Android 10 or later. This is a development beta; keep a separate backup of important media.</p>
+            </li>
+            <li data-reveal="text">
+              <h3>Install the APK.</h3>
+              <p>Download the release shown here and open it from Downloads. If Android asks, allow the browser or file manager you used to install apps, then return to the APK and continue.</p>
+            </li>
+            <li data-reveal="text">
+              <h3>Finish first-run setup.</h3>
+              <p>Grant photo and video access so Theoria can show your library. Review optional requests individually. All Files Access is broad and separate; enable it only if you need features that ask for it.</p>
+            </li>
+            <li data-reveal="text">
+              <h3>Confirm your library appears.</h3>
+              <p>After setup, your device media should appear in the gallery. Try Search suggestions such as Screenshots or Videos, or browse by date.</p>
+            </li>
+            <li data-reveal="text">
+              <h3>Fix a missing library, then explore.</h3>
+              <p>If the gallery is empty, check Theoria’s photo and video permission in Android Settings and confirm the files appear in another gallery app. For install problems, confirm Android 10+ and ARM64. Then read the build notes or report your device, Android version, and symptom in <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/issues">Issues</a>.</p>
+            </li>
           </ol>
         </div>
       </section>
 
-      <section class="compare-section" id="compare" aria-labelledby="compare-title">
-        <div class="section-wrap">
-          <div class="section-heading section-heading-split">
-            <div><p class="eyebrow">04 / Choose the right shape</p><h2 id="compare-title">A few good ways to keep a library.</h2></div>
-            <p>These projects focus on different jobs. This is a quick orientation, not a ranking. Sources checked 31 October 2026.</p>
+      <section class="comparison-stage" id="compare" aria-labelledby="compare-title">
+        <div class="comparison-sheet">
+          <div class="section-intro">
+            <h2 id="compare-title" data-reveal="text">Choose a library by job.</h2>
+            <p id="compare-description" data-reveal="text">
+              Choose by storage model and the work you want done. This comparison is based on each
+              project’s own source and documentation, checked 31 October 2026.
+            </p>
           </div>
-          <div class="alternatives-grid">
-            <article class="alternative-card alternative-current">
-              <div class="alternative-tag">THIS PROJECT</div>
-              <h3>Theoria</h3>
-              <p class="alternative-type">Android gallery · beta</p>
-              <p>On-device browsing and media tools, with offline and optional network-capable build variants.</p>
-              <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria">Project repository <span aria-hidden="true">↗</span></a>
-            </article>
-            <article class="alternative-card">
-              <div class="alternative-tag">GALLERY + DISCOVERY</div>
-              <h3>Aves</h3>
-              <p class="alternative-type">Android gallery · metadata explorer</p>
-              <p>Media discovery across albums, tags, maps, and a wide range of image and video formats.</p>
-              <a href="https://github.com/deckerst/aves">Official project <span aria-hidden="true">↗</span></a>
-            </article>
-            <article class="alternative-card">
-              <div class="alternative-tag">LOCAL GALLERY</div>
-              <h3>Fossify Gallery</h3>
-              <p class="alternative-type">Android photo &amp; video gallery</p>
-              <p>A local gallery with editing, hiding, recycle bin, and interface customization features.</p>
-              <a href="https://github.com/FossifyOrg/Gallery">Official project <span aria-hidden="true">↗</span></a>
-            </article>
-            <article class="alternative-card">
-              <div class="alternative-tag">YOUR OWN SERVER</div>
-              <h3>Immich</h3>
-              <p class="alternative-type">Self-hosted library · mobile backup</p>
-              <p>A server-based photo and video library with mobile backup, shared albums, and web access.</p>
-              <a href="https://immich.app/">Official project <span aria-hidden="true">↗</span></a>
-            </article>
+
+          <div class="project-comparison">
+            <table aria-describedby="compare-description">
+              <thead>
+                <tr>
+                  <th scope="col">Project</th>
+                  <th scope="col">Purpose and strengths</th>
+                  <th scope="col">Setup and upkeep</th>
+                  <th scope="col">Access and extension</th>
+                  <th scope="col">License</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-reveal="text">
+                  <th scope="row"><a href="https://github.com/Kenneth-Cho-InfoSec/Theoria">Theoria</a></th>
+                  <td data-label="Purpose and strengths">An early Android gallery for local browsing, search, editing, metadata, and privacy tools. The published beta is offline, has no ML models, and does not sync to a server.</td>
+                  <td data-label="Setup and upkeep">Install the ARM64 APK on Android 10 or newer and grant media access. No server is needed. Building from source needs JDK 17 plus the declared Android SDK and NDK.</td>
+                  <td data-label="Access and extension">Source build flags enable optional maps and network providers. No plugin API is documented; online variants need their permissions and TLS behavior reviewed.</td>
+                  <td data-label="License">Mixed provenance: some new code is MPL-2.0, inherited code remains Apache-2.0, and third-party components keep their own terms. <span><a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/blob/main/LICENSE-EXCLUSIONS.md">License boundaries</a>.</span></td>
+                </tr>
+                <tr data-reveal="text">
+                  <th scope="row"><a href="https://github.com/deckerst/aves">Aves</a></th>
+                  <td data-label="Purpose and strengths">A local Android gallery and metadata explorer with broad format support, maps, tags, and Android TV features. Its <a href="https://github.com/deckerst/aves/wiki/FAQ#is-aves-a-file-manager">FAQ</a> says it reads media publicly available through Android, rather than acting as a file manager.</td>
+                  <td data-label="Setup and upkeep">Install the Android app; no separate server is required. Map and reverse-geocoding behavior can use network services. The <a href="https://github.com/deckerst/aves#contributing">project README</a> currently says code pull requests are not accepted.</td>
+                  <td data-label="Access and extension">Flutter source is available and translations use Weblate. The reviewed project pages document no user plugin API.</td>
+                  <td data-label="License"><span><a href="https://github.com/deckerst/aves/blob/develop/LICENSE">BSD-3-Clause</a>.</span></td>
+                </tr>
+                <tr data-reveal="text">
+                  <th scope="row"><a href="https://github.com/FossifyOrg/Gallery">Fossify Gallery</a></th>
+                  <td data-label="Purpose and strengths">A local Android gallery with editing, metadata removal, app or item locking, a recycle bin, and broad image and video format support.</td>
+                  <td data-label="Setup and upkeep">Install the Android app; no server is required for its gallery use. Check the project’s <a href="https://github.com/FossifyOrg/Gallery/releases">release history</a> for current packages and changes.</td>
+                  <td data-label="Access and extension">Kotlin source is available for changes. The reviewed repository does not describe a separate plugin system.</td>
+                  <td data-label="License"><span><a href="https://github.com/FossifyOrg/Gallery/blob/main/LICENSE">GPL-3.0</a>.</span></td>
+                </tr>
+                <tr data-reveal="text">
+                  <th scope="row"><a href="https://github.com/immich-app/immich">Immich</a></th>
+                  <td data-label="Purpose and strengths">A self-hosted photo and video service with mobile backup, web access, shared albums, and server-side search and organization.</td>
+                  <td data-label="Setup and upkeep">Run a server with <a href="https://docs.immich.app/overview/quick-start/">Docker Compose</a> or Kubernetes, then connect mobile clients. The <a href="https://docs.immich.app/install/requirements/">quick-start requirements</a> call for at least 6 GB RAM and 2 CPU cores; <a href="https://docs.immich.app/install/upgrading/">server updates</a> need ongoing attention.</td>
+                  <td data-label="Access and extension">A documented <a href="https://api.immich.app/">server API</a> supports integrations. The owner maintains storage, backups, and updates; clients should stay compatible with the server version.</td>
+                  <td data-label="License"><span><a href="https://github.com/immich-app/immich/blob/main/LICENSE">AGPL-3.0</a>.</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <p class="comparison-note">Compare current release notes and requirements before choosing. Each project changes over time.</p>
+          <p class="comparison-note" data-reveal="text">Compare each project’s current release notes, storage model, and device requirements before choosing.</p>
         </div>
       </section>
 
-      <section class="build-section section-wrap" id="build" aria-labelledby="build-title">
-        <div class="build-intro">
-          <p class="eyebrow">05 / For people who build</p>
-          <h2 id="build-title">A gallery you can inspect.</h2>
-          <p>Theoria is a Kotlin and Jetpack Compose Android project. Builds use JDK 17 plus the Android SDK and NDK versions defined by the repository.</p>
-          <div class="build-links">
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria">Browse source <span aria-hidden="true">↗</span></a>
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/issues">Issues &amp; requests <span aria-hidden="true">↗</span></a>
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria#readme">Build notes <span aria-hidden="true">↗</span></a>
-          </div>
+      <section class="paper section-sheet docs-sheet" id="docs" aria-labelledby="docs-title">
+        <div class="docs-copy">
+          <h2 id="docs-title" data-reveal="text">Read the source and build notes.</h2>
+          <p data-reveal="text">
+            The Android app is written in Kotlin with Jetpack Compose. Within <code>:app</code>,
+            shared foundations live in <code>core</code>, gallery features in
+            <code>feature_node</code>, and provider code in <code>cloud</code>. Bundled models
+            are assembled from <code>:ml-models</code>; included libraries provide gesture, crop,
+            panorama, and scrollbar components.
+          </p>
         </div>
-        <div class="terminal-card">
-          <div class="terminal-top"><span><i></i><i></i><i></i></span><span>LOCAL / ANDROID</span></div>
-          <p class="terminal-label">Compile · test · package</p>
-          <pre><code><span class="code-comment"># Compile Kotlin</span>
-./gradlew :app:compileUniversalNoMLDebugKotlin
-
-<span class="code-comment"># Run JVM unit tests</span>
+        <div class="docs-technical">
+          <article data-reveal="text">
+            <h3>Build a local copy</h3>
+            <p>Use JDK 17 and the Android SDK and NDK versions declared by the repository. These Gradle tasks compile, test, and assemble the no-ML universal variant:</p>
+            <pre><code>./gradlew :app:compileUniversalNoMLDebugKotlin
 ./gradlew :app:testUniversalNoMLDebugUnitTest
-
-<span class="code-comment"># Build offline, no-ML APK</span>
 ./gradlew :app:assembleUniversalNoMLRelease</code></pre>
-          <div class="terminal-foot"><span>CONFIG / app.properties</span><span>JDK 17</span></div>
+            <p>The APK is written under <code>app/build/outputs/apk/universalNoML/release/</code>. Verify its signing certificate before distributing a local build.</p>
+          </article>
+          <article data-reveal="text">
+            <h3>Choose build features</h3>
+            <p><code>app.properties</code> controls offline mode, All Files Access, maps, and optional Immich, ownCloud, Nextcloud, WebDAV, SMB, and NFS providers. The current source configuration sets <code>OFFLINE=true</code> and <code>ALL_FILES_ACCESS=true</code>; provider flags do not add network access while offline mode is enabled.</p>
+            <p>The <code>NoML</code> flavor omits bundled model assets. Turning on network providers changes the app’s access needs; review the build and TLS behavior before connecting accounts or credentials.</p>
+          </article>
         </div>
-        <div class="license-note">
-          <span class="license-icon" aria-hidden="true">§</span>
-          <p><strong>Mixed provenance, clearly marked.</strong> Independently authored files may use MPL-2.0; inherited code remains Apache-2.0, and bundled libraries, generated files, and assets keep their own terms. <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/blob/main/LICENSE-EXCLUSIONS.md">Read the license boundaries</a>.</p>
+        <div class="docs-links" aria-label="Project documentation and source">
+          <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria">Browse the source</a>
+          <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria#readme">Read full build notes</a>
+          <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/blob/main/LICENSE-EXCLUSIONS.md">Check license boundaries</a>
         </div>
       </section>
 
-      <section class="community-section" aria-labelledby="community-title">
-        <div class="section-wrap community-inner">
-          <div><p class="eyebrow eyebrow-light">06 / Keep the conversation open</p><h2 id="community-title">Find the project.<br /><em>Help it get better.</em></h2></div>
-          <div class="community-links">
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria"><span>01</span> Source repository <b aria-hidden="true">↗</b></a>
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases"><span>02</span> Releases <b aria-hidden="true">↗</b></a>
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/issues"><span>03</span> Issues &amp; requests <b aria-hidden="true">↗</b></a>
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria/issues"><span>04</span> Contribute <b aria-hidden="true">↗</b></a>
+      <section class="community-stage" id="community" aria-labelledby="community-title">
+        <div class="community-sheet">
+          <div class="community-copy">
+            <h2 id="community-title" data-reveal="text">Find a way in.</h2>
+            <p data-reveal="text">
+              Browse current work, report a problem, or suggest a change in the project repository.
+              Before filing an issue, check whether it already exists and include your device and
+              build variant when they matter.
+            </p>
+          </div>
+          <div class="community-links" aria-label="Community links">
+            <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria">Project repository</a>
+            <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/releases">Releases</a>
+            <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/issues">Issues and requests</a>
+            <a data-reveal="text" href="https://github.com/Kenneth-Cho-InfoSec/Theoria/issues/new/choose">Contribute</a>
           </div>
         </div>
       </section>
 
-      <section class="faq-section section-wrap" aria-labelledby="faq-title">
-        <div class="section-heading"><p class="eyebrow">A few useful details</p><h2 id="faq-title">Before you install.</h2></div>
+      <section class="paper section-sheet faq-sheet" id="faq" aria-labelledby="faq-title">
+        <div class="faq-intro">
+          <h2 id="faq-title" data-reveal="text">Before you install.</h2>
+          <p data-reveal="text">Check the published file, permissions, and project status that apply to your device.</p>
+        </div>
         <div class="faq-list">
-          <details><summary>Is Theoria stable?</summary><p>No. The current version is the first public beta, `0.0.1-beta-1`. Treat it as development software and keep a separate backup of important media.</p></details>
-          <details><summary>Does Theoria always work offline?</summary><p>The published beta is an offline build, and the repository's default configuration sets `OFFLINE=true`. Other build configurations can enable network providers or maps, so check which variant you are installing.</p></details>
-          <details><summary>Does the vault guarantee that files are secure?</summary><p>The project includes private-folder, vault, encrypted-media, and backup-related functionality. These are beta features; their security properties have not been independently audited.</p></details>
-          <details><summary>Can I use the latest beta on a 32-bit phone?</summary><p>The currently published APK is built for ARM64. The source has other ABI flavors, but a 32-bit release package is not listed on the current release page.</p></details>
+          <details data-reveal="text">
+            <summary>Is Theoria stable?</summary>
+            <p>No. Version 0.0.1-beta-1 is the first public development beta. Keep a separate backup of important media and expect features to change.</p>
+          </details>
+          <details data-reveal="text">
+            <summary>Does the published beta connect to a server?</summary>
+            <p>The current APK is an offline build. Other source configurations can include network providers or maps, so check the exact artifact and its permissions.</p>
+          </details>
+          <details data-reveal="text">
+            <summary>Are the vault and encrypted-media features audited?</summary>
+            <p>No independent security audit is documented. Treat these as beta features and do not rely on them as the only copy of important files.</p>
+          </details>
+          <details data-reveal="text">
+            <summary>Which devices can install the current APK?</summary>
+            <p>The listed package targets ARM64 devices running Android 10 or newer. The repository has other ABI build options, but the current release page does not list a 32-bit package.</p>
+          </details>
         </div>
       </section>
-    </main>
-
-    <footer class="site-footer section-wrap">
-      <a class="brand footer-brand" href="#top"><img src="assets/theoria-icon.png" width="34" height="34" alt="" /><span>Theoria</span></a>
-      <p>Open-source Android gallery · currently in beta</p>
-      <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria">Kenneth-Cho-InfoSec / Theoria <span aria-hidden="true">↗</span></a>
-      <small>Project details and release checked 31 October 2026. Product capabilities may change between builds.</small>
+      </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-name" data-reveal="text">
+          <img src="assets/theoria-icon.png" width="48" height="48" alt="" />
+          <p>Theoria</p>
+        </div>
+        <p class="footer-copy" data-reveal="text">An open-source Android gallery for the photos and videos already on your device.</p>
+        <nav class="footer-links" data-reveal="text" aria-label="Footer navigation">
+          <a href="#features">Explore</a>
+          <a href="#access">Access</a>
+          <a href="#compare">Compare</a>
+          <a href="#docs">Build and license</a>
+          <a href="https://github.com/Kenneth-Cho-InfoSec/Theoria">GitHub</a>
+        </nav>
+        <p class="image-credit" data-reveal="text">Interface screenshots are from the project’s Android release listing in this repository.</p>
+        <a class="back-to-top" data-reveal="text" href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
     </footer>
+      </div>
+
+    <script src="assets/site.js" defer></script>
   </body>
 </html>
