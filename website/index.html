@@ -40,12 +40,6 @@
       content="Theoria gallery showing search suggestions and grouped photos."
     />
     <link rel="icon" href="assets/theoria-icon.png" type="image/png" />
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
-    <link
-      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="assets/site.css" />
     <title>Theoria — an Android gallery for your photos</title>
     <script type="application/ld+json">
@@ -104,9 +98,9 @@
 
           <figure class="hero-screen" data-ui data-reveal="picture">
             <img
-              src="assets/screens/search-and-types.png"
-              width="1080"
-              height="2400"
+              src="assets/screens/search-and-types.webp"
+              width="720"
+              height="1600"
               alt="Theoria gallery screen with search suggestions for screenshots, videos, and selfies, followed by media-type and grouping views."
               fetchpriority="high"
             />
@@ -130,9 +124,9 @@
           <figure class="screen-main" data-ui data-reveal="picture">
             <img
               id="screen-focus"
-              src="assets/screens/search-and-types.png"
-              width="1080"
-              height="2400"
+              src="assets/screens/search-and-types.webp"
+              width="720"
+              height="1600"
               alt="Search view with media-type suggestions and grouped photos."
               loading="lazy"
               decoding="async"
@@ -143,6 +137,7 @@
             <a
               class="screen-choice is-current"
               href="assets/screens/search-and-types.png"
+              data-image-src="assets/screens/search-and-types.webp"
               data-ui
               data-screen-choice
               data-alt="Search view with media-type suggestions and grouped photos."
@@ -150,43 +145,46 @@
               aria-current="true"
               aria-controls="screen-focus"
             >
-              <img src="assets/screens/search-and-types.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <img src="assets/screens/search-and-types.webp" width="720" height="1600" alt="" loading="lazy" decoding="async" />
               <span>Search</span>
             </a>
             <a
               class="screen-choice"
               href="assets/screens/media-viewer.png"
+              data-image-src="assets/screens/media-viewer.webp"
               data-ui
               data-screen-choice
               data-alt="Photo viewer with sharing, copying, favouriting, editing, and delete actions."
               data-caption="Open a photo to share, edit, or organise it."
               aria-controls="screen-focus"
             >
-              <img src="assets/screens/media-viewer.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <img src="assets/screens/media-viewer.webp" width="720" height="1600" alt="" loading="lazy" decoding="async" />
               <span>Photo viewer</span>
             </a>
             <a
               class="screen-choice"
               href="assets/screens/media-details.png"
+              data-image-src="assets/screens/media-details.webp"
               data-ui
               data-screen-choice
               data-alt="Media detail sheet showing date, filename, path, dimensions, metadata, and file actions."
               data-caption="Inspect dates, file paths, dimensions, and metadata."
               aria-controls="screen-focus"
             >
-              <img src="assets/screens/media-details.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <img src="assets/screens/media-details.webp" width="720" height="1600" alt="" loading="lazy" decoding="async" />
               <span>File details</span>
             </a>
             <a
               class="screen-choice"
               href="assets/screens/album-actions.png"
+              data-image-src="assets/screens/album-actions.webp"
               data-ui
               data-screen-choice
               data-alt="Album action sheet with options to pin, lock, change a cover, ignore, group, or merge folders."
               data-caption="Choose album actions and keep related folders together."
               aria-controls="screen-focus"
             >
-              <img src="assets/screens/album-actions.png" width="1080" height="2400" alt="" loading="lazy" decoding="async" />
+              <img src="assets/screens/album-actions.webp" width="720" height="1600" alt="" loading="lazy" decoding="async" />
               <span>Album actions</span>
             </a>
           </div>
