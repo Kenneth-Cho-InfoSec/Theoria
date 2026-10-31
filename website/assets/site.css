@@ -15,7 +15,7 @@
   --text-lead: 1.25rem;
   --text-heading: clamp(2.25rem, 5vw, 4.5rem);
   --text-display: clamp(3rem, 6.5vw, 5.75rem);
-  --face: "General Sans", "Avenir Next", system-ui, sans-serif;
+  --face: "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);

@@ -8,7 +8,7 @@ if (focusImage && focusCaption && screenChoices.length) {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
 
-      focusImage.src = choice.href;
+      focusImage.src = choice.dataset.imageSrc || choice.href;
       focusImage.alt = choice.dataset.alt || "Theoria Android interface screenshot.";
       focusCaption.textContent = choice.dataset.caption || "Theoria interface screen.";
 
